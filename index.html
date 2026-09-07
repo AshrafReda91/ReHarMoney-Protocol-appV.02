@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f2e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="البروتوكول الشهري">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>البروتوكول الشهري لإعادة التناغم مع المال</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f2e8; --bg-2:#efe8da;
+  --surface:#fffefb; --surface-2:#faf5ec;
+  --ink:#2c2720; --ink-soft:#6f6658; --ink-faint:#9d9484;
+  --gold:#b08429; --gold-deep:#8a6417; --gold-soft:#f0e2c2;
+  --line:#e5dbc8; --line-strong:#d0c2a6;
+  --ok:#3f7d55; --warn:#a4642a; --on-gold:#fffdf8;
+  --shadow:0 1px 2px rgba(70,52,20,.05), 0 10px 26px -14px rgba(70,52,20,.2);
+  --r:14px; --spring:cubic-bezier(.34,1.4,.64,1);
+}
+*{box-sizing:border-box}
+button{font-family:inherit;margin:0;-webkit-appearance:none;appearance:none}
+html,body{margin:0;padding:0;background:var(--bg)}
+body{color:var(--ink);font-family:"Noto Sans Arabic",system-ui,sans-serif;font-size:15.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Noto Sans Arabic",system-ui,sans-serif;font-weight:700;line-height:1.35}
+.shell{display:grid;grid-template-columns:1fr 300px;min-height:100vh}
+.main{padding:20px 20px 120px;max-width:880px;width:100%;margin-inline-start:auto;padding-top:max(20px,env(safe-area-inset-top))}
+.rail{border-inline-end:1px solid var(--line);background:linear-gradient(180deg,var(--surface-2),var(--bg));padding:20px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;order:-1}
+@media(max-width:940px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:fixed;inset-inline-start:0;top:0;height:100dvh;width:min(86vw,320px);z-index:60;transform:translateX(104%);transition:transform .38s var(--spring)}
+  .rail.open{transform:translateX(0)}
+  .main{padding:12px 13px 130px}
+}
+.scrim{display:none}
+@media(max-width:940px){.scrim.on{display:block;position:fixed;inset:0;background:rgba(50,38,12,.4);z-index:55}}
+.topbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:nowrap}
+.titlewrap{display:flex;flex-direction:column;line-height:1.3;min-width:0;flex:1;align-items:center;text-align:center}
+.apptitle{font-family:"Noto Sans Arabic",sans-serif;font-size:clamp(16px,4.4vw,19px);color:var(--gold-deep);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.appsub{font-size:10px;color:var(--ink-faint);letter-spacing:1.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.iconbtn.icononly{font-size:17px;line-height:1;padding:8px 13px;font-weight:700;flex:0 0 auto}
+.funnel-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px}
+.funnel-btn svg{pointer-events:none}
+.reorder-toggle-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px}
+.reorder-toggle-btn svg{pointer-events:none}
+.reorder-toggle-btn.on{border-color:var(--gold);background:var(--gold-soft);color:var(--gold-deep)}
+.railnav{width:100%;text-align:start;border:1px solid var(--line);background:var(--surface);color:var(--gold-deep);
+  border-radius:10px;padding:10px 12px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;transition:all .25s var(--spring)}
+.railnav:last-of-type{margin-bottom:16px}
+.railnav:hover{border-color:var(--gold);background:var(--gold-soft);transform:translateY(-1px)}
+.brand{margin-inline-end:auto;display:flex;flex-direction:column;line-height:1.2}
+.brand b{font-family:"Noto Sans Arabic",sans-serif;font-size:17px;color:var(--gold-deep)}
+.brand span{font-size:10.5px;color:var(--ink-faint);letter-spacing:2.4px}
+.iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);border-radius:10px;padding:7px 11px;font:inherit;font-size:13px;cursor:pointer;transition:all .25s var(--spring)}
+.iconbtn:hover{border-color:var(--gold);color:var(--gold-deep);transform:translateY(-1px)}
+.iconbtn.gold{border-color:var(--gold);color:var(--gold-deep);background:var(--gold-soft)}
+.install-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px}
+.install-btn svg{pointer-events:none}
+.menu-toggle{display:none}
+@media(max-width:940px){.menu-toggle{display:inline-block}}
+.tabs{display:flex;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px}
+.tabs button{flex:1;border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:600;color:var(--ink-soft);padding:9px 10px;border-radius:9px;cursor:pointer;transition:all .3s var(--spring)}
+.tabs button.on{background:var(--surface);color:var(--gold-deep);box-shadow:var(--shadow)}
+.prog{height:3px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:22px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-deep));width:0;transition:width .5s var(--spring)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:26px 24px}
+.card.anim{animation:rise .4s var(--spring) both}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:600px){.card{padding:19px 15px}}
+.eyebrow{font-size:11px;letter-spacing:2.4px;color:var(--gold);margin:0 0 8px;font-weight:600}
+.card h2{margin:0 0 6px;font-size:clamp(20px,4.3vw,27px)}
+.lede{color:var(--ink-soft);margin:0 0 20px;font-size:14.5px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line-strong),transparent);margin:20px 0}
+.pendulum{background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:12px;padding:11px 14px;margin:16px 0;font-size:13.8px;color:var(--ink-soft)}
+.pendulum b{color:var(--gold-deep);font-weight:600;display:block;font-size:11px;letter-spacing:1.4px;margin-bottom:3px}
+label.fl{display:block;font-size:13.5px;font-weight:600;margin:0 0 7px}
+.hint{font-size:12.5px;color:var(--ink-faint);margin:-3px 0 8px}
+textarea,input[type=text],input[type=number],select{width:100%;background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:11px;padding:11px 13px;font:inherit;font-size:14.5px;transition:border-color .2s,box-shadow .2s}
+textarea{min-height:90px;resize:vertical;line-height:1.8}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.field{margin-bottom:16px}
+.grid2{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+@media(max-width:620px){.grid2{grid-template-columns:1fr}}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;gap:11px;align-items:flex-start;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .25s var(--spring)}
+.opt:hover{border-color:var(--line-strong)}
+.opt.sel{border-color:var(--gold);background:linear-gradient(180deg,var(--surface),var(--surface-2))}
+.opt .box{flex:0 0 19px;height:19px;margin-top:3px;border:1.5px solid var(--line-strong);border-radius:6px;display:grid;place-items:center;font-size:11px;color:var(--on-gold);transition:all .25s var(--spring)}
+.opt.radio .box{border-radius:50%}
+.opt.sel .box{background:var(--gold);border-color:var(--gold)}
+.opt .box::after{content:"✓";opacity:0;transform:scale(.4);transition:all .25s var(--spring)}
+.opt.sel .box::after{opacity:1;transform:scale(1)}
+.opt.invest.sel .box{background:var(--ok);border-color:var(--ok)}
+.opt.divest .box{border-color:#e2a0bb}
+.opt.divest.sel .box{background:#e2699a;border-color:#e2699a}
+.opt.divest .box::after{content:"－"}
+.opt .t{font-size:14.5px;font-weight:600}
+.opt .d{font-size:12.8px;color:var(--ink-soft);margin-top:2px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface-2);border-radius:99px;padding:7px 14px;font:inherit;font-size:13.5px;cursor:pointer;transition:all .25s var(--spring);color:var(--ink-soft)}
+.chip:hover{transform:translateY(-2px)}
+.chip.sel{background:var(--gold);border-color:var(--gold);color:var(--on-gold);font-weight:600}
+.pick{display:block;width:100%;text-align:start;margin:4px 0;padding:6px 9px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--ink-soft);cursor:pointer;font:inherit;font-size:12.8px;line-height:1.6;transition:all .2s}
+.pick:hover{background:var(--surface-2);border-color:var(--line)}
+.pick.sel{background:var(--gold);color:var(--on-gold);border-color:var(--gold);font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;overflow:hidden;background:var(--surface-2)}
+.seg button{border:0;background:transparent;font:inherit;font-size:12.5px;padding:6px 13px;cursor:pointer;color:var(--ink-soft);transition:all .2s}
+.seg button.on{background:var(--gold);color:var(--on-gold);font-weight:600}
+.seg button.on.no{background:var(--ink-faint)}
+.row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.row .num{flex:0 0 28px;height:28px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font-size:13px;color:var(--gold-deep);font-weight:600}
+.minibtn{border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);border-radius:9px;padding:6px 10px;cursor:pointer;font:inherit;font-size:12.5px;line-height:1.3;transition:all .2s}
+.minibtn:hover{border-color:var(--gold);color:var(--gold-deep)}
+.block{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;background:var(--surface-2)}
+.block h4{margin:0 0 10px;font-size:14.5px;font-family:inherit;color:var(--gold-deep)}
+.scorebadge{position:absolute;top:9px;left:9px;background:var(--gold);color:var(--on-gold);border-radius:50%;
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+  box-shadow:var(--shadow);z-index:2;cursor:pointer}
+.scorebadge.ease-easy{background:#4caf6b}
+.scorebadge.ease-hard{background:#e2699a}
+.scoredot{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;
+  background:var(--gold);color:var(--on-gold);font-size:11px;font-weight:700;flex:0 0 20px;margin-inline-end:7px;cursor:pointer}
+.scoredot.ease-easy{background:#4caf6b}
+.scoredot.ease-hard{background:#e2699a}
+.card-undo{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-soft);font-size:12px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;transition:all .2s;z-index:2;padding:0;margin:0;-webkit-appearance:none;appearance:none;box-shadow:none}
+.card-undo:hover{border-color:#e2699a;color:#e2699a;background:#fdeef4}
+.tunewrap{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.tunepair{display:inline-flex;align-items:center;gap:8px}
+@media(max-width:600px){.tunewrap{flex-direction:column;align-items:stretch;gap:9px}.tunepair{width:100%;justify-content:space-between}}
+.reveal{background:var(--surface);border:1px solid var(--gold-soft);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:13.2px;color:var(--ink-soft)}
+.reveal b{color:var(--gold-deep)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-bottom:16px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;background:var(--surface)}
+th,td{padding:8px 10px;border:1px solid var(--line);text-align:start;vertical-align:top}
+th{background:var(--gold-soft);font-weight:600;font-size:12.5px;color:var(--gold-deep);text-align:center}
+.bt{min-width:660px}
+.bt .rh{background:var(--surface-2);color:var(--gold-deep);font-weight:600;text-align:center;white-space:nowrap;vertical-align:middle;font-size:12.5px}
+details{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);margin-bottom:16px}
+summary{cursor:pointer;padding:11px 14px;font-size:13.5px;font-weight:600;color:var(--gold-deep);list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"◆ ";color:var(--gold);font-size:10px}
+details[open] summary{border-bottom:1px solid var(--line)}
+details .in{padding:12px 14px}
+.mantra{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--gold-soft);border-radius:12px;padding:16px;font-family:"Noto Sans Arabic",sans-serif;font-size:17px;line-height:2.15}
+.mantra input{display:inline-block;width:auto;min-width:170px;font-family:"Noto Sans Arabic";font-size:15px;background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:5px 10px;margin:0 4px}
+.note{font-size:12.8px;color:var(--ink-faint);margin-top:8px}
+.empty{padding:18px;border:1px dashed var(--line-strong);border-radius:12px;color:var(--ink-faint);font-size:13.5px;text-align:center}
+.warnbox{border:1px solid var(--warn);background:#fdf3e6;border-radius:12px;padding:12px 14px;font-size:13.5px;color:var(--warn);margin:14px 0}
+.okbox{border:1px solid var(--ok);background:#eef6f0;border-radius:12px;padding:12px 14px;font-size:13.5px;color:var(--ok);margin:14px 0}
+.faded{opacity:.6}
+.out{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:16px;white-space:pre-wrap;font-size:14px;line-height:1.9}
+.nav{display:flex;gap:10px;align-items:center;margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.btn{border:0;border-radius:12px;padding:12px 22px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;background:linear-gradient(180deg,var(--gold),var(--gold-deep));color:var(--on-gold);transition:transform .3s var(--spring);box-shadow:0 6px 16px -10px var(--gold-deep)}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold-deep)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.spacer{flex:1}
+.savetag{font-size:12px;color:var(--ink-faint)}
+.rail h3{font-size:11.5px;letter-spacing:2px;color:var(--gold);margin:0 0 10px;font-family:inherit;font-weight:600}
+.steps{list-style:none;padding:0;margin:0 0 20px}
+.steps li{font-size:13px;color:var(--ink-faint);padding:6px 9px;border-radius:9px;cursor:pointer;display:flex;gap:8px;align-items:center;transition:all .2s}
+.steps li:hover{background:var(--surface-2);color:var(--ink-soft)}
+.steps li.on{background:var(--surface);color:var(--gold-deep);font-weight:600;box-shadow:var(--shadow)}
+.steps li.done{color:var(--ink-soft)}
+.steps li .dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong);flex:0 0 6px}
+.steps li.done .dot{background:var(--ok)}
+.steps li.on .dot{background:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.log{border-top:1px solid var(--line);padding-top:14px}
+.logitem{font-size:12.5px;padding:7px 10px;border-radius:9px;background:var(--surface);border:1px solid var(--line);margin-bottom:7px;line-height:1.5}
+.logitem b{display:block;font-size:10.5px;letter-spacing:1px;color:var(--gold);font-weight:600;margin-bottom:2px}
+.count{display:inline-block;background:var(--gold-soft);color:var(--gold-deep);border-radius:99px;padding:1px 9px;font-size:11.5px;font-weight:600}
+.plan{display:grid;gap:14px}
+.pcard{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface-2)}
+.pcard.done{border-color:var(--ok);background:linear-gradient(160deg,#eef8f1,#e2f4e8)}
+.pcard.done h4{text-decoration:line-through;color:var(--ink-faint)}
+.pcard.done .kv{opacity:.65}
+.plan-check{flex:0 0 auto;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--line-strong);
+  background:var(--surface);color:#fff;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;transition:all .25s var(--spring);line-height:1;padding:0;margin:0;
+  -webkit-appearance:none;appearance:none;box-shadow:none}
+.plan-check:hover{border-color:var(--ok)}
+.plan-check.checked{background:var(--ok);border-color:var(--ok)}
+.rep-row{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:9px}
+.rep-box{width:22px;height:22px;flex:0 0 auto;border-radius:6px;border:1.5px solid var(--line-strong);
+  background:var(--surface);color:var(--ink-faint);font-size:10px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;padding:0;margin:0;transition:all .2s var(--spring);
+  -webkit-appearance:none;appearance:none;box-shadow:none}
+.rep-box:hover{border-color:var(--gold)}
+.rep-box.checked{background:#4caf6b;border-color:#4caf6b;color:#fff}
+.rep-count{font-size:11px;color:var(--ink-faint);font-weight:700;margin-inline-start:4px}
+
+/* بطاقة النية المالية — ذهبي فاخر (ملهم بالثراء) */
+.intent-hero{position:relative;overflow:hidden;border-radius:20px;padding:26px 24px 20px;margin-bottom:18px;
+  background:linear-gradient(135deg,#f8ecc4 0%,#f0d692 38%,#e6bc63 72%,#f3d98c 100%);
+  border:1px solid #d9a936;color:#241a08;
+  box-shadow:0 18px 38px -22px rgba(150,108,20,.5),0 1px 0 rgba(255,255,255,.6) inset}
+.intent-hero::before{content:"";position:absolute;top:-70px;left:-50px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.65),transparent 70%);pointer-events:none}
+.intent-hero::after{content:"";position:absolute;bottom:-80px;right:-30px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.3),transparent 70%);pointer-events:none}
+.intent-progress{position:absolute;top:16px;left:18px;width:34px;height:34px}
+.intent-progress::before{content:"";position:absolute;top:-4px;left:-4px;right:-4px;bottom:-4px;border-radius:50%;
+  background:#fffdf6;box-shadow:0 2px 8px rgba(60,40,10,.3),0 0 0 1px rgba(138,100,23,.25);z-index:0}
+.intent-progress svg{width:100%;height:100%;display:block;position:relative;z-index:1}
+.intent-progress-coin{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:16px;
+  filter:drop-shadow(0 1px 2px rgba(120,80,10,.35));z-index:1}
+.intent-progress.complete .ring-fg{filter:drop-shadow(0 0 4px rgba(120,210,110,.9))}
+.intent-progress.complete{animation:ring-pulse 1.8s ease-in-out infinite}
+@keyframes ring-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+
+/* ملخص اليوم */
+.view-toggle{display:flex;gap:6px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:16px}
+.view-toggle button{flex:1;border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:600;color:var(--ink-soft);padding:9px 10px;border-radius:9px;cursor:pointer;transition:all .3s var(--spring)}
+.view-toggle button.on{background:var(--surface);color:var(--gold-deep);box-shadow:var(--shadow)}
+.today-hero{position:relative;overflow:hidden;border-radius:18px;padding:16px 18px;margin-bottom:16px;
+  background:linear-gradient(135deg,#f8ecc4 0%,#f0d692 38%,#e6bc63 72%,#f3d98c 100%);border:1px solid #d9a936;
+  display:flex;align-items:center;gap:12px;box-shadow:0 14px 30px -18px rgba(150,108,20,.5)}
+.today-icon{font-size:28px;flex:0 0 auto;filter:drop-shadow(0 2px 3px rgba(120,80,10,.3))}
+.today-value{flex:1;text-align:center;font-family:"Noto Sans Arabic",sans-serif;font-weight:900;font-size:clamp(22px,7vw,32px);
+  color:#1c1305;text-shadow:0 1px 0 rgba(255,255,255,.5);word-break:break-word}
+.today-hero .intent-progress{position:relative;top:auto;left:auto;flex:0 0 auto;width:38px;height:38px}
+.today-heading{font-size:16px;font-weight:700;color:var(--gold-deep);margin:0 0 12px;font-family:"Noto Sans Arabic",sans-serif}
+.cat-badge{background:var(--surface);border:1px solid var(--line-strong);color:var(--ink-soft)}
+.filter-bar{border:1px solid var(--line);background:var(--surface-2);border-radius:14px;padding:14px;margin-bottom:16px}
+.filter-bar .field{margin-bottom:12px}
+.active-filter{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--gold-soft);border:1px solid var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:16px;
+  font-size:13px;color:var(--gold-deep)}
+.active-filter b{color:var(--ink)}
+.task-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.task-toolbar.end{justify-content:flex-end}
+.task-toolbar.between{justify-content:space-between}
+#undoBtn{display:none}
+.undo-ring-bg{fill:none;stroke:var(--gold-soft);stroke-width:2.5}
+.undo-ring-fg{fill:none;stroke:var(--gold-deep);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:88}
+.undo-ic{position:relative;font-size:15px;color:var(--gold-deep);font-weight:700;z-index:1;pointer-events:none}
+.undo-float{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);z-index:90;
+  opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s var(--spring)}
+.undo-float.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.undo-float-btn{position:relative;width:46px;height:46px;border:0;border-radius:50%;cursor:pointer;padding:0;
+  background:var(--surface);box-shadow:0 10px 24px -8px rgba(0,0,0,.35),0 0 0 1px var(--line);
+  display:flex;align-items:center;justify-content:center;-webkit-appearance:none;appearance:none}
+.undo-float-btn svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none}
+.cat-badge.cat-overdue{background:#fbe2ec;border-color:#f0b8cf;color:#a83a63}
+.today-item{display:flex;gap:8px;align-items:stretch}
+.today-reorder{display:flex;flex-direction:column;gap:4px;flex:0 0 auto;justify-content:center}
+.reorder-btn{width:26px;height:26px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);
+  color:var(--ink-soft);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  padding:0;margin:0;-webkit-appearance:none;appearance:none;transition:all .2s}
+.reorder-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold-deep)}
+.reorder-btn:disabled{opacity:.3;cursor:not-allowed}
+.routine-badge{background:#fdf1de;color:#8a6417}
+.intent-label{position:relative;font-size:11.5px;letter-spacing:2.6px;color:#5a3e12;font-weight:700;margin-bottom:12px}
+.intent-value{position:relative;font-family:"Cormorant Garamond","Amiri",serif;font-weight:700;font-size:clamp(34px,9.5vw,54px);
+  letter-spacing:.5px;line-height:1.25;margin:0 0 12px;word-break:break-word;color:#1c1305;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+.intent-sentence{position:relative;font-size:14.5px;color:#2a1d08;line-height:1.9;font-weight:700}
+.intent-sentence b{color:#000;font-weight:800}
+.intent-mission{position:relative;font-size:12.8px;color:#4a3410;margin-top:12px;padding-top:12px;
+  border-top:1px solid rgba(40,26,4,.18)}
+.intent-stats{position:relative;display:flex;flex-wrap:nowrap;gap:6px;margin-top:16px;overflow-x:auto;padding-bottom:2px}
+.stat-pill{background:rgba(255,255,255,.5);border:1px solid rgba(60,40,8,.22);border-radius:99px;
+  padding:5px 10px;font-size:11px;color:#241a08;display:flex;align-items:center;gap:5px;white-space:nowrap;flex:0 0 auto}
+.stat-pill b{color:#000;font-weight:800;font-size:12px}
+
+/* أكورديون بطاقات الخطة */
+.plan-header{cursor:pointer;display:flex;align-items:center;gap:9px}
+.plan-header .tag{margin-bottom:0;flex:0 0 auto}
+.plan-title{flex:1;min-width:0;margin:0;text-align:start;line-height:1.5;font-size:15px}
+.plan-detail{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line-strong)}
+.title-edit-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.title-edit-input{flex:1}
+.title-edit-btn{flex:0 0 auto;font-size:14px}
+.meta-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:12px}
+.meta-pill{background:var(--gold-soft);color:var(--gold-deep);border:1px solid var(--gold);border-radius:99px;
+  padding:5px 10px;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;flex:0 0 auto;width:auto}
+select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appearance:auto;width:auto!important}
+.meta-edit-btn{flex:0 0 auto;width:26px;height:26px;border-radius:50%;border:1px solid var(--gold);
+  background:var(--gold-soft);color:var(--gold-deep);font-size:12px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;padding:0;-webkit-appearance:none;appearance:none}
+.timeline{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:12px}
+.tl-node-col{display:flex;flex-direction:column;align-items:center;flex:0 0 auto}
+.tl-node{width:15px;height:15px;border-radius:50%;margin-top:5px;flex:0 0 auto;background:var(--ink-faint);
+  box-shadow:0 0 0 4px var(--surface),0 0 0 5px var(--line-strong)}
+.tl-node.status-overdue{background:#e2699a;box-shadow:0 0 0 4px var(--surface),0 0 0 5px #f0b8cf}
+.tl-node.status-today{background:#7ee3a8;box-shadow:0 0 0 4px var(--surface),0 0 0 5px #c8f2da}
+.tl-node.status-future{background:#5b9bd5;box-shadow:0 0 0 4px var(--surface),0 0 0 5px #b7d5ee}
+.tl-node.status-done{background:var(--ok);box-shadow:0 0 0 4px var(--surface),0 0 0 5px #a9dcbb}
+.tl-line{flex:1;width:2px;min-height:22px;background:var(--line-strong);margin:2px 0}
+.tl-line.status-overdue{background:#e2699a}
+.tl-line.status-today{background:#7ee3a8}
+.tl-line.status-future{background:#5b9bd5}
+.tl-line.status-done{background:var(--ok)}
+.tl-content{flex:1;min-width:0;padding-bottom:20px}
+.tl-item:last-child .tl-content{padding-bottom:2px}
+.tl-toprow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+.tl-date{font-size:12px;color:var(--gold-deep);font-weight:700}
+.tl-badge{font-size:10.5px;font-weight:700;border-radius:99px;padding:1px 9px}
+.tl-badge.status-overdue{background:#fbe2ec;color:#a83a63}
+.tl-badge.status-today{background:#d7f7e6;color:#1a8f5a}
+.tl-badge.status-future{background:#e4eefb;color:#33628e}
+.tl-badge.status-done{background:#dcefe1;color:#245c3c}
+.tl-text{font-size:14px;color:var(--ink)}
+.tl-text.tl-done{text-decoration:line-through;color:var(--ink-faint)}
+.tl-meta{font-size:11.5px;color:var(--ink-faint);margin-top:2px}
+.pcard.hero{border-color:var(--gold);background:linear-gradient(160deg,var(--surface),var(--surface-2))}
+.pcard h4{margin:0 0 4px;font-size:15.5px;font-family:inherit}
+.tag{display:inline-block;font-size:11px;letter-spacing:1.2px;color:var(--gold-deep);background:var(--gold-soft);border-radius:99px;padding:2px 10px;margin-bottom:8px;font-weight:600}
+.kv{font-size:13px;color:var(--ink-soft);margin:4px 0}
+.kv b{color:var(--ink);font-weight:600}
+.archive-panel{position:fixed;inset:0;z-index:80;background:var(--bg);display:none;overflow-y:auto;padding:18px 16px 60px}
+.archive-panel.open{display:block}
+.arch-item{cursor:pointer}
+.splash{position:fixed;inset:0;z-index:998;background:linear-gradient(160deg,var(--bg),var(--bg-2));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  transition:opacity .5s ease;opacity:1}
+.splash.hide{opacity:0;pointer-events:none}
+.splash-coin-img{width:84px;height:84px;margin-bottom:10px;filter:drop-shadow(0 6px 14px rgba(138,100,23,.4));
+  animation:splash-pulse 1.8s ease-in-out infinite}
+@keyframes splash-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.splash-title{font-size:22px;font-weight:800;color:var(--gold-deep)}
+.splash-sub{font-size:14px;color:var(--ink-soft)}
+.splash-brand{font-size:11px;letter-spacing:3px;color:var(--ink-faint);margin-top:16px;text-transform:uppercase}
+.confirm-modal{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-modal.open{display:flex}
+.confirm-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:26px 22px 22px;max-width:360px;width:100%;
+  max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.confirm-card h3{margin:0 0 10px;font-size:19px;color:var(--gold-deep);flex:0 0 auto}
+.confirm-card p{margin:0 0 20px;font-size:14px;color:var(--ink-soft);line-height:1.8}
+.confirm-actions{display:flex;flex-direction:column;gap:10px;flex:0 0 auto}
+.confirm-actions .btn{width:100%}
+#infoBody{overflow-y:auto;flex:1 1 auto;min-height:0}
+.modal-close{position:absolute;top:12px;inset-inline-end:12px;width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--ink-soft);font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{border-color:var(--gold);color:var(--gold-deep)}
+[data-carditem]{-webkit-user-select:none;user-select:none}
+@media print{.rail,.nav,.topbar,.prog,.tabs,.scrim,.archive-panel,.confirm-modal{display:none!important}.shell{grid-template-columns:1fr}.card{box-shadow:none;border:none;padding:0}}
+</style>
+</head>
+<body>
+<div class="splash" id="splashScreen">
+  <img class="splash-coin-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAAAFiklEQVR42u2dvWoVQRSAJ8NGm4CNmCZgaZXHSJ0XSB2sLUQQLARBLKwltS9gncfwCezULiKIKYLFwiXe/Zkz539mz1QXs1x3v2/OOTN3Z3cO/vz6nqLZtRwIQsCm28D7dX9//9wCtYdHTxwJ2Aj0pUsmyhgCPYsMtIYh0NtqGAK9rYahIfpXb87gB1++vTbUAHdwAJ+I6dOvIu7NB9ABSIAmekboHmQUNZQF6NBX4G5lYt1BQYACfRP0yhpWHJgJQHA/P3sKPPLL9TdXJpAChOjD0cOJM/oQ0rDkYFGAFX0u6BQZmg7mBUjQN0fvQcPUgYaAdfSa3BEmeDWABKjRt0UP1yDqQFbAEn0/6IEaGB0UBHDRb6LjW4XCfQciAuQ6/vHpRfGYH18/Ow+FRQEO6UOIS/hQc8AsYJY+Aj2dO4uJJQ10ByIC6PQluBNNCDngF4Cjf3h0Mn54/Oz8/r/f3d740SDhYEaAGv0d9Fn00yYqA6hBzgGDADj9WvSuNLA7GAVQV8bp0E8p5QeP5ARAas9SQBPvZ2QF+odHJ0T6OwdyGqwcMK8NnaW/hx5HXyEUjk8vihrYp/GZsftD6POctGk6mnWADoLcHP3OHOQW6ffkQOP5AAn6Ck1nWp6lu78ofdEgKDpgCQJqBBjSd+tAUECV3kYzDz0XVVHKlO8t1l6dJh0EotU48/7H/XV/6USUJcKqM/qiiSizd/8u6RcdoIOAcx5gUgA8lAHxUdBeNG2z+yOCAJKF4kl59xEAL7/dd39ENS7Sq44Az+vazBsCTjbpF1sbkuIFwMuvVfv0/qXzIFjPQkO73XCHfvxw+eJ1i1cxMIbk3e2Nwnh8qctffXw3ftAxcXx6QV8F3FgEALPNaKKVgFhbmAUvALuiJBEBxCwvZ2IlAqaruKbrt8aFWQNLMHousHIBwZKFmFMQSxmQGNi4zUu+aoD0mFK5UNsIQASB/ljeT0AsFmFEBf5vggdz4GQahTZBqcM8RRhXgb1NX9EBQa/DUj9HKzzi0kcTvB8QDowFhAMXw9DZQdHzVx+KVWHvmL0Dpvl6N8ScPWDvr35Gohq3JO9ubyIULAVEOvIyEx4d1E7T+jZn8FPEfaArMjYSMca/BUVeinVBISAEUBrLfdF2G/3yoQJw76LdbIPjWhRg+P79LtsSz6gBUYRDQNRhwwuvEBB1WAJURtSNaFwVmK0GbDALcV1yFOGminCUAXZE5bcmEhcIzX/n5Aahi0wNvklJXJY7NuRbEyMIeOFw1oCNlGLeyywLiMGo0AAUHwErgdZ9EFRlf0gbgBp597tr9IE69u6PrwHbDAL27i81EevSgdBFZXQ0rTvvzMH65cyiAA5eSBEQcwI6hAoBtePRboIAcSFwVpn4vd0nIrnkw1aEO3aAoC8+CkJMjBt1gDvtWj48w9BiX2jOQfGEuQYgmUtyTw7Q9BHpARkBHTvQpJ+I21iht87z+X4z5c2seLaxwiVHh6FAoa9dA4ram3NApE+5ZSK1k14Cv+HPNh0RtzJM5J30BPeSTDVvWdTXQN/MM/HuJWnuIDW1nW1i3001yewnnHrc0Dk53E943UHqaEvz5HZHbSEHtT7o4ytp+osCFBwk36//Lg6geeknoXvC62fp9j6aDv3FeQBvELQVCpro73d/cQEJsIOBrQZIOPJ2/LIAfQf6JuBpUJS+kgBXGqzQ1wkQcpAqN4TjklFb9oXWI0/prwlw4gDngzLQ0qRfECDngKJBrsktxF+ibynAjwmFByDwAnQcWGnQefZkhT5IgJoDNROaz/ys04cK0NfALkP/Qasi+moBJg7QPmwfbQPSrxZg7qCJBqefEK+tHL89NNDRIwWEBi70JAGhgY6eQcD0DDYigwidWYDQmW2kxfuCjNs/yFvLId0BQ30AAAAASUVORK5CYII=" alt="">
+  <div class="splash-title">البروتوكول الشهري</div>
+  <div class="splash-sub">لإعادة التناغم مع المال</div>
+  <div class="splash-brand">SOUL MEETING</div>
+</div>
+<div class="scrim" id="scrim"></div>
+<div class="scrim" id="confirmScrim"></div>
+<div class="confirm-modal" id="confirmModal">
+  <div class="confirm-card">
+    <button class="modal-close" id="confirmClose">✕</button>
+    <h3>بدء شهر جديد</h3>
+    <p id="confirmMsg">سيتم حفظ خطة هذا الشهر في السجل، ثم فتح شهر جديد فارغ. هل تريد المتابعة؟</p>
+    <div class="confirm-actions">
+      <button class="btn ghost" id="cancelNewMonth">إلغاء</button>
+      <button class="btn" id="confirmNewMonth">نعم، ابدأ شهر جديد</button>
+    </div>
+  </div>
+</div>
+<div class="archive-panel" id="archivePanel"><div id="archiveInner" style="max-width:820px;margin:0 auto"></div></div>
+<div class="scrim" id="infoScrim"></div>
+<div class="confirm-modal" id="infoModal">
+  <div class="confirm-card">
+    <button class="modal-close" id="infoClose">✕</button>
+    <h3 id="infoTitle"></h3>
+    <div id="infoBody" style="font-size:14px;color:var(--ink-soft);line-height:1.9;margin-bottom:18px"></div>
+    <div class="confirm-actions" id="infoActions"></div>
+  </div>
+</div>
+<div class="undo-float" id="undoFloatWrap">
+  <button class="undo-float-btn" id="undoFloatBtn" title="تراجع عن آخر إجراء">
+    <svg viewBox="0 0 32 32"><circle class="undo-ring-bg" cx="16" cy="16" r="14"/>
+      <circle class="undo-ring-fg" id="undoFloatRingFg" cx="16" cy="16" r="14" stroke-dashoffset="0"/></svg>
+    <span class="undo-ic">↶</span>
+  </button>
+</div>
+<div class="shell">
+  <aside class="rail" id="rail">
+    <button class="railnav" id="archiveBtn">🕘 سجل الشهور السابقة</button>
+    <button class="railnav" id="exportBtn">⬇ تصدير نسخة احتياطية</button>
+    <button class="railnav" id="importBtn">⬆ استيراد نسخة احتياطية</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none">
+    <div class="rule" style="margin:0 0 16px"></div>
+    <h3>مسار البروتوكول</h3>
+    <ul class="steps" id="steps"></ul>
+    <div class="log"><h3>سجل التصفية</h3><div id="log"></div></div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <button class="iconbtn icononly menu-toggle" id="menuBtn" title="المسار">☰</button>
+      <div class="titlewrap">
+        <div class="apptitle">البروتوكول الشهري</div>
+        <div class="appsub">لإعادة التناغم مع المال</div>
+      </div>
+      <button class="iconbtn gold install-btn" id="installBtn" style="display:none" title="تثبيت التطبيق"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg></button>
+      <button class="iconbtn icononly" id="resetBtn" title="شهر جديد">+</button>
+    </div>
+    <div class="tabs">
+      <button id="tab1" class="on">اليوم الأول</button>
+      <button id="tab2">الأيام السبعة</button>
+      <button id="tab3">خطة الشهر</button>
+    </div>
+    <div class="prog"><i id="progBar"></i></div>
+    <div id="screen"></div>
+  </main>
+</div>
+<script>
+/* ===================== مراجع ===================== */
+const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+const YEARS=(()=>{const a=[];for(let y=2026;y<=2050;y++)a.push(String(y));return a;})();
+const CHAKRAS=[
+ ["1 — الجذر","قاعدة العمود الفقري","القبيلة، البقاء، الاتصال بالأرض، القوة، الجسد"],
+ ["2 — الجنس","أسفل البطن","التجلي المادي، المال، الإبداع الجسدي، المتعة"],
+ ["3 — الضفيرة الشمسية","أعلى البطن","الأهداف، الدافع، الإنجاز، القوة الشخصية، الهوية"],
+ ["4 — القلب","مركز الصدر","الحب، العلاقات، الارتباط العاطفي، الشفاء"],
+ ["5 — الحلق","الحلق","التواصل، الأصالة، التعبير عن الذات"],
+ ["6 — العين الثالثة","مركز الجبهة","الحدس، البصيرة، المعارف"],
+ ["7 — التاج","قمة الرأس","الاتصال بالإلهي، معرفة هدف الروح"]];
+const TYPES=[
+ ["اعتقاد","هو شيء تم إخبارك به من المجتمع أو الأهل أو المعلمين، أو استنتاج توصلت إليه بناءً على تجربتك الشخصية."],
+ ["نمط","هو عادة فكرية أو شعورية متكررة، تتكرر ببساطة لأنها عادتك غير الواعية، وغالبًا ما يتم اقتباسه من الآخرين."],
+ ["برمجة","هي منهجية تفكير أو شعور نفعتك في الماضي كوسيلة حماية أو اختباء، وغالبًا ما تم خلقها في مرحلة الطفولة أو تحت ظروف شديدة."]];
+const BELIEFS_TABLE=[
+ [["عصفور في اليد خير من ألف على الشجرة","السذج يصرفون أموالهم بسرعة على أشياء لا قيمة لها","المال يفتح الأبواب المغلقة","تبن الملك أفضل من قمح الفلاح"],
+  ["ليس ثمة مصدر للربح مؤكد مثل الادخار والتوفير","الغني إما لص أو ابن لص","الشخص غير المديون غني","على قد لحافك مد رجليك"],
+  ["المليونير هو رجل يساعد موته على حل أزمة الكثير من أقاربه","أريد أن أجمع قدرًا من المال يكفي لعلاج الأمراض التي أصابتني أثناء جمعه","البلد ديه أحسن من غيرها"]],
+ [["اللي تعرفه أحسن من اللي ما تعرفوش","لا تضع البيض كله في سلة واحدة","ما يأتي بسهولة يذهب بسهولة","الأغبياء يبنون بيوتًا والأذكياء يعيشون فيها"],
+  ["لو كانت الأمنيات خيلًا لكان كل الشحاذين فرسانًا","من لا يدخر يفتقر","إن كنت على البير اصرف بتدبير"],
+  ["المال الحلال ييجي بعرق الجبين","المال السايب يعلم السرقة","إذا لم تخاطر لن تكسب","حوش القرش على القرش تبقى مليونير"]],
+ [["إذا لم تعمل لن تأكل","خليك في الأمان","الأفضل أن تولد محظوظًا على أن تولد غنيًا","العطاء أفضل من الأخذ"],
+  ["الفلوس بتغير النفوس","لو سلفت صاحبك تخسره","اشتري على ضمانتك انت","المال لا ينمو على الأشجار"],
+  ["المال قوة","المال سبب كل الشرور","الفلوس مش كل حاجة","معاك قرش تسوى قرش"]],
+ [["الراجل يتعرف من جيبه","محتاج مال عشان تعمل مال","المال يتكلم","الصيت ولا الغنى"],
+  ["السلف تلف والرد خسارة","الأغنياء يزدادون غنى والفقراء يزدادون فقرا","ما تبصليش بعين ردية بص للي اندفع فيا","لا تتزوج من اجل المال، ولكن تزوج حيث يوجد المال"],
+  ["فقط 1% من الناس يستمتعون بثروات العالم","هناك قانون للأغنياء وآخر للفقراء","اللي مالوش ضهر يتضرب على وشه","خسارة شخص هي مكسب لشخص آخر"]],
+ [["الدين سواد الخدين","الدراهم مراهم","بفلوسك بنت السلطان عروسك","اللي معاه قرش محيره يجيب حمام ويطيره"],
+  ["قيراط حظ ولا فدان شطارة","أفضل الأشياء المجانية","كلما أخذت ازددت جشعا","مش مهم المال مهم الستر والصحة"],
+  ["اللهم احشرنا في زمرة الفقراء","إذا لا تستطيع أن تكون غنيا، اسكن بجوار غني","لا يوجد أبدًا شيء مجاني","التوفير عائد كبير"]],
+ [["الوقت من ذهب","المال لا ينام","إن المبذرين كانوا اخوان الشياطين","ما لا تملكه لا تفتقده"],
+  ["إذا دخل الفقر من الباب خرج الحب من الشباك","المال خادم جيد لكن سيد سيئ","إن كان ليك عند الكلب حاجة قوله يا سيدي","من لا يملك قوته لا يملك قراره"],
+  ["مافيش حاجة هتاخدها معاك","إن كان حبيبك عسل ما تلحسوش كله","ما لديك احتفظ به"]]];
+const ASPECTS_TABLE=[
+ ["المحيط المادي",["المنزل","مكان العمل","السيارة"],["منازل يتم زيارتها بشكل متكرر","أماكن عامة"],["أخرى"]],
+ ["الصحة",["النظام الغذائي","أدوية","المكملات الغذائية","التدريبات"],["أخصائيين التغذية","الطب البديل","أماكن الرعاية الصحية"],["أخرى"]],
+ ["العلاقات الرومانسية",["الزوجة/الزوج","الحبيب/الحبيبة","الحياة الجنسية","الوقت الذي يقضى مع الشريك"],["الرومانسية","الصداقة","الأبوة/الامومة","القيم المشتركة"],["الاهتمامات المشتركة","أخرى"]],
+ ["الرفاهية",["الهوايات","الاهتمامات","التسلية"],["اجازات السفر","إجازة آخر الأسبوع"],["أخرى"]],
+ ["الماليات",["البنك","المؤسسات المالية","الديون"],["سداد الديون","الاستثمار","التقاعد"],["الميزانية","أخرى"]],
+ ["المسار الوظيفي (إن وجد)",["صاحب عمل","زميل","موظف تابع","مدير"],["الصناعة","المنصب الحالي","مشروع خاص","التخطيط","التدريب"],["الإدارة","الشبكات والتواصل","الاجتماعات","العملاء","المرشدين والمنتور","أخرى"]],
+ ["البيزنس (إن وجد)",["المنتج/الخدمات","التسويق","الأنظمة","البنية التحتية","العملاء","الشركاء"],["عملاء متوقعين","المبيعات","التسليمات","الدعاية","الإعلان"],["المنتورز","الداعمين","الممولين","الشركاء","التدريب","أخرى"]],
+ ["العائلة والأصدقاء",["طفل","أب/أم","أخوة","عم/عمة","خال/خالة","أبناء خال/خالة"],["ابن عم","جد/جدة","جيران","أصدقاء","معارف"],["أخرى"]],
+ ["التطور الشخصي",["أهداف","معرفة/علم","تعلم"],["التزام","حافز","أدب"],["إدارة وقت","أخرى"]],
+ ["التطور الروحي",["الممارسة الروحية","الحدس","التجذر"],["التجلي","النية"],[]]];
+const LACK=[
+ ["المال لا يهم","اعتقاد أن المال أمر تافه، وليس مصدرًا حقيقيًا للسعادة أو القيمة في الحياة."],
+ ["المال لا ينبغي أن يوجد","رفض داخلي عميق لفكرة المال ذاتها، أو شعور بأنه شرير ومسبب للمشاكل."],
+ ["المال وهم","اعتقاد أن المال غير حقيقي، أو غير جدير بالطاقة والجهد المبذول لكسبه."]];
+const REMEDIES=[
+ ["رصيدك اليومي","يوميًا، قم بمعرفة رصيدك في البنك، ومعرفة الديون التي عليك."],
+ ["توكيد عند الشراء","في كل مرة تشتري أي شيء خلال الأسبوع، قل توكيدًا يعبر عن امتنانك لهذه المبادلة."],
+ ["كتابة موضوع التحول","اكتب موضوعًا عن التغيير والتحول الإيجابي الذي يحدث في حياتك من خلال وفرة المال."],
+ ["كتابة موضوع التوقف","اكتب موضوعًا عما يمكن أن يحدث إذا توقفت عن استخدام المال وسداد فواتيرك."]];
+const BLOCKERS=["الاستياء","الغضب","اللوم","الذنب","الاشمئزاز","التجاهل","العار","الضحية","الاستضعاف","الإنكار"];
+const TRIGGERS=["عند وجود المال وإنفاقه على الاحتياجات","عند وجود المال وإنفاقه على الرغبات","عند عدم وجود المال وعدم الإنفاق على الاحتياجات","عند عدم وجود المال وعدم الإنفاق على الرغبات"];
+const SPEND=["الإيجار","المنافع","التأمين الصحي","الضرائب","مصاريف السيارة","العلاج الطبي","كارت الكريديت","تناول الطعام بالخارج","الاهتمام بالأطفال","الملابس","الهوايات","العناية الشخصية","السينما (المسرح)","التعليم","التطوع","الإدخار"];
+const METHODS=[
+ ["التقليل","ابحث عن بديل أقل تكلفة لنفس السلعة أو الخدمة."],
+ ["الحذف","ألغِ شراء هذا العنصر بشكل دائم إذا كان لا يخدم نيتك المالية."],
+ ["التغيير","استبدل مقدّم الخدمة، أو أعد هيكلة عملية التبادل نفسها."],
+ ["إعادة تناغم القيمة","أعد توجيه تركيزك للبحث عن الاستثمار الحقيقي داخل هذا العنصر."]];
+const PATTERNS=[
+ ["عدم التناغم مع الرسالة","عندما لا تتناغم مع رسالة روحك، ذاتك العليا لا تشارك في تجلي الوفرة."],
+ ["التنظير وعدم التفعيل","مجرد التخطيط دون تطبيق يخلق ذبذبات «عدم الخلق»."],
+ ["التكرار","تكرار نفس الأفعال يؤدي دائمًا لنفس النتائج، حتى لو اختلفت الظواهر."],
+ ["نوايا متعددة محيرة","إرسال نوايا كثيرة للكون في وقت واحد يخلق تضارب الذبذبات."],
+ ["الخوف مما نريد","الخوف من تحقيق ما نتمناه يُظهر ترددنا في قبول الوفرة والخلق."],
+ ["التناقض","قول شيء وفعل عكسه تمامًا يعيق تحقيق النوايا."],
+ ["التواصل السيئ","أفعال تغيّر حالتنا الداخلية بشكل يتناقض مع نيتنا (موسيقى كئيبة، أطعمة غير مناسبة...)."]];
+const AXES=[["العقل","أفعال ذهنية / تخطيطية"],["العاطفة","أفعال عاطفية / علائقية"],["الجسد","أفعال جسدية / تنفيذية"],["الروح","أفعال تخدم الرسالة مباشرة"]];
+
+/* ===================== الحالة ===================== */
+const KEY="sm_protocol_v3";
+let S=null,tab=1,cur1="start",cur2="d7-1-ideas",timelineReturnId=null;
+function blank(){return{
+ month:MONTHS[new Date().getMonth()],year:"2026",mission:"",
+ intentValue:"",acts:["","","","",""],order:[0,1,2,3,4],
+ hasEnergies:"",energyCount:"",selBeliefs:[],customEnergies:[],energyMeta:{},cleanseNotes:"",
+ eftSkillLink:"",eftByEnergy:{},correctiveByEnergy:{},
+ lack:[],lackRemedy:{},lackNotes:"",
+ blockers:[],blockerTrigger:{},blockerAffirm:{},
+ spendKind:{},spendDecisions:{},
+ selAspects:[],aspectMeta:{},
+ ideas:Array.from({length:7},()=>[{t:"",s:""},{t:"",s:""}]),
+ ideaBank:[],pool:[],planView:"today",planFilterEnergy:"",planFilterAxis:"",todayReorderMode:false};}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.state){S=Object.assign(blank(),o.state);tab=o.tab||1;cur1=o.cur1||"start";cur2=o.cur2||"d7-1-ideas";return;}}}catch(e){}S=blank();}
+let st=null;
+function save(){clearTimeout(st);st=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify({state:S,tab,cur1,cur2}));tg("حُفظ تلقائيًا");}catch(e){tg("التخزين غير متاح");}},300);}
+/* تراجع (Undo) — زرار ثابت + toast عائم بعداد دائري 5 ثوانٍ */
+let undoStack=[];
+const UNDO_SAFE_KEYS=new Set(["go","accordion","navto","scoreinfo","copy","eftcopytopic","archopen","archword","viewmode","setfilter","clearfilter","filtertab","titleedit"]);
+function isMutatingTarget(el){return Object.keys(el.dataset).some(k=>el.dataset[k]!=null&&!UNDO_SAFE_KEYS.has(k));}
+const UNDO_MS=5000,UNDO_C=2*Math.PI*14;
+let undoExpiry=0,undoTimer=null;
+function pushUndo(){
+ try{undoStack.push(JSON.stringify({state:S,tab,cur1,cur2}));if(undoStack.length>20)undoStack.shift();}catch(e){}
+ updateUndoBtnVisibility();
+ triggerUndoToast();
+}
+function updateUndoBtnVisibility(){
+ const b=document.getElementById("undoBtn");
+ if(b)b.style.display=undoStack.length?"inline-flex":"none";
+}
+function triggerUndoToast(){
+ undoExpiry=Date.now()+UNDO_MS;
+ tickUndoToast();
+}
+function tickUndoToast(){
+ if(undoTimer){clearTimeout(undoTimer);undoTimer=null;}
+ renderUndoToastUI();
+ if(undoExpiry>Date.now())undoTimer=setTimeout(tickUndoToast,80);
+}
+function renderUndoToastUI(){
+ const wrap=document.getElementById("undoFloatWrap");if(!wrap)return;
+ const remaining=undoExpiry-Date.now();
+ if(remaining<=0||!undoStack.length){wrap.classList.remove("show");return;}
+ wrap.classList.add("show");
+ const frac=Math.max(0,Math.min(1,remaining/UNDO_MS));
+ const ring=document.getElementById("undoFloatRingFg");
+ if(ring)ring.setAttribute("stroke-dashoffset",(UNDO_C*(1-frac)).toFixed(1));
+}
+function doUndo(){
+ const snap=undoStack.pop();if(!snap)return;
+ try{const o=JSON.parse(snap);S=Object.assign(blank(),o.state);tab=o.tab||1;cur1=o.cur1||"start";cur2=o.cur2||"d7-1-ideas";}catch(e){}
+ undoExpiry=0;if(undoTimer){clearTimeout(undoTimer);undoTimer=null;}
+ save();updateUndoBtnVisibility();renderUndoToastUI();render();
+}
+function tg(t){const e=document.getElementById("savetag");if(e)e.textContent=t;}
+function undoBtnHTML(){return `<button class="iconbtn icononly" id="undoBtn" title="تراجع عن آخر إجراء">↶</button>`;}
+const esc=s=>{
+ if(s==null)s="";
+ else if(Array.isArray(s))s=s.filter(x=>typeof x==="string"||typeof x==="number").join("، ");
+ else if(typeof s==="object")s="";
+ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+};
+function get(p){return p.split("~").reduce((o,k)=>(o==null?undefined:o[k]),S);}
+function set(p,v){const ks=p.split("~");let o=S;for(let i=0;i<ks.length-1;i++){const k=ks[i];if(o[k]==null)o[k]=/^\d+$/.test(ks[i+1])?[]:{};o=o[k];}o[ks[ks.length-1]]=v;save();}
+function toggleArr(p,v){const a=get(p)||[];const i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);set(p,a);}
+const when=()=>`${S.month} ${S.year}`;
+const intentSentence=()=>`أن أحصل على ${S.intentValue||"........."} هذا الشهر — ${when()} — وليكن الأمر كذلك`;
+const energyList=()=>S.selBeliefs.concat((S.customEnergies||[]).filter(x=>(x||"").trim()));
+const em=n=>(S.energyMeta[n]=S.energyMeta[n]||{type:"",chakra:"",interp:""});
+const am=n=>(S.aspectMeta[n]=S.aspectMeta[n]||{pattern:"",root:"",signs:"",step:""});
+
+const F={
+ ta:(p,l,ph,h)=>`<div class="field">${l?`<label class="fl">${l}</label>`:""}${h?`<div class="hint">${h}</div>`:""}<textarea data-bind="${p}" placeholder="${esc(ph||"")}">${esc(get(p)||"")}</textarea></div>`,
+ tx:(p,l,ph,h)=>`<div class="field">${l?`<label class="fl">${l}</label>`:""}${h?`<div class="hint">${h}</div>`:""}<input type="text" data-bind="${p}" placeholder="${esc(ph||"")}" value="${esc(get(p)||"")}"></div>`,
+ pend:q=>`<div class="pendulum"><b>سؤال البندول</b>«${esc(q)}»</div>`,
+ radios:(p,items)=>`<div class="opts">${items.map(it=>{const[v,d]=Array.isArray(it)?it:[it,""];const on=get(p)===v;
+   return `<div class="opt radio ${on?"sel":""}" data-radio="${p}" data-val="${esc(v)}"><div class="box"></div><div><div class="t">${esc(v)}</div>${d?`<div class="d">${esc(d)}</div>`:""}</div></div>`;}).join("")}</div>`,
+ checks:(p,items)=>`<div class="opts">${items.map(it=>{const[v,d]=Array.isArray(it)?it:[it,""];const on=(get(p)||[]).includes(v);
+   return `<div class="opt ${on?"sel":""}" data-check="${p}" data-val="${esc(v)}"><div class="box"></div><div><div class="t">${esc(v)}</div>${d?`<div class="d">${esc(d)}</div>`:""}</div></div>`;}).join("")}</div>`,
+ chips:(p,items)=>`<div class="chips">${items.map(v=>{const on=(get(p)||[]).includes(v);
+   return `<button class="chip ${on?"sel":""}" data-check="${p}" data-val="${esc(v)}">${esc(v)}</button>`;}).join("")}</div>`
+};
+
+/* ===================== الرصيد ===================== */
+function derived(){
+ const out=[];
+ const ord=(S.order&&S.order.length===5)?S.order:[0,1,2,3,4];
+ ord.forEach((oi,r)=>{const t=(S.acts[oi]||"").trim();if(t)out.push({key:"act-"+oi,text:t,source:`الأفعال الخمسة · أولوية ${r+1}`,tab:1,nav:{tab:1,id:"acts"}});});
+ energyList().forEach((n,ei)=>out.push({key:"eft-"+n,text:`تنفيذ برنامج EFT (${ei+1}) لتحرير: ${n}`,source:"برنامج EFT · الطاقات غير المتناغمة",tab:1,nav:{tab:1,id:"eft"}}));
+ energyList().forEach(n=>{(S.correctiveByEnergy[n]||"").split("\n").map(x=>x.trim()).filter(Boolean).forEach((t,i)=>
+   out.push({key:`corr-${n}-${i}`,text:t,source:`الأفعال التصحيحية · ${n}`,tab:1,nav:{tab:1,id:"corrective"}}));});
+ (S.lack||[]).forEach((b,bi)=>{const r=S.lackRemedy[b];if(r)out.push({key:"lack-"+b,text:`${r} — لعلاج اعتقاد «${b}»`,source:"علاج اعتقادات النقص",tab:1,nav:{tab:1,id:"lack-remedy-"+bi}});});
+ (S.blockers||[]).forEach((b,bi)=>{const t=S.blockerTrigger[b];const a=(S.blockerAffirm[b]||"").trim();
+   if(t)out.push({key:"blk-"+b,text:`استخدام التوكيد عند تنشّط «${b}» — ${t}${a?" — التوكيد: "+a:""}`,source:"المشاعر المعيقة · التوكيد",tab:1,nav:{tab:1,id:"blk-trigger-"+bi}});});
+ Object.entries(S.spendDecisions||{}).forEach(([pt,d])=>{if(d&&d.method){const n=(d.note||"").trim();
+   out.push({key:"spend-"+pt,text:`${pt} — ${d.method}${n?": "+n:""}`,source:"تحويل صرف إلى استثمار",tab:1,nav:{tab:1,id:"spend-decide"}});}});
+ (S.selAspects||[]).forEach(a=>{const m=am(a);if((m.step||"").trim())
+   out.push({key:"aspect-"+a,text:m.step.trim(),source:`جوانب المقاومة · ${a}`,tab:1,nav:{tab:1,id:"aspects"}});});
+ S.ideas.forEach((day,d)=>day.forEach((c,ci)=>{if(c.s==="الآن"&&(c.t||"").trim())
+   out.push({key:`idea-${d}-${ci}`,text:c.t.trim(),source:`فكرة متناغمة · يوم ${d+1}`,tab:2,day:d,nav:{tab:2,id:`d7-${d+1}-ideas`}});}));
+ return out;
+}
+function syncPool(){
+ const d=derived(),by={};S.pool.forEach(p=>by[p.key]=p);
+ d.forEach(x=>{const e=by[x.key];
+   if(e){if(!e.edited)e.text=x.text;e.source=x.source;e.tab=x.tab;e.day=x.day;e.nav=x.nav;}
+   else S.pool.push({key:x.key,text:x.text,source:x.source,tab:x.tab,day:x.day,nav:x.nav,edited:false,removed:false,resolves:"",solves:[],align:"",ease:"",axis:"",commit:"",promoted:false,done:false,rank:S.pool.length,def:{}});});
+ const live=new Set(d.map(x=>x.key));
+ S.pool=S.pool.filter(p=>p.key.indexOf("custom-")===0||live.has(p.key));
+ save();
+}
+const P=t=>S.pool.filter(p=>!p.removed&&p.tab===t);
+const Pd=d=>S.pool.filter(p=>!p.removed&&p.tab===2&&p.day===d);
+const scope=(t,d)=>t===1?P(1):Pd(d);
+const resolved=(t,d)=>scope(t,d).filter(p=>p.resolves==="نعم");
+const survivors=(t,d)=>resolved(t,d).filter(p=>p.align==="عالٍ"&&(p.ease==="سهل"||p.promoted));
+const reserve=(t,d)=>resolved(t,d).filter(p=>p.align==="عالٍ"&&p.ease==="صعب"&&!p.promoted);
+const committed=(t,d)=>survivors(t,d).filter(p=>p.commit==="نعم");
+const nsolve=p=>((p.solves||[]).length);
+const ordered=(t,d)=>committed(t,d).slice().sort((a,b)=>nsolve(b)-nsolve(a)||(a.rank||0)-(b.rank||0));
+function solvesChips(i,it){const L=energyList();
+ if(!L.length)return `<div class="note">لم تُسجّل طاقات غير متناغمة لاختيارها.</div>`;
+ return `<div class="field" style="margin:10px 0 0"><label class="fl">أي طاقة/نمط يحلّها هذا الفعل؟ (يمكن اختيار أكثر من واحدة)</label>
+  <div class="chips">${L.map(n=>`<button class="chip ${(it.solves||[]).includes(n)?"sel":""}" data-psolve="${i}" data-val="${esc(n)}">${esc(n)}</button>`).join("")}</div>
+  <div class="note">يحل <span class="count">${nsolve(it)}</span> من الطاقات — كلما زاد العدد ارتفعت أولويته في الخطة.</div></div>`;}
+const byScoreAsc=list=>list.slice().sort((a,b)=>nsolve(a)-nsolve(b));
+const byPlanPriority=list=>list.slice().sort((a,b)=>{
+ const ae=a.ease==="سهل"?0:1,be=b.ease==="سهل"?0:1;
+ if(ae!==be)return ae-be;
+ return nsolve(b)-nsolve(a);
+});
+const easeClass=it=>it.ease==="سهل"?"ease-easy":(it.ease==="صعب"?"ease-hard":"");
+function scoreBadge(it){const i=S.pool.indexOf(it);return `<span class="scorebadge ${easeClass(it)}" data-scoreinfo="${i}" title="اضغط لرؤية الطاقات التي يحلها">${nsolve(it)}</span>`;}
+function scoreDot(it){const i=S.pool.indexOf(it);return `<span class="scoredot ${easeClass(it)}" data-scoreinfo="${i}" title="اضغط لرؤية الطاقات التي يحلها">${nsolve(it)}</span>`;}
+function tuneBlock(i,it){
+ return `<div class="block" style="position:relative" data-carditem="${i}">
+   ${scoreBadge(it)}
+   <h4 style="color:var(--ink);font-weight:600;padding-left:30px">${esc(it.text)}</h4>
+   <div class="tunewrap">
+    <div class="tunepair"><span class="note" style="margin:0">قوة التناغم</span><div class="seg">
+      <button class="${it.align==="عالٍ"?"on":""}" data-pl="${i}.align" data-val="عالٍ">عالٍ</button>
+      <button class="${it.align==="منخفض"?"on no":""}" data-pl="${i}.align" data-val="منخفض">منخفض</button></div></div>
+    <div class="tunepair"><span class="note" style="margin:0">سهولة التنفيذ</span><div class="seg">
+      <button class="${it.ease==="سهل"?"on":""}" data-pl="${i}.ease" data-val="سهل">سهل</button>
+      <button class="${it.ease==="صعب"?"on no":""}" data-pl="${i}.ease" data-val="صعب">صعب</button></div></div>
+   </div></div>`;}
+function dateField(i,it){const d=(it.def||{}).startDay||"";
+ return `<div class="field"><label class="fl">تاريخ البدء الفعلي</label>
+  <div style="display:flex;gap:10px;align-items:center">
+   <select data-bind="pool~${i}~def~startDay" style="max-width:120px"><option value="">— اليوم —</option>${Array.from({length:31},(_,k)=>k+1).map(n=>`<option ${+d===n?"selected":""}>${n}</option>`).join("")}</select>
+   <div style="font-size:14.5px;color:var(--gold-deep);font-weight:600">${esc(when())}</div></div></div>`;}
+function startDaySelect(i,it){const d=(it.def||{}).startDay||"";
+ return `<select class="meta-pill meta-select" data-bind="pool~${i}~def~startDay" title="تاريخ البدء">
+   <option value="">اليوم</option>
+   ${Array.from({length:31},(_,k)=>k+1).map(n=>`<option ${+d===n?"selected":""}>${n}</option>`).join("")}
+ </select>`;}
+const WEEKDAYS=[["SU","الأحد"],["MO","الإثنين"],["TU","الثلاثاء"],["WE","الأربعاء"],["TH","الخميس"],["FR","الجمعة"],["SA","السبت"]];
+function repeatTypeSelect(i,it){const df=it.def||{};const rt=df.repeatType==="recurring"?"recurring":(df.repeatType==="routine"?"routine":"single");
+ return `<select class="meta-pill meta-select" data-bind="pool~${i}~def~repeatType" title="نوع الفعل">
+   <option value="single" ${rt==="single"?"selected":""}>مرة واحدة</option>
+   <option value="recurring" ${rt==="recurring"?"selected":""}>متكررة لفترة</option>
+   <option value="routine" ${rt==="routine"?"selected":""}>روتين ثابت</option>
+ </select>`;}
+function repeatCountSelect(i,it){const df=it.def||{};const val=Math.max(1,Math.min(31,+df.repeatCount||7));
+ return `<select class="meta-pill meta-select" data-bind="pool~${i}~def~repeatCount" title="عدد مرات التكرار">
+   ${Array.from({length:31},(_,k)=>k+1).map(n=>`<option ${val===n?"selected":""}>${n}</option>`).join("")}
+ </select>`;}
+function repeatSubFields(i,it){const df=it.def||{};const rt=df.repeatType==="recurring"?"recurring":(df.repeatType==="routine"?"routine":"single");
+ if(rt==="routine"){
+   const freq=df.routineFreq==="أسبوعي"?"أسبوعي":"يومي";
+   const time=df.routineTime==="مسائي"?"مسائي":"صباحي";
+   return `<div style="margin-top:10px">
+     <label class="fl">التكرار</label>
+     <div class="chips">
+       <button class="chip ${freq==="يومي"?"sel":""}" data-radio="pool~${i}~def~routineFreq" data-val="يومي">يومي</button>
+       <button class="chip ${freq==="أسبوعي"?"sel":""}" data-radio="pool~${i}~def~routineFreq" data-val="أسبوعي">أسبوعي</button>
+     </div>
+     ${freq==="أسبوعي"?`<div style="margin-top:8px;max-width:160px"><select data-bind="pool~${i}~def~routineDay">${WEEKDAYS.map(w=>`<option value="${w[0]}" ${df.routineDay===w[0]?"selected":""}>${w[1]}</option>`).join("")}</select></div>`:""}
+     <label class="fl" style="margin-top:10px">الوقت</label>
+     <div class="chips">
+       <button class="chip ${time==="صباحي"?"sel":""}" data-radio="pool~${i}~def~routineTime" data-val="صباحي">🌅 صباحي</button>
+       <button class="chip ${time==="مسائي"?"sel":""}" data-radio="pool~${i}~def~routineTime" data-val="مسائي">🌙 مسائي</button>
+     </div>
+     <div class="note" style="margin-top:8px">الروتين يتم تحديده يوميًا بشكل مستقل — كل يوم تعمل عليه check لوحده، وسجل إنجازك بيتحفظ عبر الشهور.</div>
+   </div>`;
+ }
+ return "";}
+function repeatField(i,it){const df=it.def||{};const rt=df.repeatType==="recurring"?"recurring":(df.repeatType==="routine"?"routine":"single");
+ let h=`<div class="field"><label class="fl">نوع الفعل</label>
+   <div class="chips">
+     <button class="chip ${rt==="single"?"sel":""}" data-radio="pool~${i}~def~repeatType" data-val="single">مرة واحدة</button>
+     <button class="chip ${rt==="recurring"?"sel":""}" data-radio="pool~${i}~def~repeatType" data-val="recurring">متكررة لفترة</button>
+     <button class="chip ${rt==="routine"?"sel":""}" data-radio="pool~${i}~def~repeatType" data-val="routine">روتين ثابت</button>
+   </div>`;
+ if(rt==="recurring"){
+   h+=`<div style="margin-top:10px;max-width:160px">${F.tx(`pool~${i}~def~repeatCount`,"عدد مرات التكرار","مثال: 7")}</div>
+     <div class="note" style="margin-top:-6px">هيظهرلك ${Math.max(1,Math.min(31,+df.repeatCount||1))} مربع صغير في خطة الشهر تعمل عليهم check كل ما تنجز مرة.</div>`;
+ }
+ if(rt==="routine"){
+   const freq=df.routineFreq==="أسبوعي"?"أسبوعي":"يومي";
+   const time=df.routineTime==="مسائي"?"مسائي":"صباحي";
+   h+=`<div style="margin-top:10px">
+     <label class="fl">التكرار</label>
+     <div class="chips">
+       <button class="chip ${freq==="يومي"?"sel":""}" data-radio="pool~${i}~def~routineFreq" data-val="يومي">يومي</button>
+       <button class="chip ${freq==="أسبوعي"?"sel":""}" data-radio="pool~${i}~def~routineFreq" data-val="أسبوعي">أسبوعي</button>
+     </div>
+     ${freq==="أسبوعي"?`<div style="margin-top:8px;max-width:160px"><select data-bind="pool~${i}~def~routineDay">${WEEKDAYS.map(w=>`<option value="${w[0]}" ${df.routineDay===w[0]?"selected":""}>${w[1]}</option>`).join("")}</select></div>`:""}
+     <label class="fl" style="margin-top:10px">الوقت</label>
+     <div class="chips">
+       <button class="chip ${time==="صباحي"?"sel":""}" data-radio="pool~${i}~def~routineTime" data-val="صباحي">🌅 صباحي</button>
+       <button class="chip ${time==="مسائي"?"sel":""}" data-radio="pool~${i}~def~routineTime" data-val="مسائي">🌙 مسائي</button>
+     </div>
+     <div class="note" style="margin-top:8px">الروتين يتم تحديده يوميًا بشكل مستقل — كل يوم تعمل عليه check لوحده، وسجل إنجازك بيتحفظ عبر الشهور.</div>
+   </div>`;
+ }
+ return h+`</div>`;}
+function repsArray(it){const n=Math.max(1,Math.min(31,+((it.def||{}).repeatCount)||1));
+ if(!Array.isArray(it.repeatDone))it.repeatDone=[];
+ while(it.repeatDone.length<n)it.repeatDone.push(false);
+ it.repeatDone.length=n;return it.repeatDone;}
+const startText=it=>{const d=(it.def||{}).startDay;return d?`${d} ${when()}`:"";};
+function itemDate(it){
+ const d=(it.def||{}).startDay;if(!d)return null;
+ const mi=MONTHS.indexOf(S.month);if(mi<0)return null;
+ return new Date(+S.year,mi,+d);
+}
+function dateStatus(it){
+ if(it.done)return "done";
+ const dt=itemDate(it);if(!dt)return "none";
+ const today=new Date();today.setHours(0,0,0,0);
+ const cmp=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate());
+ if(cmp.getTime()<today.getTime())return "overdue";
+ if(cmp.getTime()===today.getTime())return "today";
+ return "future";
+}
+const STATUS_LABEL={overdue:"فات موعده",today:"اليوم",future:"قادم",done:"تم ✓",none:""};
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;}
+function isRoutineDueToday(it){const df=it.def||{};if(df.repeatType!=="routine")return false;
+ if((df.routineFreq||"يومي")==="يومي")return true;
+ const map=["SU","MO","TU","WE","TH","FR","SA"];return map[new Date().getDay()]===df.routineDay;}
+function routineDoneToday(it){return !!(it.routineLog&&it.routineLog[todayKey()]);}
+function toggleRoutineToday(it){it.routineLog=it.routineLog||{};const k=todayKey();it.routineLog[k]=!it.routineLog[k];}
+function routineStreak(it){if(!it.routineLog)return 0;return Object.values(it.routineLog).filter(Boolean).length;}
+function ringColor(pct){
+ const stops=[[0,[201,138,58]],[40,[232,181,69]],[75,[255,199,64]],[100,[126,224,153]]];
+ let a=stops[0],b=stops[stops.length-1];
+ for(let i=0;i<stops.length-1;i++){if(pct>=stops[i][0]&&pct<=stops[i+1][0]){a=stops[i];b=stops[i+1];break;}}
+ const span=(b[0]-a[0])||1,t=(pct-a[0])/span;
+ const c=a[1].map((v,k)=>Math.round(v+(b[1][k]-v)*t));
+ return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function missionIcon(){
+ const PLANTS=["🌳","🌱","🌿","🌴","🌾","🌻","🌼","🍀","🌲","🪴"];
+ const text=(S.mission||"").trim();
+ if(!text)return PLANTS[0];
+ let h=0;for(let i=0;i<text.length;i++)h=(h*31+text.charCodeAt(i))>>>0;
+ return PLANTS[h%PLANTS.length];
+}
+function todayProgressStats(){
+ const items=allCommitted(),today=new Date();today.setHours(0,0,0,0);
+ let total=0,done=0;
+ items.forEach(it=>{
+   const df=it.def||{};
+   if(df.repeatType==="routine"){
+     if(isRoutineDueToday(it)){total++;if(routineDoneToday(it))done++;}
+     return;
+   }
+   if(df.repeatType==="recurring"){
+     const dt=itemDate(it);
+     if(!dt||dt.getTime()<=today.getTime()){total++;if(it.done)done++;}
+     return;
+   }
+   const dt=itemDate(it);
+   if(dt&&dt.getTime()<=today.getTime()){total++;if(it.done)done++;}
+ });
+ return {done,total};
+}
+function renderProgressRing(stats){
+ const total=stats?stats.total:allCommitted().length;
+ const done=stats?stats.done:allCommitted().filter(it=>it.done).length;
+ const pct=total?Math.round(done/total*100):0;
+ const r=14,cx=17,cy=17,C=2*Math.PI*r,offset=C*(1-pct/100),color=ringColor(pct),complete=total>0&&pct>=100;
+ const label=stats?"نسبة إنجاز مهام اليوم":"نسبة إنجاز مهام هذا الشهر";
+ return `<div class="intent-progress ${complete?"complete":""}" title="${label}: ${pct}%">
+   <svg viewBox="0 0 34 34">
+     <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e8d7ae" stroke-width="3.5"/>
+     <circle class="ring-fg" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="3.5"
+       stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"
+       transform="rotate(-90 ${cx} ${cy})" style="transition:stroke-dashoffset .5s ease,stroke .5s ease"/>
+   </svg>
+   <div class="intent-progress-coin" aria-hidden="true">🪙</div>
+ </div>`;
+}
+function renderTimeline(){
+ const items=allCommitted();
+ if(!items.length)return `<div class="empty">لا توجد أفعال ملتزم بها بعد.</div>`;
+ const dated=items.filter(it=>itemDate(it)).sort((a,b)=>itemDate(a)-itemDate(b));
+ const undated=items.filter(it=>!itemDate(it));
+ let h="";
+ if(dated.length){
+   h+=`<div class="timeline">`+dated.map((it,idx)=>{
+     const st=dateStatus(it);
+     return `<div class="tl-item">
+       <div class="tl-node-col"><div class="tl-node status-${st}"></div>${idx<dated.length-1?`<div class="tl-line status-${st}"></div>`:""}</div>
+       <div class="tl-content">
+         <div class="tl-toprow"><span class="tl-date">${esc(startText(it))}</span>${STATUS_LABEL[st]?`<span class="tl-badge status-${st}">${STATUS_LABEL[st]}</span>`:""}</div>
+         <div class="tl-text ${it.done?"tl-done":""}">${esc((it.def||{}).what||it.text)}</div>
+         <div class="tl-meta">${esc(it.axis||"بلا محور")} · يحل ${nsolve(it)}</div>
+       </div></div>`;}).join("")+`</div>`;
+ }
+ if(undated.length){
+   h+=`<div class="note" style="margin:${dated.length?"14px":"0"} 0 8px">بلا تاريخ بعد:</div>
+     ${undated.map(it=>`<div class="row" style="margin:0 0 6px"><div class="num">◆</div><div style="flex:1;font-size:14px">${esc((it.def||{}).what||it.text)}
+       <div class="note">${esc(it.axis||"بلا محور")} · يحل ${nsolve(it)}</div></div></div>`).join("")}`;
+ }
+ return h;
+}
+const allCommitted=()=>ordered(1).concat([0,1,2,3,4,5,6].reduce((a,d)=>a.concat(ordered(2,d)),[]));
+const axesCovered=(t,d)=>AXES.filter(a=>survivors(t,d).some(x=>x.axis===a[0])).map(a=>a[0]);
+const axesMissing=(t,d)=>AXES.map(a=>a[0]).filter(a=>!axesCovered(t,d).includes(a));
+
+/* ===================== شاشات اليوم الأول ===================== */
+function screens1(){
+ const L=[];
+ L.push({id:"start",sec:"البداية",eyebrow:"دفتر العمل الكامل",title:"البروتوكول الشهري لإعادة التناغم مع المال",
+  lede:"سِر عبر هذه الخطوات في أول يوم من كل شهر. كل ما تكتبه يُحفظ تلقائيًا على جهازك.",
+  render:()=>`<div class="grid2">
+    <div class="field"><label class="fl">الشهر</label><select data-bind="month">${MONTHS.map(m=>`<option ${S.month===m?"selected":""}>${m}</option>`).join("")}</select></div>
+    <div class="field"><label class="fl">السنة</label><select data-bind="year">${YEARS.map(y=>`<option ${S.year===y?"selected":""}>${y}</option>`).join("")}</select></div></div>
+    ${F.ta("mission","الرسالة","رسالتي في هذه الحياة...","النية المالية لا بد أن تتناغم مع رسالتك")}
+    <div class="mantra">أنا أسير هذا الشهر — ${esc(when())} — في تناغم كامل مع رسالتي.</div>`});
+
+ L.push({id:"intent",sec:"القسم الأول",eyebrow:"القسم الأول · أولًا",title:"تحديد النية المالية",
+  lede:"اكتب القيمة فقط — باقي الجملة ثابت، والشهر والسنة يأتيان تلقائيًا.",
+  render:()=>`<div class="mantra">نيتي المالية: أن أحصل على
+    <input type="text" data-bind="intentValue" value="${esc(S.intentValue)}" placeholder="القيمة">
+    هذا الشهر — ${esc(when())} — وليكن الأمر كذلك.</div>
+    ${S.mission?`<div class="note">رسالتي: ${esc(S.mission)}</div>`:""}`,
+  ok:()=>(S.intentValue||"").trim().length>0});
+
+ L.push({id:"acts",sec:"القسم الأول",eyebrow:"القسم الأول · ثانيًا",title:"الأفعال الخمسة",
+  lede:"اكتب خمسة أفعال محددة يمكنك القيام بها هذا الشهر للمساعدة في تحقيق هدفك المالي.",
+  render:()=>S.acts.map((v,i)=>`<div class="row"><div class="num">${i+1}</div><input type="text" data-bind="acts~${i}" value="${esc(v)}" placeholder="فعل ${i+1}"></div>`).join("")
+    +F.pend("هل (اذكر الفعل) متناغم مع تحقيق نيتي المالية لهذا الشهر؟ ← أي فعل هو الأكثر تناغمًا؟"),
+  ok:()=>S.acts.filter(a=>(a||"").trim()).length>=3});
+
+ L.push({id:"order",sec:"القسم الأول",eyebrow:"القسم الأول · ثانيًا (تكملة)",title:"ترتيب الأولوية",
+  lede:"رتّبها بالبندول من الأعلى تناغمًا إلى الأقل.",
+  render:()=>{const o=(S.order&&S.order.length===5)?S.order:[0,1,2,3,4];
+    return o.map((oi,r)=>`<div class="row"><div class="num">${r+1}</div>
+      <div style="flex:1;font-size:14.5px">${(S.acts[oi]||"").trim()?esc(S.acts[oi]):'<span style="color:var(--ink-faint)">— فارغ —</span>'}</div>
+      <button class="minibtn" data-move="up" data-i="${r}" ${r===0?"disabled":""}>▲</button>
+      <button class="minibtn" data-move="down" data-i="${r}" ${r===4?"disabled":""}>▼</button></div>`).join("");}});
+
+ L.push({id:"energies-q",sec:"القسم الثاني",eyebrow:"القسم الثاني · أولًا",title:"تحديد وتحرير الطاقات غير المتناغمة",
+  lede:"اسأل بالبندول قبل الدخول إلى الجدول.",
+  render:()=>F.pend(`هل يوجد طاقات غير متناغمة مع نيتي المالية لشهر ${when()}؟`)
+   +`<div class="field">${F.radios("hasEnergies",["نعم","لا"])}</div>`
+   +(S.hasEnergies==="نعم"?F.pend("كم يوجد من الطاقات غير المتناغمة والمتاح لي كشفه هذا الشهر وتطهيره كي أُجلّي نيتي المالية؟")
+     +`<div class="field" style="max-width:200px"><label class="fl">العدد المتاح كشفه</label><input type="number" min="1" max="12" data-bind="energyCount" value="${esc(S.energyCount)}"></div>`:""),
+  ok:()=>S.hasEnergies==="لا"||(S.hasEnergies==="نعم"&&+S.energyCount>0)});
+
+ if(S.hasEnergies==="نعم"){
+  L.push({id:"beliefs-table",sec:"القسم الثاني",eyebrow:"القسم الثاني · الجدول",title:"جدول المعتقدات حول المال",
+   lede:"اضغط على المعتقدات التي كشفها البندول — تنتقل تلقائيًا إلى صفحة التشخيص.",
+   render:()=>`<div class="note" style="margin-bottom:10px">المتاح كشفه هذا الشهر: <span class="count">${esc(S.energyCount||"—")}</span> — اخترت حتى الآن: <span class="count">${S.selBeliefs.length}</span></div>
+     <div class="tw"><table class="bt"><thead><tr><th></th><th>عمود 1</th><th>عمود 2</th><th>عمود 3</th></tr></thead><tbody>
+     ${BELIEFS_TABLE.map((row,i)=>`<tr><td class="rh">صف ${i+1}</td>${row.map(c=>`<td>${c.map(x=>
+       `<button class="pick ${S.selBeliefs.includes(x)?"sel":""}" data-check="selBeliefs" data-val="${esc(x)}">${esc(x)}</button>`).join("")}</td>`).join("")}</tr>`).join("")}
+     </tbody></table></div>`});
+
+  L.push({id:"energies-diag",sec:"القسم الثاني",eyebrow:"القسم الثاني · أولًا (تكملة)",title:"تشخيص كل طاقة",
+   lede:"لكل طاقة: هل هي اعتقاد أم نمط أم برمجة؟ وفي أي شاكرا تتواجد؟ ثم فسّر النتيجة.",
+   render:()=>{
+     const list=energyList();
+     let h=list.length?"":`<div class="empty">لم تختر أي معتقد من الجدول بعد.</div>`;
+     list.forEach((n,i)=>{const m=em(n);const ch=CHAKRAS.find(c=>c[0]===m.chakra);const ty=TYPES.find(t=>t[0]===m.type);
+       h+=`<div class="block"><h4>الطاقة ${i+1}</h4>
+         <div style="font-family:'Noto Sans Arabic',sans-serif;font-size:17px;margin-bottom:10px">${esc(n)}</div>
+         <div class="field"><label class="fl">النوع</label>
+           <div class="chips">${TYPES.map(t=>`<button class="chip ${m.type===t[0]?"sel":""}" data-radio="energyMeta~${esc(n)}~type" data-val="${t[0]}">${t[0]}</button>`).join("")}</div>
+           ${ty?`<div class="reveal"><b>${esc(ty[0])}:</b> ${esc(ty[1])}</div>`:""}</div>
+         <div class="field"><label class="fl">الشاكرا</label>
+           <select data-bind="energyMeta~${esc(n)}~chakra"><option value="">— اختر —</option>${CHAKRAS.map(c=>`<option ${m.chakra===c[0]?"selected":""}>${c[0]}</option>`).join("")}</select>
+           ${ch?`<div class="reveal"><b>الموقع:</b> ${esc(ch[1])}<br><b>وظيفتها في الحدس المالي:</b> ${esc(ch[2])}</div>`:""}</div>
+         ${F.ta("energyMeta~"+n+"~interp","تفسير النتيجة","اكتب شرحًا وافيًا واثقًا في المعنى الذي يأتيك لهذه الطاقة تحديدًا...")}
+       </div>`;});
+     h+=(S.customEnergies||[]).map((v,i)=>`<div class="row"><div class="num">+</div><input type="text" data-bind="customEnergies~${i}" value="${esc(v)}" placeholder="طاقة من خارج الجدول"><button class="minibtn" data-del="customEnergies.${i}">✕</button></div>`).join("");
+     return h+`<button class="minibtn" data-add="customEnergies">+ إضافة طاقة من خارج الجدول</button>`;}});
+
+  L.push({id:"cleanse",sec:"القسم الثاني",eyebrow:"القسم الثاني · التنظيف",title:"الدخول إلى السجلات الأكاشية",
+   lede:"ادخل في التأمل، ثم انطق النية التالية لكل طاقة على حدة.",
+   render:()=>{const list=energyList();
+     return (list.length?list.map((n,i)=>{const m=em(n);
+       return `<div class="block"><h4>نية التنظيف — ${esc(n)}</h4>
+        <div class="mantra">«أضع هنا النية بأن يتم تنظيف من كياني الطاقي وذبذباتي وسجلاتي الأكاشية (${esc(m.type||"الاعتقاد – النمط – البرمجة")}) التالية (${esc(n)}) والتي تؤثر في شاكرا (${esc(m.chakra||"......")}).. وأضع النية كذلك بأن يتم إعادة التناغم لنيتي المالية التالية (${esc(intentSentence())}) حتى يمكن لها أن تتجلى في حياتي وتجربتي..<br>ليكن الأمر كذلك.. شكرًا، شكرًا، شكرًا»</div>
+        <div style="margin-top:10px"><button class="minibtn" data-copy="${i}">نسخ النية</button></div></div>`;}).join("")
+      :`<div class="empty">لا توجد طاقات.</div>`)
+      +F.ta("cleanseNotes","ملاحظاتي بعد التنظيف","ما الذي تغيّر؟");}});
+
+  L.push({id:"eft",sec:"القسم الثاني",eyebrow:"القسم الثاني · ثانيًا",title:"برنامج EFT",
+   lede:"مواضيعك هي الطاقات غير المتناغمة اللي حددتها بالترتيب. لكل موضوع: انسخ محتواه وألصقه في الـ skill الخاصة بك على Claude، ثم الصق ناتج البرنامج هنا داخل المربع الخاص به.",
+   render:()=>{const list=energyList();
+     if(!list.length)return `<div class="empty">لا توجد طاقات لبناء البرنامج عليها.</div>`;
+     let h=`<div class="field"><label class="fl">رابط الـ skill الخاصة بك على Claude</label>
+       <div style="display:flex;gap:8px"><input type="text" data-bind="eftSkillLink" value="${esc(S.eftSkillLink)}" placeholder="الصق هنا رابط المشاركة الخاص بالـ skill">
+       <button class="minibtn" id="eftOpenSkill" style="white-space:nowrap">فتح الـ skill</button></div></div>`;
+     list.forEach((n,i)=>{const m=em(n);const has=(S.eftByEnergy[n]||"").trim();
+       const topicInput=`الموضوع ${i+1}: ${n}\nالنوع: ${m.type||"غير محدد"} — الشاكرا: ${m.chakra||"غير محددة"}\n${m.interp?"تفسيري لهذه الطاقة: "+m.interp:""}`;
+       h+=`<details ${has?"open":""}><summary>${i+1}. ${esc(n)} ${has?"✓":""}</summary><div class="in">
+         <div class="note" style="margin-bottom:8px">هذا هو محتوى الموضوع لتلصقه في الـ skill:</div>
+         <div class="out" style="font-size:13px;margin-bottom:10px">${esc(topicInput)}</div>
+         <button class="minibtn" data-eftcopytopic="${i}">نسخ محتوى الموضوع</button>
+         <div style="height:12px"></div>
+         ${F.ta("eftByEnergy~"+n,"برنامج EFT الخاص بهذا الموضوع (الصق الناتج من الـ skill هنا)","")}
+       </div></details>`;});
+     h+=`<div class="note" style="margin-top:10px">عند ممارسة أي تمرين، افتح موضوعه من هنا وستجد البرنامج الذي ألصقته جاهزًا لاستخدامه.</div>`;
+     if(list.some(n=>(S.eftByEnergy[n]||"").trim()))
+       h+=`<div style="margin-top:14px"><button class="btn ghost" id="eftWordAll">تنزيل كل برامج EFT كملف Word</button></div>`;
+     return h;}});
+ }
+
+ L.push({id:"corrective",sec:"القسم الثاني",eyebrow:"القسم الثاني · ثالثًا",title:"الأفعال التصحيحية",
+  lede:"لكل طاقة غير متناغمة حددتها: اكتب الأفعال التصحيحية التي تثبّت تنظيفها على المستويين الخامس والرابع (الروحي والطاقي). سطر لكل فعل.",
+  render:()=>{const list=energyList();
+    if(!list.length)return `<div class="empty">لم تُسجّل طاقات غير متناغمة بعد.</div>`;
+    return `<div class="pendulum"><b>مثال</b>الاعتقاد السلبي: «ما لديك احتفظ به» ← الفعل التصحيحي: التخلي عن المال بشكل إيجابي (استثمار، صرف ذو مردود جيد، أو تبرّع).</div>`
+     +list.map((n,i)=>`<div class="block"><h4>${i+1}. ${esc(n)}</h4>`+F.ta("correctiveByEnergy~"+n,"","اكتب كل فعل تصحيحي في سطر مستقل")+`</div>`).join("");}});
+
+ L.push({id:"lack",sec:"القسم الثالث",eyebrow:"القسم الثالث · أولًا",title:"تحديد اعتقادات النقص",
+  lede:"من تطهير علاقتك بالمال، إلى بناء ممارسة تدوم.",
+  render:()=>F.pend("هل أعتقد أو أشارك في أي سلوك من سلوكيات النقص؟")+F.checks("lack",LACK)+F.ta("lackNotes","ملاحظاتي واستجابتي","")});
+
+ if((S.lack||[]).length===0){
+  L.push({id:"lack-none",sec:"القسم الثالث",eyebrow:"القسم الثالث · ثانيًا",title:"لا توجد اعتقادات نقص هذا الشهر",
+   lede:"",
+   render:()=>`<div class="okbox">حتى في حال عدم وجود اعتقادات نقص هذا الشهر، تذكّر دائمًا أن تردد توكيد الامتنان عند الشراء أو صرف المال.</div>
+     <div class="mantra">«أنا بمنتهى السعادة والامتنان أختار (لا أختار) مبادلة مالي مقابل (الشيء / المنفعة العائدة عليّ منه)»</div>`});
+ }
+ (S.lack||[]).forEach((b,i)=>L.push({id:"lack-remedy-"+i,sec:"القسم الثالث",eyebrow:`القسم الثالث · ثانيًا (${i+1} من ${S.lack.length})`,title:"اختر العلاج المناسب",
+  lede:"العلاج الذي تختاره يتحول إلى فعل في خطتك.",
+  render:()=>`<div class="block"><h4>الاعتقاد</h4><div style="font-size:16px;font-family:'Noto Sans Arabic',sans-serif">${esc(b)}</div>
+    <div class="note">${esc((LACK.find(x=>x[0]===b)||[])[1]||"")}</div></div>`+F.radios("lackRemedy~"+b,REMEDIES),
+  ok:()=>!!S.lackRemedy[b]}));
+
+ L.push({id:"blockers",sec:"القسم الثالث",eyebrow:"القسم الثالث · ثالثًا",title:"المشاعر المعيقة",
+  lede:"استكشف المشاعر التي قد تعيق تدفق الوفرة في حياتك.",
+  render:()=>F.pend("هل علاقتي الحالية بالمال فيها أيًا من المعيقات التالية؟")+F.chips("blockers",BLOCKERS)});
+
+ (S.blockers||[]).forEach((b,i)=>L.push({id:"blk-trigger-"+i,sec:"القسم الثالث",eyebrow:`القسم الثالث · رابعًا (${i+1} من ${S.blockers.length})`,title:"متى يتحفز هذا المعيق؟",
+  lede:"لكل معيق محفّزه الخاص.",
+  render:()=>`<div class="block"><h4>المعيق</h4><div style="font-size:18px;font-family:'Noto Sans Arabic',sans-serif;color:var(--gold-deep)">${esc(b)}</div></div>`
+    +F.radios("blockerTrigger~"+b,TRIGGERS)
+    +`<div class="rule"></div><div class="mantra">«أنا — بمنتهى الامتنان والسعادة — أختار (أو لا أختار) أن أستبدل مالي مقابل (اذكر المقابل)»</div>
+      <div class="note">قله كلما شعرت بأن الطاقة السلبية يتم تنشيطها.</div><div style="height:14px"></div>`
+    +F.tx("blockerAffirm~"+b,"صياغة التوكيد الخاص بهذا المعيق","اكتب التوكيد كما ستقوله"),
+  ok:()=>!!S.blockerTrigger[b]}));
+
+ L.push({id:"spend",sec:"القسم الثالث",eyebrow:"القسم الثالث · خامسًا",title:"استثمار أم صرف؟",
+  lede:"أمام كل بند، حدد طاقة التبادل. بنود «الصرف» هي التي سنشتغل عليها.",
+  render:()=>F.pend("عندما أُخرج مالي مقابل [...] هل هذا التبادل مشحون بطاقة الاستثمار أم الإنفاق؟")
+   +`<div class="tw"><table><thead><tr><th style="text-align:start">البند</th><th style="width:100px">استثمار</th><th style="width:100px">صرف</th></tr></thead><tbody>
+     ${SPEND.map(it=>{const v=S.spendKind[it]||"";
+       return `<tr><td>${esc(it)}</td>
+        <td style="text-align:center"><span class="opt radio invest ${v==="استثمار"?"sel":""}" style="display:inline-flex;padding:6px;border-radius:99px" data-radio="spendKind~${esc(it)}" data-val="استثمار"><span class="box"></span></span></td>
+        <td style="text-align:center"><span class="opt radio divest ${v==="صرف"?"sel":""}" style="display:inline-flex;padding:6px;border-radius:99px" data-radio="spendKind~${esc(it)}" data-val="صرف"><span class="box"></span></span></td></tr>`;}).join("")}
+     </tbody></table></div>
+     <div class="note">حدّدت <span class="count">${SPEND.filter(i=>S.spendKind[i]==="صرف").length}</span> بندًا كـ«صرف».</div>`});
+
+ const sp=SPEND.filter(i=>S.spendKind[i]==="صرف");
+ if(sp.length)L.push({id:"spend-decide",sec:"القسم الثالث",eyebrow:"القسم الثالث · سادسًا",title:"قرارات التحويل",
+  lede:"لكل بند صرف: أولًا هل التغيير الدائم ممكن هذا الشهر؟ إن كانت الإجابة نعم، اختر طريقة التحويل.",
+  render:()=>sp.map(pt=>{const d=S.spendDecisions[pt]||{};
+     return `<div class="block"><h4>${esc(pt)}</h4>`
+      +F.pend("هل يمكن إجراء تغيير دائم من طاقة صرف إلى طاقة استثمار هذا الشهر؟")
+      +F.radios("spendDecisions~"+pt+"~possible",["نعم","لا"])
+      +(d.possible==="نعم"?`<div style="height:10px"></div>${F.radios("spendDecisions~"+pt+"~method",METHODS)}
+        <div style="height:10px"></div><input type="text" data-bind="spendDecisions~${esc(pt)}~note" value="${esc(d.note||"")}" placeholder="القرار التحويلي بالتحديد">`
+      :(d.possible==="لا"?`<div class="note">تُركت جانبًا هذا الشهر.</div>`:""))
+      +`</div>`;}).join("")});
+
+ L.push({id:"aspects-q",sec:"القسم الثالث",eyebrow:"القسم الثالث · سابعًا",title:"أين تقاومني حياتي؟",
+  lede:"اضغط على الجوانب التي تحتوي أنماطًا سلبية تؤثر على نيتك المالية — تنتقل تلقائيًا للصفحة التالية.",
+  render:()=>F.pend("كم جانب من حياتي يحتوي أنماطًا سلبية تؤثر على نيتي المالية ومتاح لي التعامل معه هذا الشهر؟")
+   +`<div class="note" style="margin-bottom:10px">اخترت: <span class="count">${S.selAspects.length}</span></div>
+    <div class="tw"><table class="bt"><thead><tr><th></th><th>العمود الأول</th><th>العمود الثاني</th><th>العمود الثالث</th></tr></thead><tbody>
+    ${ASPECTS_TABLE.map(r=>`<tr><td class="rh">${esc(r[0])}</td>${[1,2,3].map(ci=>`<td>${r[ci].map(x=>{
+      const v=r[0]+" — "+x;
+      return `<button class="pick ${S.selAspects.includes(v)?"sel":""}" data-check="selAspects" data-val="${esc(v)}">${esc(x)}</button>`;}).join("")}</td>`).join("")}</tr>`).join("")}
+    </tbody></table></div>`,
+  ok:()=>S.selAspects.length>0});
+
+ L.push({id:"aspects",sec:"القسم الثالث",eyebrow:"القسم الثالث · سابعًا (تكملة)",title:"تفصيل الجوانب والأنماط",
+  lede:"لكل جانب اخترته: حدد النمط الطاقي المعيق، ثم الخطوة العملية — والتي تنتقل لخطتك.",
+  render:()=>{
+    if(!S.selAspects.length)return `<div class="empty">لم تختر جوانب بعد.</div>`;
+    return `<details><summary>الأنماط الطاقية المعيقة السبعة</summary><div class="in">${PATTERNS.map(p=>`<p style="margin:6px 0;font-size:13.3px"><b style="color:var(--gold-deep)">${p[0]}</b> — ${p[1]}</p>`).join("")}</div></details>`
+     +S.selAspects.map((a,i)=>{const m=am(a);const pt=PATTERNS.find(p=>p[0]===m.pattern);
+       return `<div class="block"><h4>الجانب ${i+1}</h4>
+        <div style="font-family:'Noto Sans Arabic',sans-serif;font-size:17px;margin-bottom:10px">${esc(a)}</div>
+        <div class="field"><label class="fl">النمط الطاقي المعيق</label>
+          <select data-bind="aspectMeta~${esc(a)}~pattern"><option value="">— اختر —</option>${PATTERNS.map(p=>`<option ${m.pattern===p[0]?"selected":""}>${p[0]}</option>`).join("")}</select>
+          ${pt?`<div class="reveal">${esc(pt[1])}</div>`:""}</div>
+        ${F.tx("aspectMeta~"+a+"~root","السبب الجذري","معتقد؟ برمجة؟ نمط سلوكي؟")}
+        ${F.tx("aspectMeta~"+a+"~signs","تجلياته في واقعي اليومي","ما المواقف أو التحديات التي يسببها؟")}
+        ${F.tx("aspectMeta~"+a+"~step","الخطوة العملية هذا الشهر","خطوة محددة وقابلة للتنفيذ")}</div>`;}).join("");}});
+
+ return L.concat(filterScreens(1,null,"الفلترة"));
+}
+
+/* ===================== شاشات الأيام السبعة ===================== */
+function screens2(){
+ let L=[];
+ for(let d=0;d<7;d++){
+  const sec="يوم "+(d+1);
+  L.push({id:`d7-${d+1}-ideas`,sec:sec,eyebrow:`الأيام السبعة · يوم ${d+1}`,title:`أفكار يوم ${d+1}`,
+   lede:"اكتب فكرتين على الأقل، ثم اختبر كل فكرة بالبندول. المتناغمة فقط تدخل الفلترة.",
+   render:()=>{
+     if(!S.ideas[d])S.ideas[d]=[{t:"",s:""},{t:"",s:""}];
+     let h=F.pend("هل هذه الفكرة متناغمة مع نيتي المالية لهذا الشهر؟")
+      +`<div class="note" style="margin-bottom:12px">النية: ${esc(intentSentence())}</div>`;
+     h+=S.ideas[d].map((c,i)=>`<div class="block" style="padding:12px">
+       <div class="row" style="margin:0"><div class="num">${i+1}</div>
+       <input type="text" data-bind="ideas~${d}~${i}~t" value="${esc(c.t)}" placeholder="فكرة ${i+1}"></div>
+       <div class="chips" style="margin-top:9px">
+        <button class="chip ${c.s==="الآن"?"sel":""}" data-seg="ideas~${d}~${i}~s" data-val="الآن">متناغم هذا الشهر</button>
+        <button class="chip" data-ibank="${d}.${i}">متناغم فيما بعد</button>
+        <button class="chip" data-idel="${d}.${i}">غير متناغم</button></div>
+       ${c.s==="الآن"?`<div class="note">تدخل الفلترة وتُضاف لخطة الشهر إن اجتازت.</div>`:""}</div>`).join("");
+     h+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="minibtn" data-addidea="${d}">+ إضافة فكرة</button>
+        <button class="minibtn" data-go="d7-timeline">عرض خطة العمل بعد التحديث</button></div>`;
+     h+=`<details><summary>بنك الأفكار المؤجلة (${(S.ideaBank||[]).length})</summary><div class="in">
+       <div class="note" style="margin:0 0 8px">أفكار قلت عنها «متناغم فيما بعد» — تبقى محفوظة عبر الشهور. اختبرها من جديد مع الشهر الحالي.</div>
+       ${(S.ideaBank||[]).length?(S.ideaBank||[]).map((b,bi)=>`<div class="row"><div style="flex:1;font-size:14px">${esc(b.text)}<div class="note">مؤجلة من ${esc(b.from||"—")}</div></div>
+         <button class="minibtn" data-brest="${bi}.${d}">اختبرها الآن</button>
+         <button class="minibtn" data-bdel="${bi}">حذف</button></div>`).join(""):`<div class="note">لا توجد أفكار مؤجلة.</div>`}
+       </div></details>`;
+     return h;}});
+
+  L.push({id:`d7-${d+1}-filter`,sec:sec,eyebrow:`يوم ${d+1} · الفلترة`,title:"فلترة أفكار اليوم",
+   enter:syncPool,
+   lede:"أولًا: هل تحل نمطًا؟ ثم — للتي تحل نمطًا فقط — قوة التناغم وسهولة التنفيذ.",
+   render:()=>{
+     const p=Pd(d);
+     if(!p.length)return `<div class="empty">لا توجد أفكار متناغمة في هذا اليوم. يمكنك الانتقال لليوم التالي.</div>`;
+     let h=F.pend("هل هذا الفعل يحل أي نمط من أنماط عدم التناغم التي اكتشفتها؟")
+      +p.map(it=>{const i=S.pool.indexOf(it);
+        return `<div class="block"><div class="row" style="margin:0"><div style="flex:1;font-size:14.5px">${esc(it.text)}</div>
+          <div class="seg"><button class="${it.resolves==="نعم"?"on":""}" data-pl="${i}.resolves" data-val="نعم">نعم</button>
+          <button class="${it.resolves==="لا"?"on no":""}" data-pl="${i}.resolves" data-val="لا">لا</button></div></div>
+          ${it.resolves==="نعم"?solvesChips(i,it):""}</div>`;}).join("");
+     const r=byScoreAsc(resolved(2,d));
+     if(r.length){h+=`<div class="rule"></div>`+r.map(it=>tuneBlock(S.pool.indexOf(it),it)).join("");}
+     const s=survivors(2,d);
+     h+=s.length?`<div class="okbox">اجتاز ${s.length} فكرة إلى مرحلة التعريف.</div>`
+       :`<div class="warnbox">لم تجتز أي فكرة حتى الآن — يُغلق اليوم بلا إضافة، ونجرّب اليوم التالي.</div>`;
+     return h;}});
+
+  L.push({id:`d7-${d+1}-close`,sec:sec,eyebrow:`يوم ${d+1} · الإغلاق`,title:"إغلاق اليوم",
+   lede:"للأفكار التي اجتازت: حدد المحور، ثم الالتزام، ثم عرّفها — لتُضاف إلى خطة الشهر.",
+   render:()=>{
+     const s=survivors(2,d);
+     if(!s.length)return `<div class="warnbox">اليوم ${d+1} أُغلق بدون إضافة — لم تمر أي فكرة عبر الفلاتر.</div>`;
+     let h=s.map(it=>{const i=S.pool.indexOf(it);const df=it.def||{};
+       return `<div class="block" style="position:relative" data-carditem="${i}">${scoreBadge(it)}<h4 style="color:var(--ink);font-weight:600;padding-left:30px">${esc(it.text)}</h4>
+        <div class="field"><label class="fl">المحور</label><div class="chips">${AXES.map(a=>`<button class="chip ${it.axis===a[0]?"sel":""}" data-pl="${i}.axis" data-val="${a[0]}">${a[0]}</button>`).join("")}</div></div>
+        <div class="field"><label class="fl">هل يدخل ضمن التزامي هذا الشهر؟</label>
+          <div class="seg"><button class="${it.commit==="نعم"?"on":""}" data-pl="${i}.commit" data-val="نعم">ألتزم</button>
+          <button class="${it.commit==="لا"?"on no":""}" data-pl="${i}.commit" data-val="لا">أرحّله</button></div></div>
+        ${it.commit==="نعم"?`${F.tx(`pool~${i}~def~what`,"تعريف الفعل","ما هو هذا الفعل بالضبط؟")}
+          ${F.ta(`pool~${i}~def~steps`,"الخطوات","ما الخطوات التي سأقوم بها؟")}
+          ${F.tx(`pool~${i}~def~goal`,"الهدف النهائي","")}
+          ${F.tx(`pool~${i}~def~who`,"المتأثر بأفعالي","")}
+          ${F.tx(`pool~${i}~def~out`,"خارج النطاق","")}
+          ${dateField(i,it)}
+          ${repeatField(i,it)}`:""}
+       </div>`;}).join("");
+     const c=committed(2,d);
+     h+=c.length?`<div class="okbox">أُضيف ${c.length} فعلًا من يوم ${d+1} إلى خطة الشهر.</div>`
+       :`<div class="warnbox">لم تلتزم بأي فعل من هذا اليوم بعد.</div>`;
+     h+=`<button class="minibtn" data-go="d7-timeline">عرض خطة العمل بعد التحديث</button>`;
+     return h;}});
+ }
+ L.push({id:"d7-timeline",sec:"الخطة",eyebrow:"خطة العمل",title:"خطة العمل بعد التحديث",
+  lede:"كل الأفعال الملتزم بها — أفعال اليوم الأول وإضافات الأيام السبعة — مرتبة بتاريخ التنفيذ.",last:true,
+  render:()=>renderTimeline()});
+ return L;
+}
+
+/* ===================== فلترة اليوم الأول ===================== */
+function filterScreens(t,d,sec){
+ const L=[];
+ L.push({id:"pool",sec:sec,eyebrow:"الرصيد",title:"من الرصيد إلى الخطة",
+  lede:"كل ما جمعته من كل الأقسام في قائمة واحدة. احتفظ فقط بما هو فعل قابل للتنفيذ.",
+  enter:syncPool,
+  render:()=>{const p=P(1);
+    let h=`<div class="note" style="margin-bottom:14px">عدد الأفعال في الرصيد: <span class="count">${p.length}</span> — المستهدف من 8 إلى 12 على الأقل.</div>`;
+    h+=p.length?p.map(it=>{const i=S.pool.indexOf(it);
+      return `<div class="row"><div class="num">${P(1).indexOf(it)+1}</div><div style="flex:1">
+        <input type="text" data-pool="${i}" value="${esc(it.text)}">
+        <div class="note" style="margin-top:3px">${esc(it.source)}</div></div>
+        <button class="minibtn" data-prm="${i}">✕</button></div>`;}).join(""):`<div class="empty">لا توجد أفعال بعد.</div>`;
+    return h+`<div style="margin-top:12px"><button class="minibtn" data-addpool="1">+ إضافة فعل يدويًا</button></div>`;}});
+
+ L.push({id:"test-resolve",sec:sec,eyebrow:"الفلترة · 1",title:"هل يحل نمطًا؟",
+  lede:"الأفعال التي لا تحل نمطًا تُستبعد ولا تدخل المرحلة التالية.",
+  render:()=>{const p=P(1);if(!p.length)return `<div class="empty">لا توجد أفعال.</div>`;
+    return F.pend("هل هذا الفعل يحل أي نمط من أنماط عدم التناغم التي اكتشفتها حتى الآن؟")
+     +p.map(it=>{const i=S.pool.indexOf(it);
+       return `<div class="block"><div class="row" style="margin:0"><div style="flex:1;font-size:14.5px">${esc(it.text)}<div class="note">${esc(it.source)}</div></div>
+        <div class="seg"><button class="${it.resolves==="نعم"?"on":""}" data-pl="${i}.resolves" data-val="نعم">نعم</button>
+        <button class="${it.resolves==="لا"?"on no":""}" data-pl="${i}.resolves" data-val="لا">لا</button></div></div>
+        ${it.resolves==="نعم"?solvesChips(i,it):""}</div>`;}).join("")
+     +`<div class="note" style="margin-top:14px">اجتاز <span class="count">${resolved(1).length}</span> فعلًا.</div>`;}});
+
+ L.push({id:"test-matrix",sec:sec,eyebrow:"الفلترة · 2",title:"التناغم وسهولة التنفيذ",
+  lede:"للأفعال التي أثبتت أنها تحل نمطًا فقط — مرتبة تصاعديًا بعدد الأنماط التي تحلها.",
+  render:()=>{const p=byScoreAsc(resolved(1));if(!p.length)return `<div class="empty">لا توجد أفعال اجتازت الاختبار الأول.</div>`;
+    return p.map(it=>tuneBlock(S.pool.indexOf(it),it)).join("");}});
+
+ L.push({id:"filter-result",sec:sec,eyebrow:"الفلترة · النتيجة",title:"الأفعال الباقية",
+  lede:"عالية التناغم وسهلة التنفيذ هي التي تكمل إجباريًا. لو طاقة غير متناغمة فضلت بلا فعل يحلها، هنقترح لك من الاحتياطي.",
+  render:()=>{
+    const s=byPlanPriority(survivors(1)),res=reserve(1),out=P(1).filter(x=>x.resolves==="لا"),low=resolved(1).filter(x=>x.align==="منخفض");
+    let h=`<div class="plan">${s.length?s.map(i=>`<div class="pcard hero" style="position:relative;padding-left:34px" data-carditem="${S.pool.indexOf(i)}">${scoreBadge(i)}${i.promoted?`<button class="card-undo" data-pl="${S.pool.indexOf(i)}.promoted" data-val="1" title="إلغاء الإضافة من الاحتياطي">✕</button>`:""}<span class="tag">تكمل المسار</span><h4>${esc(i.text)}</h4><div class="kv">${esc(i.source)}</div></div>`).join(""):`<div class="empty">لا توجد أفعال عالية التناغم وسهلة التنفيذ بعد.</div>`}</div>`;
+
+    const energies=energyList();
+    if(energies.length){
+      const missing=energies.filter(n=>!s.some(it=>(it.solves||[]).includes(n)));
+      h+=`<div class="rule"></div><h3 style="font-size:15px;margin:0 0 8px">تغطية الطاقات غير المتناغمة</h3>`;
+      if(!missing.length){
+        h+=`<div class="okbox">كل الطاقات غير المتناغمة مغطاة بفعل ضمن خطتك ✓</div>`;
+      }else{
+        h+=`<div class="warnbox">طاقات لم يغطّها أي فعل بعد: <b>${missing.map(esc).join(" · ")}</b></div>`;
+        missing.forEach(n=>{
+          const cands=res.filter(it=>(it.solves||[]).includes(n));
+          h+=`<div class="block"><h4>${esc(n)}</h4>`;
+          h+=cands.length?cands.map(it=>{const i=S.pool.indexOf(it);
+            return `<div class="opt" data-pl="${i}.promoted" data-val="1" data-carditem="${i}"><div class="box"></div><div style="flex:1"><div class="t" style="font-weight:500;display:flex;align-items:center">${scoreDot(it)}${esc(it.text)}</div>
+              <div class="d">مقترح لتغطية «${esc(n)}» — تناغم عالٍ، صعب التنفيذ</div></div></div>`;}).join("")
+           :`<div class="note">لا يوجد فعل احتياطي يحل هذه الطاقة حاليًا. ارجع لصفحة الرصيد وأضف فعلًا يخدمها، أو راجع اختباراتك السابقة.</div>`;
+          h+=`</div>`;});
+      }
+    }
+
+    h+=res.length?`<div class="rule"></div><h3 style="font-size:15px;margin:0 0 8px">كل الاحتياطي — تناغم عالٍ وصعب التنفيذ</h3>
+      <div class="note" style="margin:0 0 8px">يُستدعى عند الحاجة لتغطية محور أو طاقة ناقصة — أو أضفه الآن بإرادتك رغم صعوبة التنفيذ.</div>
+      ${res.map(it=>{const i=S.pool.indexOf(it);
+        return `<div class="opt" data-pl="${i}.promoted" data-val="1" data-carditem="${i}"><div class="box"></div><div style="flex:1"><div class="t" style="font-weight:500;display:flex;align-items:center">${scoreDot(it)}${esc(it.text)}</div>
+          <div class="d">أضفه إلى مهام الشهر رغم صعوبة التنفيذ</div></div></div>`;}).join("")}`:"";
+
+    h+=(low.length||out.length)?`<div class="rule"></div><div class="faded"><h3 style="font-size:15px;margin:0 0 8px">مؤجّل بقرار واعٍ</h3>
+      <ul style="font-size:13.5px;color:var(--ink-soft);padding-inline-start:18px;list-style:none">${low.concat(out).map(i=>`<li style="display:flex;align-items:center;margin-bottom:6px">${scoreDot(i)}${esc(i.text)}</li>`).join("")}</ul></div>`:"";
+    return h;}});
+
+ L.push({id:"axes",sec:sec,eyebrow:"الفلترة · 3",title:"محاور الحياة الأربعة",
+  lede:"لا نخرج من هنا إلا بأفعال تغطي المحاور الأربعة. إن نقص محور، استدعِ فعلًا من الاحتياطي (عالي التناغم وصعب التنفيذ).",
+  render:()=>{
+    const s=survivors(1);if(!s.length)return `<div class="empty">لا توجد أفعال في هذه المرحلة.</div>`;
+    const miss=axesMissing(1),res=reserve(1);
+    let h=s.map(it=>{const i=S.pool.indexOf(it);
+      return `<div class="block" style="position:relative" data-carditem="${i}">${scoreBadge(it)}<h4 style="color:var(--ink);font-weight:600;padding-left:30px">${esc(it.text)}${it.promoted?` <span class="tag" style="margin:0">من الاحتياطي</span>`:""}</h4>
+       <div class="chips">${AXES.map(a=>`<button class="chip ${it.axis===a[0]?"sel":""}" data-pl="${i}.axis" data-val="${a[0]}">${a[0]}</button>`).join("")}</div>
+       ${it.axis?`<div class="reveal">${esc((AXES.find(a=>a[0]===it.axis)||[])[1]||"")}</div>`:""}</div>`;}).join("");
+    h+=`<div class="${miss.length?"warnbox":"okbox"}">${miss.length?`محاور لم تُغطَّ بعد: <b>${miss.join(" · ")}</b>`:"المحاور الأربعة مغطاة ✓"}</div>`;
+    if(miss.length&&res.length)h+=`<h3 style="font-size:15px;margin:14px 0 8px">الاحتياطي — تناغم عالٍ وصعب التنفيذ</h3>
+      <div class="note" style="margin:0 0 8px">أدخِل منها فعلًا يتناغم مع المحور الناقص.</div>
+      ${res.map(it=>{const i=S.pool.indexOf(it);
+        return `<div class="row"><div style="flex:1;font-size:14px;display:flex;align-items:center">${scoreDot(it)}<div>${esc(it.text)}<div class="note">${esc(it.source)}</div></div></div>
+          <button class="minibtn" data-pl="${i}.promoted" data-val="1">+ أدخِله</button></div>`;}).join("")}`;
+    else if(miss.length&&!res.length)h+=`<div class="note">لا يوجد احتياطي متاح — ارجع لصفحة الرصيد وأضف فعلًا يخدم المحور الناقص، أو أعد اختبار التناغم.</div>`;
+    return h;},
+  ok:()=>survivors(1).length>0&&axesMissing(1).length===0});
+
+ L.push({id:"commit",sec:sec,eyebrow:"الفلترة · 4",title:"التزام هذا الشهر",
+  lede:"لا تلتزم بها كلها دفعة واحدة — اختر ما يدخل ضمن هذا الشهر تحديدًا.",
+  render:()=>{const s=survivors(1);if(!s.length)return `<div class="empty">لا توجد أفعال.</div>`;
+    return F.pend("هل هذا الفعل يدخل ضمن التزامي لهذا الشهر؟")
+     +s.map(it=>{const i=S.pool.indexOf(it);
+       return `<div class="row" data-carditem="${i}"><div style="flex:1;display:flex;align-items:center">${scoreDot(it)}<div><div style="font-size:14.5px">${esc(it.text)}</div><div class="note">${esc(it.axis||"بلا محور")}</div></div></div>
+        <div class="seg"><button class="${it.commit==="نعم"?"on":""}" data-pl="${i}.commit" data-val="نعم">ألتزم</button>
+        <button class="${it.commit==="لا"?"on no":""}" data-pl="${i}.commit" data-val="لا">أرحّله</button></div></div>`;}).join("")
+     +`<div class="note" style="margin-top:14px">ملتزم بـ <span class="count">${committed(1).length}</span> فعلًا.</div>`;}});
+
+ L.push({id:"define",sec:sec,eyebrow:"الفلترة · 5",title:"تعريف الأفعال بدقة",
+  lede:"لكل فعل ملتزم به: عرّفه بدقة ورتّبه بحسب الأولوية.",last:true,
+  render:()=>{const c=ordered(1);if(!c.length)return `<div class="empty">لم تلتزم بأي فعل بعد.</div>`;
+    return c.map((it,n)=>{const i=S.pool.indexOf(it);
+      return `<div class="block" data-carditem="${i}"><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <div class="num">${n+1}</div>${scoreDot(it)}<h4 style="margin:0;flex:1">${esc(it.text)}</h4>
+        <button class="minibtn" data-rank="up" data-i="${i}" ${n===0?"disabled":""}>▲</button>
+        <button class="minibtn" data-rank="down" data-i="${i}" ${n===c.length-1?"disabled":""}>▼</button></div>
+       ${F.tx(`pool~${i}~def~what`,"تعريف الفعل","ما هو هذا الفعل بالضبط؟")}
+       ${F.ta(`pool~${i}~def~steps`,"الخطوات","ما الخطوات التي سأقوم بها؟")}
+       ${F.tx(`pool~${i}~def~goal`,"الهدف النهائي","ما الذي أريد تحقيقه في النهاية؟")}
+       ${F.tx(`pool~${i}~def~who`,"المتأثر بأفعالي","من سيتأثر بهذا الفعل، إيجابًا أو سلبًا؟")}
+       ${F.tx(`pool~${i}~def~out`,"خارج النطاق","ما الذي لن أفعله ضمنه حاليًا؟")}
+       ${dateField(i,it)}
+       ${repeatField(i,it)}</div>`;}).join("");}});
+ return L;
+}
+
+/* ===================== الخطة والتصدير ===================== */
+const byTodoOrder=list=>list.slice().sort((a,b)=>{
+ const ad=a.done?1:0,bd=b.done?1:0;
+ if(ad!==bd)return ad-bd;
+ const da=itemDate(a),db=itemDate(b);
+ if(da&&db)return da-db;
+ if(da&&!db)return -1;
+ if(!da&&db)return 1;
+ return (a.rank||0)-(b.rank||0);
+});
+const allReserve=()=>[reserve(1)].concat([0,1,2,3,4,5,6].map(d=>reserve(2,d))).flat();
+function planCardFn(){
+ return (it,n,badge)=>{const df=it.def||{};const i=S.pool.indexOf(it);const open=!!it.expanded;
+   const recurring=df.repeatType==="recurring";const routine=df.repeatType==="routine";
+   const reps=recurring?repsArray(it):null;
+   const isDone=routine?routineDoneToday(it):it.done;
+   const checkAttr=routine?`data-routinetoggle="${i}"`:`data-donetoggle="${i}"`;
+   return `<div class="pcard ${n===0&&!isDone?"hero":""} ${isDone?"done":""}" data-carditem="${i}">
+     <div class="plan-header" data-accordion="${i}">
+       <button class="plan-check ${isDone?"checked":""}" ${checkAttr} title="${isDone?"إلغاء الإنجاز":"تحديد كمُنجز"}">${isDone?"✓":""}</button>
+       <h4 class="plan-title">${esc(df.what||it.text)}</h4>
+       ${badge?`<span class="tag cat-badge ${badge==="فات موعده"?"cat-overdue":""}">${esc(badge)}</span>`:""}
+       ${scoreDot(it)}
+     </div>
+     ${recurring?`<div class="rep-row">
+       ${reps.map((d,ri)=>`<button class="rep-box ${d?"checked":""}" data-reptoggle="${i}.${ri}" title="المرة ${ri+1}">${d?"✓":ri+1}</button>`).join("")}
+       <span class="rep-count">${reps.filter(Boolean).length}/${reps.length}</span>
+     </div>`:""}
+     ${open?`<div class="plan-detail">
+       ${it.titleEditMode?`<div class="title-edit-row">
+           <input type="text" id="titleInput-${i}" class="title-edit-input" data-bind="pool~${i}~def~what" value="${esc(df.what||it.text)}" placeholder="عنوان المهمة">
+           <button class="minibtn title-edit-btn" data-titleedit="${i}" title="تم">✓</button>
+         </div>`:""}
+       <div class="meta-row">
+         ${!it.titleEditMode?`<button class="meta-edit-btn" data-titleedit="${i}" title="تعديل العنوان">✎</button>`:""}
+         ${it.axis?`<span class="meta-pill">${esc(it.axis)}</span>`:""}
+         ${!routine?startDaySelect(i,it):""}
+         ${repeatTypeSelect(i,it)}
+         ${recurring?repeatCountSelect(i,it):""}
+       </div>
+       ${df.what?`<div class="kv">${esc(it.text)}</div>`:""}
+       ${routine?`<div class="kv"><b>الروتين:</b> ${df.routineFreq==="أسبوعي"?"أسبوعي — "+esc((WEEKDAYS.find(w=>w[0]===df.routineDay)||[])[1]||""):"يومي"} · ${df.routineTime==="مسائي"?"مسائي 🌙":"صباحي 🌅"} · أنجزته ${routineStreak(it)} مرة حتى الآن</div>`:""}
+       ${repeatSubFields(i,it)}
+       ${df.steps?`<div class="kv"><b>الخطوات:</b> ${esc(df.steps)}</div>`:""}
+       ${df.goal?`<div class="kv"><b>الهدف:</b> ${esc(df.goal)}</div>`:""}
+       ${df.who?`<div class="kv"><b>المتأثر:</b> ${esc(df.who)}</div>`:""}
+       ${df.out?`<div class="kv"><b>خارج النطاق:</b> ${esc(df.out)}</div>`:""}
+       <div class="rule" style="margin:12px 0"></div>
+       <div class="kv" style="color:var(--ink-faint);font-size:12px">${esc(it.source)}</div></div>`:""}
+   </div>`;};
+}
+function todayWidgetItems(){
+ const items=allCommitted(),today=new Date();today.setHours(0,0,0,0);
+ const out=[];
+ items.forEach(it=>{
+   const df=it.def||{};
+   if(df.repeatType==="routine"){if(isRoutineDueToday(it))out.push({it,cat:df.routineTime==="مسائي"?"routine-evening":"routine-morning"});return;}
+   if(df.repeatType==="recurring"){
+     if(it.done)return;
+     const dt=itemDate(it);
+     if(!dt||dt.getTime()<=today.getTime())out.push({it,cat:"recurring"});
+     return;
+   }
+   if(it.done)return;
+   const dt=itemDate(it);
+   if(dt&&dt.getTime()<today.getTime())out.push({it,cat:"overdue"});
+   else if(dt&&dt.getTime()===today.getTime())out.push({it,cat:"today"});
+ });
+ const order={"routine-morning":0,"overdue":1,"today":2,"recurring":3,"routine-evening":4};
+ out.sort((a,b)=>order[a.cat]-order[b.cat]);
+ out.forEach((x,idx)=>{if(typeof x.it.todayRank!=="number")x.it.todayRank=idx;});
+ out.sort((a,b)=>(a.it.todayRank-b.it.todayRank)||(order[a.cat]-order[b.cat]));
+ return out;
+}
+const CAT_LABEL={overdue:"فات موعده",today:"اليوم","routine-morning":"روتين صباحي","routine-evening":"روتين مسائي",recurring:"قيد التقدم"};
+function renderPlan(){
+ const toggle=`<div class="view-toggle">
+   <button class="${S.planView!=="list"?"on":""}" data-viewmode="today">☀️ مهام اليوم</button>
+   <button class="${S.planView==="list"?"on":""}" data-viewmode="list">☰ القائمة الكاملة</button>
+ </div>`;
+ return toggle+(S.planView==="list"?renderFullPlanList():renderTodayWidget());
+}
+function renderTodayWidget(){
+ const cardFn=planCardFn();
+ const list=todayWidgetItems();
+ const reorderOn=!!S.todayReorderMode;
+ let h=`<div class="today-hero">
+   <div class="today-icon" aria-hidden="true">${missionIcon()}</div>
+   <div class="today-value">${esc(S.intentValue||"—")}</div>
+   ${renderProgressRing(todayProgressStats())}
+ </div>
+ <div class="task-toolbar between">
+   <div class="today-heading" style="margin:0">مهام النهاردة</div>
+   <div style="display:flex;gap:8px;align-items:center">
+     ${undoBtnHTML()}
+     <button class="iconbtn icononly reorder-toggle-btn ${reorderOn?"on":""}" id="reorderToggleBtn" title="ترتيب المهام يدويًا"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg></button>
+   </div>
+ </div>
+ ${reorderOn?`<div class="note" style="margin:-6px 0 12px">وضع الترتيب اليدوي مفعّل — استخدم الأسهم لتحريك أي مهمة.</div>`:""}`;
+ h+=list.length?`<div class="plan">${list.map((x,n)=>{
+   const badge=(x.cat==="overdue"||x.cat==="recurring")?CAT_LABEL[x.cat]:null;
+   const i=S.pool.indexOf(x.it);
+   if(!reorderOn)return cardFn(x.it,n,badge);
+   return `<div class="today-item">
+     <div class="today-reorder">
+       <button class="reorder-btn" data-todaymove="up~${i}" ${n===0?"disabled":""} title="نقل لأعلى">▲</button>
+       <button class="reorder-btn" data-todaymove="down~${i}" ${n===list.length-1?"disabled":""} title="نقل لأسفل">▼</button>
+     </div>
+     <div style="flex:1;min-width:0">${cardFn(x.it,n,badge)}</div>
+   </div>`;}).join("")}</div>`
+   :`<div class="empty">لا توجد مهام مستحقة اليوم — استمتع بيومك 🌿</div>`;
+ h+=`<div class="note" style="text-align:center;margin-top:16px">للتفاصيل والأرشيف والاحتياطي — <button class="minibtn" data-viewmode="list">القائمة الكاملة</button></div>`;
+ return h;
+}
+function renderFullPlanList(){
+ const cardFn=planCardFn();
+ const passesFilter=it=>{
+   if(S.planFilterEnergy&&!(it.solves||[]).includes(S.planFilterEnergy))return false;
+   if(S.planFilterAxis&&it.axis!==S.planFilterAxis)return false;
+   return true;
+ };
+ const mainAll=byTodoOrder(ordered(1)),daysAll=[0,1,2,3,4,5,6].map(d=>({d,items:byTodoOrder(ordered(2,d))}));
+ const main=mainAll.filter(passesFilter);
+ const days=daysAll.map(g=>({d:g.d,items:g.items.filter(passesFilter)})).filter(x=>x.items.length);
+ const axesCount=AXES.map(a=>({name:a[0],n:allCommitted().filter(x=>x.axis===a[0]).length}));
+ const filterActive=!!(S.planFilterEnergy||S.planFilterAxis);
+ const totalShown=main.length+days.reduce((s,g)=>s+g.items.length,0);
+ const totalAll=mainAll.length+daysAll.reduce((s,g)=>s+g.items.length,0);
+ let h=`<div class="intent-hero">
+   ${renderProgressRing()}
+   <div class="intent-label">✦ النية المالية</div>
+   <div class="intent-value">${esc(S.intentValue||"—")}</div>
+   <div class="intent-sentence">أن أحصل على <b>${esc(S.intentValue||"—")}</b> هذا الشهر <b>${esc(when())}</b>، وليكن الأمر كذلك.</div>
+   ${S.mission?`<div class="intent-mission">✦ ${esc(S.mission)}</div>`:""}
+   <div class="intent-stats">${axesCount.map(a=>`<div class="stat-pill"><b>${a.n}</b>${esc(a.name)}</div>`).join("")}</div>
+ </div>`;
+ h+=`<div class="task-toolbar between">
+   <div class="today-heading" style="margin:0">مهام الشهر</div>
+   <div style="display:flex;gap:8px;align-items:center">
+     ${undoBtnHTML()}
+     <button class="iconbtn icononly funnel-btn" id="filterBtn" title="تصفية القائمة"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z"/></svg></button>
+   </div>
+ </div>`;
+ if(filterActive){
+   h+=`<div class="active-filter">
+     <span>🎛 فلتر شغّال: ${S.planFilterEnergy?`<b>${esc(S.planFilterEnergy)}</b>`:""}${S.planFilterEnergy&&S.planFilterAxis?" · ":""}${S.planFilterAxis?`<b>${esc(S.planFilterAxis)}</b>`:""} — يعرض ${totalShown} من ${totalAll}</span>
+     <button class="minibtn" data-clearfilter="1">مسح</button>
+   </div>`;
+ }
+ if(filterActive&&totalShown===0){
+   h+=`<div class="empty">لا توجد أفعال تطابق هذا الفلتر.</div>`;
+ }else{
+   h+=main.length?`<div class="plan">${main.map((it,n)=>cardFn(it,n)).join("")}</div>`:(filterActive?"":`<div class="empty">لم تكتمل فلترة اليوم الأول بعد.</div>`);
+   days.forEach(g=>{h+=`<div class="rule"></div><h3 style="font-size:16px;margin:0 0 10px">إضافات يوم ${g.d+1}</h3>
+     <div class="plan">${g.items.map((it,n)=>cardFn(it,n+1)).join("")}</div>`;});
+ }
+ h+=`<div class="rule"></div>`;
+ const resv=allReserve();
+ if(resv.length){
+   h+=`<details><summary>احتياطي — أفعال عالية التناغم وصعبة التنفيذ (${resv.length})</summary><div class="in">
+     <div class="note" style="margin:0 0 10px">خلصت الأفعال السهلة ولقيت وقت إضافي؟ اضغط على أي فعل هنا ليدخل خطة الشهر فورًا.</div>
+     ${resv.map(it=>{const i=S.pool.indexOf(it);
+       return `<div class="opt" data-addtoplan="${i}"><div class="box"></div><div style="flex:1">
+         <div class="t" style="font-weight:500;display:flex;align-items:center">${scoreDot(it)}${esc(it.text)}</div>
+         <div class="d">${esc(it.source)} — تناغم عالٍ، صعب التنفيذ</div></div></div>`;}).join("")}
+   </div></details>`;
+ }
+ h+=`<details><summary>التسلسل الزمني للتنفيذ</summary><div class="in">${renderTimeline()}</div></details>
+  <details><summary>السجل الكامل للبروتوكول</summary><div class="in" style="font-size:13.3px;color:var(--ink-soft);white-space:pre-wrap">${esc(exportText())}</div></details>`;
+ h+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+    <button class="btn" id="copyBtn">نسخ الخطة</button>
+    <button class="btn ghost" id="wordBtn">تنزيل ملف Word</button>
+    <button class="btn ghost" id="printBtn">طباعة</button></div>`;
+ return h;
+}
+function exportText(){
+ const L=[];
+ L.push(`البروتوكول الشهري لإعادة التناغم مع المال — ${when()}`);
+ if(S.mission)L.push("الرسالة: "+S.mission);
+ L.push("النية المالية: "+intentSentence());
+ const line=(it,i)=>{const d=it.def||{};const o=[`${i+1}. ${d.what||it.text}`];
+   if(d.what)o.push("   الفعل: "+it.text);
+   if(startText(it))o.push("   البدء: "+startText(it));
+   if(nsolve(it))o.push("   يحل من الطاقات: "+(it.solves||[]).join(" / "));
+   if(d.steps)o.push("   الخطوات: "+d.steps);
+   if(d.goal)o.push("   الهدف: "+d.goal);
+   if(d.who)o.push("   المتأثر: "+d.who);
+   if(d.out)o.push("   خارج النطاق: "+d.out);
+   o.push(`   [المحور: ${it.axis||"—"} · المصدر: ${it.source}]`);return o.join("\n");};
+ const m=ordered(1);
+ if(m.length){L.push("");L.push("— أفعال اليوم الأول —");m.forEach((it,i)=>L.push(line(it,i)));}
+ [0,1,2,3,4,5,6].forEach(d=>{const c=ordered(2,d);
+   if(c.length){L.push("");L.push(`— إضافات يوم ${d+1} —`);c.forEach((it,i)=>L.push(line(it,i)));}});
+ L.push("");L.push("— تغطية المحاور —");
+ AXES.forEach(a=>L.push(`• ${a[0]}: ${allCommitted().filter(x=>x.axis===a[0]).length}`));
+ const later=S.pool.filter(p=>!p.removed&&p.commit!=="نعم");
+ if(later.length){L.push("");L.push("— مؤجّل بقرار واعٍ —");later.forEach(p=>L.push("• "+p.text));}
+ L.push("");L.push("— الطاقات غير المتناغمة —");
+ energyList().forEach(n=>{const e=em(n);L.push(`• ${n} (${e.type||"—"}) — شاكرا ${e.chakra||"—"}${e.interp?" — التفسير: "+e.interp:""}`);});
+ if(S.cleanseNotes)L.push("بعد التنظيف: "+S.cleanseNotes);
+ if(energyList().some(n=>(S.eftByEnergy[n]||"").trim())){L.push("");L.push("— برنامج EFT —");L.push(eftAllText());}
+ L.push("");L.push("— اعتقادات النقص وعلاجها —");
+ (S.lack||[]).forEach(b=>L.push(`• ${b} ← ${S.lackRemedy[b]||"—"}`));
+ L.push("");L.push("— المشاعر المعيقة ومحفزاتها —");
+ (S.blockers||[]).forEach(b=>L.push(`• ${b} ← ${S.blockerTrigger[b]||"—"}${S.blockerAffirm[b]?" — التوكيد: "+S.blockerAffirm[b]:""}`));
+ L.push("");L.push("— استثمار أم صرف —");
+ SPEND.forEach(i=>{if(S.spendKind[i]){const d=S.spendDecisions[i]||{};L.push(`• ${i}: ${S.spendKind[i]}${d.method?" ← "+d.method+(d.note?": "+d.note:""):""}`);}});
+ if((S.ideaBank||[]).length){L.push("");L.push("— بنك الأفكار المؤجلة (للشهر القادم) —");S.ideaBank.forEach(b=>L.push(`• ${b.text} (مؤجلة من ${b.from||"—"})`));}
+ L.push("");L.push("— جوانب المقاومة —");
+ (S.selAspects||[]).forEach(a=>{const m2=am(a);L.push(`• ${a} — ${m2.pattern||"—"} — الجذر: ${m2.root||"—"} — الخطوة: ${m2.step||"—"}`);});
+ return L.join("\n");
+}
+
+/* ===================== المحرك ===================== */
+function list(){return tab===1?screens1():tab===2?screens2():[];}
+function curId(){return tab===1?cur1:cur2;}
+function setCur(id){if(tab===1)cur1=id;else if(tab===2)cur2=id;save();}
+function curIdx(){const L=list();const i=L.findIndex(s=>s.id===curId());return i<0?0:i;}
+function render(keep){
+ const y=window.scrollY;
+ document.getElementById("tab1").className=tab===1?"on":"";
+ document.getElementById("tab2").className=tab===2?"on":"";
+ document.getElementById("tab3").className=tab===3?"on":"";
+ if(tab===3){
+   document.getElementById("progBar").style.width="100%";
+   document.getElementById("screen").innerHTML=`<div class="card ${keep?"":"anim"}">${renderPlan()}</div>`;
+   renderRail();
+   updateUndoBtnVisibility();
+   renderUndoToastUI();
+   if(keep)window.scrollTo(0,y);else window.scrollTo({top:0,behavior:"smooth"});
+   return;
+ }
+ const L=list(),i=curIdx(),s=L[i];
+ if(s.enter)s.enter();
+ document.getElementById("progBar").style.width=(i/Math.max(1,L.length-1)*100)+"%";
+ const ok=(s.ok||(()=>true))();
+ document.getElementById("screen").innerHTML=`<div class="card ${keep?"":"anim"}">
+   ${s.eyebrow?`<p class="eyebrow">${s.eyebrow}</p>`:""}<h2>${s.title}</h2>${s.lede?`<p class="lede">${s.lede}</p>`:""}
+   ${s.render()}
+   <div class="nav"><button class="btn ghost" id="prev" ${i===0?"disabled":""}>السابق</button>
+   ${s.last?"":`<button class="btn" id="next" ${ok?"":"disabled"}>التالي</button>`}
+   <div class="spacer"></div><span class="savetag" id="savetag"></span></div></div>`;
+ renderRail();
+ updateUndoBtnVisibility();
+ renderUndoToastUI();
+ if(keep)window.scrollTo(0,y);else window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderRail(){
+ const L=list(),i=curIdx(),secs=[];
+ L.forEach((s,n)=>{if(!secs.length||secs[secs.length-1].name!==s.sec)secs.push({name:s.sec,first:n,last:n,id:s.id});else secs[secs.length-1].last=n;});
+ document.getElementById("steps").innerHTML=secs.map(s=>
+   `<li class="${i>=s.first&&i<=s.last?"on":""} ${i>s.last?"done":""}" data-go="${s.id}"><span class="dot"></span>${s.name}</li>`).join("");
+ const all=S.pool.filter(p=>!p.removed);
+ const rows=[["النية",S.intentValue||"—"],["طاقات مكتشفة",energyList().length],["جوانب مختارة",S.selAspects.length],
+  ["أفعال مُجمّعة",all.length],["تحل نمطًا",all.filter(x=>x.resolves==="نعم").length],
+  ["عالٍ + سهل",all.filter(x=>x.resolves==="نعم"&&x.align==="عالٍ"&&(x.ease==="سهل"||x.promoted)).length],
+  ["ملتزم به",allCommitted().length],
+  ["محاور ناقصة",axesMissing(1).length?axesMissing(1).join("، "):"لا شيء"],
+  ["بنك الأفكار",(S.ideaBank||[]).length]];
+ document.getElementById("log").innerHTML=rows.map(r=>`<div class="logitem"><b>${r[0]}</b>${esc(String(r[1]))}</div>`).join("");
+}
+
+/* أحداث */
+document.addEventListener("input",e=>{
+ const el=e.target;
+ if(el.dataset.bind){set(el.dataset.bind,el.value);const b=document.getElementById("next");if(b){const s=list()[curIdx()];b.disabled=!((s.ok||(()=>true))());}renderRail();}
+ else if(el.dataset.pool!=null){const i=+el.dataset.pool;S.pool[i].text=el.value;S.pool[i].edited=true;save();}
+});
+document.addEventListener("change",e=>{if(e.target.tagName==="SELECT"&&e.target.dataset.bind){set(e.target.dataset.bind,e.target.value);render(true);}});
+document.addEventListener("click",e=>{
+ const t=e.target.closest("[data-radio],[data-check],[data-seg],[data-move],[data-add],[data-del],[data-go],[data-pl],[data-prm],[data-addpool],[data-addidea],[data-copy],[data-rank],[data-psolve],[data-ibank],[data-idel],[data-brest],[data-bdel],[data-eftcopytopic],[data-archopen],[data-archtoggle],[data-archword],[data-archresume],[data-scoreinfo],[data-navto],[data-donetoggle],[data-accordion],[data-addtoplan],[data-reptoggle],[data-routinetoggle],[data-viewmode],[data-setfilter],[data-clearfilter],[data-filtertab],[data-todaymove],[data-titleedit]");
+ if(t){
+  if(isMutatingTarget(t))pushUndo();
+  if(t.dataset.radio!=null)set(t.dataset.radio,get(t.dataset.radio)===t.dataset.val?"":t.dataset.val);
+  else if(t.dataset.check!=null)toggleArr(t.dataset.check,t.dataset.val);
+  else if(t.dataset.seg!=null){const c=get(t.dataset.seg);set(t.dataset.seg,c===t.dataset.val?"":t.dataset.val);}
+  else if(t.dataset.move){const i=+t.dataset.i,o=(S.order&&S.order.length===5)?S.order.slice():[0,1,2,3,4];
+    const j=t.dataset.move==="up"?i-1:i+1;if(j<0||j>4)return;[o[i],o[j]]=[o[j],o[i]];set("order",o);}
+  else if(t.dataset.add){const a=get(t.dataset.add)||[];a.push("");set(t.dataset.add,a);}
+  else if(t.dataset.del){const p=t.dataset.del.split(".");const a=get(p[0])||[];a.splice(+p[1],1);set(p[0],a);}
+  else if(t.dataset.addidea!=null){const d=+t.dataset.addidea;S.ideas[d].push({t:"",s:""});save();}
+  else if(t.dataset.psolve!=null){const it=S.pool[+t.dataset.psolve];it.solves=it.solves||[];
+    const k=it.solves.indexOf(t.dataset.val);k<0?it.solves.push(t.dataset.val):it.solves.splice(k,1);save();}
+  else if(t.dataset.ibank){const[d,i]=t.dataset.ibank.split(".").map(Number);const c=S.ideas[d][i];
+    if((c.t||"").trim()){S.ideaBank=S.ideaBank||[];S.ideaBank.push({text:c.t.trim(),from:when()});}
+    S.ideas[d].splice(i,1);if(!S.ideas[d].length)S.ideas[d].push({t:"",s:""});save();}
+  else if(t.dataset.idel){const[d,i]=t.dataset.idel.split(".").map(Number);
+    S.ideas[d].splice(i,1);if(!S.ideas[d].length)S.ideas[d].push({t:"",s:""});save();}
+  else if(t.dataset.brest){const[bi,d]=t.dataset.brest.split(".").map(Number);const b=S.ideaBank[bi];
+    if(b){S.ideas[d].push({t:b.text,s:""});S.ideaBank.splice(bi,1);}save();}
+  else if(t.dataset.bdel!=null){S.ideaBank.splice(+t.dataset.bdel,1);save();}
+  else if(t.dataset.eftcopytopic!=null){const n=energyList()[+t.dataset.eftcopytopic],m=em(n);
+    copy(`الموضوع ${(+t.dataset.eftcopytopic)+1}: ${n}\nالنوع: ${m.type||"غير محدد"} — الشاكرا: ${m.chakra||"غير محددة"}\n${m.interp?"تفسيري لهذه الطاقة: "+m.interp:""}`,t);return;}
+  else if(t.dataset.archopen){renderArchiveDetail(t.dataset.archopen);return;}
+  else if(t.dataset.archtoggle){const p=t.dataset.archtoggle.split("~~");toggleArchiveItem(p[0],+p[1]);renderArchiveDetail(p[0]);return;}
+  else if(t.dataset.archword){const en=loadArchive().find(x=>x.id===t.dataset.archword);if(en)saveWord(`أرشيف-${en.month}-${en.year}.docx`,`خطة ${en.month} ${en.year}`,archiveExportText(en),t);return;}
+  else if(t.dataset.archresume){resumeArchive(t.dataset.archresume);return;}
+  else if(t.dataset.scoreinfo!=null){showScorePopup(S.pool[+t.dataset.scoreinfo]);return;}
+  else if(t.dataset.navto){const p=t.dataset.navto.split("~~");navigateTo(p[0],p[1]);return;}
+  else if(t.dataset.donetoggle!=null){const it=S.pool[+t.dataset.donetoggle];const df=it.def||{};
+    if(df.repeatType==="recurring"){const reps=repsArray(it);const allDone=reps.every(Boolean);reps.fill(!allDone);it.done=!allDone;}
+    else it.done=!it.done;
+    save();}
+  else if(t.dataset.reptoggle){const p=t.dataset.reptoggle.split(".");const it=S.pool[+p[0]];const reps=repsArray(it);
+    reps[+p[1]]=!reps[+p[1]];it.done=reps.every(Boolean);save();}
+  else if(t.dataset.routinetoggle!=null){toggleRoutineToday(S.pool[+t.dataset.routinetoggle]);save();}
+  else if(t.dataset.viewmode){S.planView=t.dataset.viewmode;save();}
+  else if(t.dataset.accordion!=null){const it=S.pool[+t.dataset.accordion];it.expanded=!it.expanded;save();}
+  else if(t.dataset.addtoplan!=null){const it=S.pool[+t.dataset.addtoplan];it.promoted=true;it.commit="نعم";save();}
+  else if(t.dataset.go!=null){timelineReturnId=(t.dataset.go==="d7-timeline"&&tab===2)?cur2:null;setCur(t.dataset.go);closeRail();render();return;}
+  else if(t.dataset.pl!=null){const p=t.dataset.pl.split("."),it=S.pool[+p[0]],f=p[1];
+    if(f==="promoted")it.promoted=!it.promoted;else it[f]=it[f]===t.dataset.val?"":t.dataset.val;save();}
+  else if(t.dataset.prm!=null){S.pool[+t.dataset.prm].removed=true;save();}
+  else if(t.dataset.addpool){S.pool.push({key:"custom-"+Math.random().toString(36).slice(2,8),text:"",source:"مضاف يدويًا",tab:1,edited:true,removed:false,resolves:"",solves:[],align:"",ease:"",axis:"",commit:"",promoted:false,done:false,rank:S.pool.length,def:{}});save();}
+  else if(t.dataset.rank){const it=S.pool[+t.dataset.i],c=ordered(1),n=c.indexOf(it),m=t.dataset.rank==="up"?n-1:n+1;
+    if(m<0||m>=c.length)return;c.forEach((x,k)=>x.rank=k);const a=c[n].rank;c[n].rank=c[m].rank;c[m].rank=a;save();}
+  else if(t.dataset.copy!=null){const n=energyList()[+t.dataset.copy],mm=em(n);
+    copy(`أضع هنا النية بأن يتم تنظيف من كياني الطاقي وذبذباتي وسجلاتي الأكاشية (${mm.type||"الاعتقاد – النمط – البرمجة"}) التالية (${n}) والتي تؤثر في شاكرا (${mm.chakra||"......"}).. وأضع النية كذلك بأن يتم إعادة التناغم لنيتي المالية التالية (${intentSentence()}) حتى يمكن لها أن تتجلى في حياتي وتجربتي..\nليكن الأمر كذلك.. شكرًا، شكرًا، شكرًا`,t);return;}
+  else if(t.dataset.setfilter){const p=t.dataset.setfilter.split("~"),idx=+p[1];
+    if(p[0]==="energy")S.planFilterEnergy=idx<0?"":(energyList()[idx]||"");
+    else if(p[0]==="axis")S.planFilterAxis=idx<0?"":((AXES[idx]||[])[0]||"");
+    save();
+    if(document.getElementById("infoModal").classList.contains("open"))renderFilterPanelBody();}
+  else if(t.dataset.clearfilter){S.planFilterEnergy="";S.planFilterAxis="";save();}
+  else if(t.dataset.filtertab){filterPanelTab=t.dataset.filtertab;renderFilterPanelBody();}
+  else if(t.dataset.titleedit!=null){const it=S.pool[+t.dataset.titleedit];it.titleEditMode=!it.titleEditMode;save();
+    if(it.titleEditMode){setTimeout(()=>{const el=document.getElementById("titleInput-"+t.dataset.titleedit);if(el){el.focus();el.select();}},60);}}
+  else if(t.dataset.todaymove){const[dir,ii]=t.dataset.todaymove.split("~"),idx=+ii;
+    const L=todayWidgetItems(),pos=L.findIndex(x=>S.pool.indexOf(x.it)===idx),swapPos=dir==="up"?pos-1:pos+1;
+    if(pos>=0&&swapPos>=0&&swapPos<L.length){const a=L[pos].it,b=L[swapPos].it,tmp=a.todayRank;a.todayRank=b.todayRank;b.todayRank=tmp;save();}}
+  render(true);return;
+ }
+ const id=e.target.id;
+ if(id==="next"){timelineReturnId=null;const L=list(),i=curIdx();if(i<L.length-1)setCur(L[i+1].id);render();}
+ else if(id==="prev"){
+   if(tab===2&&cur2==="d7-timeline"&&timelineReturnId){setCur(timelineReturnId);timelineReturnId=null;render();}
+   else{const L=list(),i=curIdx();if(i>0)setCur(L[i-1].id);render();}
+ }
+ else if(id==="tab1"){tab=1;save();render();}
+ else if(id==="tab2"){tab=2;save();render();}
+ else if(id==="tab3"){tab=3;save();render();}
+ else if(id==="copyBtn")copy(exportText(),e.target);
+ else if(id==="printBtn")window.print();
+ else if(id==="wordBtn")saveWord(`خطة-${S.month}-${S.year}.docx`,`البروتوكول الشهري — ${when()}`,exportText(),e.target);
+ else if(id==="eftWordAll")saveWord(`برنامج-EFT-${S.month}.docx`,"برنامج EFT — "+when(),eftAllText(),e.target);
+ else if(id==="eftOpenSkill"){if((S.eftSkillLink||"").trim())window.open(S.eftSkillLink.trim(),"_blank");}
+ else if(id==="menuBtn"){document.getElementById("rail").classList.add("open");document.getElementById("scrim").classList.add("on");}
+ else if(id==="scrim")closeRail();
+ else if(id==="installBtn")doInstall();
+ else if(id==="undoBtn"||id==="undoFloatBtn")doUndo();
+ else if(id==="archiveBtn")openArchive();
+ else if(id==="exportBtn")openExportModal();
+ else if(id==="importBtn")openImportModal();
+ else if(id==="copyBackupBtn")copy(document.getElementById("backupText").value,document.getElementById("copyBackupBtn"));
+ else if(id==="downloadBackupBtn")exportBackupFileAttempt();
+ else if(id==="importFilePick")document.getElementById("importFile").click();
+ else if(id==="importTextBtn"){
+   const txt=(document.getElementById("importText").value||"").trim();
+   let backup=null;
+   try{backup=JSON.parse(txt);}catch(err){}
+   if(!backup){openInfoModal("تعذّر الاستيراد","<div class=\"note\">النص المُلصق مش صالح. تأكد إنك نسخت النص كامل من غير ما ينقص منه حاجة.</div>","");}
+   else applyBackupObject(backup);
+ }
+ else if(id==="archBack")closeArchive();
+ else if(id==="archBackList")renderArchiveList();
+ else if(id==="resetBtn")openConfirmModal();
+ else if(id==="confirmScrim"||id==="confirmClose"||id==="cancelNewMonth")closeConfirmModal();
+ else if(id==="confirmNewMonth"){
+   pushUndo();
+   archiveCurrentMonth();const bank=S.ideaBank||[];S=blank();S.ideaBank=bank;cur1="start";cur2="d7-1-ideas";tab=1;save();
+   closeConfirmModal();render();}
+ else if(id==="infoScrim"||id==="infoClose"||id==="infoClose2")closeInfoModal();
+ else if(id==="filterBtn")openFilterPanel();
+ else if(id==="reorderToggleBtn"){S.todayReorderMode=!S.todayReorderMode;save();render();}
+ else if(id==="filterDone")closeInfoModal();
+});
+function closeRail(){document.getElementById("rail").classList.remove("open");document.getElementById("scrim").classList.remove("on");}
+function openConfirmModal(){
+ const hasWork=hasContent(S);
+ document.getElementById("confirmMsg").textContent=hasWork
+   ?`سيتم حفظ خطة ${S.month} ${S.year} الحالية في السجل، ثم فتح شهر جديد فارغ. هل تريد المتابعة؟`
+   :"سيتم فتح شهر جديد فارغ. هل تريد المتابعة؟";
+ document.getElementById("confirmModal").classList.add("open");
+}
+function closeConfirmModal(){document.getElementById("confirmModal").classList.remove("open");}
+
+/* بوباب: الطاقات التي يحلها فعل / تفاصيل مصدره */
+function openInfoModal(title,bodyHtml,actionsHtml){
+ document.getElementById("infoTitle").textContent=title;
+ document.getElementById("infoBody").innerHTML=bodyHtml;
+ document.getElementById("infoActions").innerHTML=actionsHtml||"";
+ document.getElementById("infoModal").classList.add("open");
+}
+function closeInfoModal(){document.getElementById("infoModal").classList.remove("open");}
+function showScorePopup(it){
+ if(!it)return;
+ const names=it.solves||[];
+ const body=names.length
+   ?`<div class="note" style="margin:0 0 10px">هذا الفعل يحل ${names.length} من الطاقات/الأنماط غير المتناغمة:</div>
+     <ul style="margin:0;padding-inline-start:18px">${names.map(n=>`<li style="margin-bottom:7px">${esc(n)}</li>`).join("")}</ul>`
+   :`<div class="note">لم يُحدَّد بعد أي طاقة يحلها هذا الفعل.</div>`;
+ openInfoModal(esc(it.text),body,"");
+}
+function showSourcePopup(it){
+ if(!it)return;
+ const body=`<div class="kv" style="margin:0 0 8px"><b>الفعل:</b> ${esc(it.text)}</div>
+   <div class="kv" style="margin:0">${esc(it.source||"مضاف يدويًا")}</div>`;
+ const actions=it.nav?`<button class="btn ghost" data-navto="${it.nav.tab}~~${it.nav.id}">↩ الرجوع لتلك الصفحة</button>`:"";
+ openInfoModal("من أين جاء هذا الفعل؟",body,actions);
+}
+function navigateTo(t,id){tab=+t;setCur(id);closeInfoModal();closeRail();render();}
+let filterPanelTab="energy";
+function renderFilterPanelBody(){
+ const energies=energyList();
+ const tabs=`<div class="view-toggle" style="margin-bottom:14px;flex:0 0 auto">
+   <button class="${filterPanelTab==="energy"?"on":""}" data-filtertab="energy">الطاقات/الأنماط</button>
+   <button class="${filterPanelTab==="axis"?"on":""}" data-filtertab="axis">محاور الحياة</button>
+ </div>`;
+ let inner;
+ if(filterPanelTab==="axis"){
+   inner=`<div class="field" style="margin-bottom:0"><label class="fl">محاور الحياة</label>
+     <div class="chips">
+       <button class="chip ${!S.planFilterAxis?"sel":""}" data-setfilter="axis~-1">الكل</button>
+       ${AXES.map((a,i)=>`<button class="chip ${S.planFilterAxis===a[0]?"sel":""}" data-setfilter="axis~${i}">${a[0]}</button>`).join("")}
+     </div></div>`;
+ }else{
+   inner=energies.length?`<div class="field" style="margin-bottom:0"><label class="fl">المعتقدات / الطاقات غير المتناغمة</label>
+     <div class="chips">
+       <button class="chip ${!S.planFilterEnergy?"sel":""}" data-setfilter="energy~-1">الكل</button>
+       ${energies.map((n,i)=>`<button class="chip ${S.planFilterEnergy===n?"sel":""}" data-setfilter="energy~${i}">${esc(n)}</button>`).join("")}
+     </div></div>`:`<div class="note">لا توجد طاقات غير متناغمة مسجّلة هذا الشهر.</div>`;
+ }
+ const b=document.getElementById("infoBody");if(b)b.innerHTML=tabs+inner;
+}
+function openFilterPanel(){
+ document.getElementById("infoTitle").textContent="تصفية القائمة";
+ document.getElementById("infoActions").innerHTML=`<button class="btn" id="filterDone">تم</button>`;
+ filterPanelTab=S.planFilterAxis&&!S.planFilterEnergy?"axis":"energy";
+ renderFilterPanelBody();
+ document.getElementById("infoModal").classList.add("open");
+}
+
+/* الضغطة المطولة */
+let lpTimer=null,lpStart=null,lpCard=null;
+function interactiveAncestor(el){return el.closest('button,input,textarea,select,a,.chip,.opt,.seg,.card-undo,.scorebadge,.scoredot,[data-pl],[data-radio],[data-check],[data-rank],[data-go],[data-move]');}
+document.addEventListener("pointerdown",e=>{
+ const card=e.target.closest("[data-carditem]");
+ if(!card||interactiveAncestor(e.target)){lpCard=null;return;}
+ lpCard=card;lpStart={x:e.clientX,y:e.clientY};
+ lpTimer=setTimeout(()=>{
+   const i=+card.dataset.carditem,it=S.pool[i];
+   if(it)showSourcePopup(it);
+   lpTimer=null;
+ },550);
+});
+function cancelLP(){if(lpTimer){clearTimeout(lpTimer);lpTimer=null;}lpCard=null;}
+document.addEventListener("pointerup",cancelLP);
+document.addEventListener("pointercancel",cancelLP);
+document.addEventListener("pointermove",e=>{
+ if(!lpTimer||!lpStart)return;
+ if(Math.abs(e.clientX-lpStart.x)>10||Math.abs(e.clientY-lpStart.y)>10)cancelLP();
+});
+document.addEventListener("contextmenu",e=>{if(e.target.closest("[data-carditem]"))e.preventDefault();});
+
+/* الأرشيف */
+const ARCHIVE_KEY="sm_protocol_archive_v1";
+/* نسخة احتياطية — تصدير/استيراد (نص يُنسخ كطريقة أساسية موثوقة + ملف كخيار احتياطي) */
+function buildBackupText(){
+ let main=null,archive=[];
+ try{main=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){}
+ try{archive=JSON.parse(localStorage.getItem(ARCHIVE_KEY)||"[]");}catch(e){}
+ const backup={app:"البروتوكول الشهري لإعادة التناغم مع المال",version:1,exportedAt:new Date().toISOString(),main,archive};
+ return JSON.stringify(backup);
+}
+function applyBackupObject(backup){
+ if(!backup||typeof backup!=="object"||!backup.main){
+   openInfoModal("تعذّر الاستيراد","<div class=\"note\">النص أو الملف ده مش نسخة احتياطية صحيحة من هذا التطبيق.</div>","");
+   return false;
+ }
+ try{
+   localStorage.setItem(KEY,JSON.stringify(backup.main));
+   if(backup.archive)localStorage.setItem(ARCHIVE_KEY,JSON.stringify(backup.archive));
+ }catch(err){}
+ load();closeInfoModal();render();
+ setTimeout(()=>{openInfoModal("تم الاسترجاع ✓","<div class=\"note\">اتحمّلت النسخة الاحتياطية بنجاح، وبياناتك دلوقتي محدّثة.</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");},150);
+ return true;
+}
+function exportBackupFileAttempt(){
+ try{
+   const blob=new Blob([buildBackupText()],{type:"application/json"});
+   const a=document.createElement("a");
+   a.href=URL.createObjectURL(blob);
+   const d=new Date();
+   a.download=`نسخة-احتياطية-البروتوكول-${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}.json`;
+   document.body.appendChild(a);a.click();
+   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
+ }catch(e){}
+}
+function openExportModal(){
+ const text=buildBackupText();
+ document.getElementById("infoTitle").textContent="نسخة احتياطية";
+ document.getElementById("infoBody").innerHTML=`
+   <div class="note" style="margin:0 0 10px">اضغط «نسخ النص» واحفظه في أي مكان تقدر ترجعله بعدين (Notes، واتساب لنفسك، إيميل...) — دي أضمن طريقة تشتغل على كل الأجهزة والمتصفحات.</div>
+   <textarea id="backupText" readonly style="width:100%;min-height:110px;font-size:10.5px;direction:ltr;text-align:left;font-family:monospace">${esc(text)}</textarea>`;
+ document.getElementById("infoActions").innerHTML=`
+   <button class="btn" id="copyBackupBtn">نسخ النص</button>
+   <button class="btn ghost" id="downloadBackupBtn">تجربة تنزيل كملف كمان</button>`;
+ document.getElementById("infoModal").classList.add("open");
+}
+function openImportModal(){
+ document.getElementById("infoTitle").textContent="استيراد نسخة احتياطية";
+ document.getElementById("infoBody").innerHTML=`
+   <div class="note" style="margin:0 0 10px">الصق هنا النص اللي نسخته قبل كده:</div>
+   <textarea id="importText" placeholder="الصق النص هنا..." style="width:100%;min-height:110px;font-size:10.5px;direction:ltr;text-align:left;font-family:monospace"></textarea>
+   <div class="note" style="margin:10px 0 6px">أو لو عندك ملف محفوظ:</div>
+   <button class="minibtn" id="importFilePick">اختيار ملف من الجهاز</button>`;
+ document.getElementById("infoActions").innerHTML=`<button class="btn" id="importTextBtn">استرجاع من النص</button>`;
+ document.getElementById("infoModal").classList.add("open");
+}
+function importBackupFile(file){
+ const reader=new FileReader();
+ reader.onload=e=>{
+   let backup;
+   try{backup=JSON.parse(e.target.result);}catch(err){
+     openInfoModal("تعذّر الاستيراد","<div class=\"note\">الملف غير صالح أو تالف.</div>","");
+     return;
+   }
+   applyBackupObject(backup);
+ };
+ reader.readAsText(file);
+}
+function loadArchive(){try{return JSON.parse(localStorage.getItem(ARCHIVE_KEY))||[];}catch(e){return [];}}
+function saveArchiveList(L){try{localStorage.setItem(ARCHIVE_KEY,JSON.stringify(L));}catch(e){}}
+function archPct(en){if(!en.items.length)return 0;return Math.round(100*en.items.filter(x=>x.done).length/en.items.length);}
+function hasContent(st){
+ return !!((st.intentValue||"").trim())||!!((st.mission||"").trim())
+   ||(st.acts||[]).some(a=>(a||"").trim())||(st.pool||[]).some(p=>!p.removed)
+   ||(st.selBeliefs||[]).length>0||(st.selAspects||[]).length>0||(st.lack||[]).length>0||(st.blockers||[]).length>0;
+}
+function snapshotEntry(){
+ const items=allCommitted().map(it=>({text:(it.def||{}).what||it.text,axis:it.axis||"",source:it.source||"",done:!!it.done}));
+ return {id:S.month+"-"+S.year+"-"+Date.now(),month:S.month,year:S.year,savedAt:Date.now(),
+   intent:intentSentence(),mission:S.mission,items,complete:items.length>0,
+   fullState:JSON.parse(JSON.stringify(S)),cur1,cur2,tab};
+}
+function archiveCurrentMonth(){
+ if(!hasContent(S))return;
+ const L=loadArchive();L.push(snapshotEntry());saveArchiveList(L);
+}
+function archiveExportText(en){
+ const L=[`خطة ${en.month} ${en.year}`,en.intent||"",""];
+ if(en.items.length)en.items.forEach(it=>L.push(`${it.done?"☑":"☐"} ${it.text}${it.axis?"  ["+it.axis+"]":""}`));
+ else L.push("(لم تصل الخطة لمرحلة الأفعال النهائية بعد)");
+ L.push("",`الإنجاز: ${archPct(en)}%`);
+ return L.join("\n");
+}
+function openArchive(){document.getElementById("archivePanel").classList.add("open");renderArchiveList();}
+function closeArchive(){document.getElementById("archivePanel").classList.remove("open");}
+function renderArchiveList(){
+ const L=loadArchive().slice().sort((a,b)=>b.savedAt-a.savedAt);
+ document.getElementById("archiveInner").innerHTML=`<div class="topbar"><div class="brand"><b>سجل الشهور السابقة</b></div><button class="iconbtn" id="archBack">✕ إغلاق</button></div>`
+  +(L.length?L.map(en=>`<div class="pcard arch-item" style="margin-bottom:12px" data-archopen="${en.id}">
+     <span class="tag">${en.complete?archPct(en)+"% إنجاز":"لم تكتمل الخطة بعد"}</span>
+     <h4>${esc(en.month)} ${esc(en.year)}</h4><div class="kv">${esc(en.intent||"")}</div>
+     <div class="note">${en.items.length} فعل — حُفظ ${new Date(en.savedAt).toLocaleDateString("ar-EG")}</div></div>`).join("")
+    :`<div class="empty">لا يوجد أرشيف بعد. أول مرة تضغط فيها «+» سيُحفظ عملك الحالي هنا.</div>`);
+}
+function renderArchiveDetail(id){
+ const L=loadArchive();const en=L.find(x=>x.id===id);if(!en)return renderArchiveList();
+ const p=archPct(en),isCurrent=en.month===S.month&&en.year===S.year&&en.fullState;
+ document.getElementById("archiveInner").innerHTML=`<div class="topbar"><div class="brand"><b>${esc(en.month)} ${esc(en.year)}</b></div>
+   <button class="iconbtn" id="archBackList">→ السجل</button><button class="iconbtn" id="archBack">✕ إغلاق</button></div>
+  <div class="note" style="margin-bottom:10px">${esc(en.intent||"")}</div>
+  ${en.items.length?`<div class="prog" style="margin-bottom:6px"><i style="width:${p}%"></i></div>
+  <div class="note" style="margin-bottom:16px">${p}% مكتمل (${en.items.filter(x=>x.done).length} من ${en.items.length})</div>
+  ${en.items.map((it,i)=>`<div class="opt ${it.done?"sel":""}" data-archtoggle="${en.id}~~${i}"><div class="box"></div>
+    <div><div class="t" style="${it.done?"text-decoration:line-through;color:var(--ink-faint)":""}">${esc(it.text)}</div>
+    <div class="d">${esc(it.axis||"")}${it.source?" · "+esc(it.source):""}</div></div></div>`).join("")}`
+   :`<div class="empty">لم تصل خطة هذا الشهر لمرحلة الأفعال النهائية بعد.</div>`}
+  <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+   ${en.fullState?`<button class="btn" data-archresume="${en.id}">استئناف العمل على هذا الشهر</button>
+     <div class="note" style="margin:0">سيُحفظ عملك الحالي تلقائيًا في السجل قبل الانتقال.</div>`:""}
+   ${en.items.length?`<button class="btn ghost" data-archword="${en.id}">تنزيل كملف Word (checklist)</button>`:""}
+  </div>`;
+}
+function toggleArchiveItem(id,idx){const L=loadArchive();const en=L.find(x=>x.id===id);if(!en)return;en.items[idx].done=!en.items[idx].done;saveArchiveList(L);}
+function resumeArchive(id){
+ const L=loadArchive();const idx=L.findIndex(x=>x.id===id);if(idx<0)return;
+ const entry=L[idx];
+ if(hasContent(S))L.push(snapshotEntry());
+ L.splice(L.findIndex(x=>x.id===id),1);
+ saveArchiveList(L);
+ S=Object.assign(blank(),entry.fullState||{});
+ tab=entry.tab||1;cur1=entry.cur1||"start";cur2=entry.cur2||"d7-1-ideas";
+ save();closeArchive();render();
+}
+
+async function copy(txt,btn){
+ try{await navigator.clipboard.writeText(txt);}catch(_){const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");}catch(__){}ta.remove();}
+ if(btn&&btn.textContent){const o=btn.textContent;btn.textContent="تم النسخ ✓";setTimeout(()=>btn.textContent=o,1600);}
+}
+
+/* EFT */
+function eftAllText(){
+ const list=energyList();
+ return list.map((n,i)=>`${i+1}. ${n}\n${"-".repeat(20)}\n${(S.eftByEnergy[n]||"— لم يُلصق بعد —").trim()}`).join("\n\n");
+}
+
+/* Word (docx) */
+function crc32(buf){let c,t=[];for(let n=0;n<256;n++){c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}
+ let crc=0xFFFFFFFF;for(let i=0;i<buf.length;i++)crc=(crc>>>8)^t[(crc^buf[i])&0xFF];return (crc^0xFFFFFFFF)>>>0;}
+function zip(files){
+ const enc=new TextEncoder(),parts=[],central=[];let off=0;
+ const u16=n=>[n&255,(n>>8)&255],u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>24)&255];
+ files.forEach(f=>{const name=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data);
+  const lh=[].concat([80,75,3,4],u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(data.length),u32(data.length),u16(name.length),u16(0));
+  parts.push(new Uint8Array(lh),name,data);central.push({name,crc,len:data.length,off});off+=lh.length+name.length+data.length;});
+ const cd=[];let cdLen=0;
+ central.forEach(c=>{const h=[].concat([80,75,1,2],u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(c.crc),u32(c.len),u32(c.len),u16(c.name.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(c.off));
+  cd.push(new Uint8Array(h),c.name);cdLen+=h.length+c.name.length;});
+ const end=new Uint8Array([].concat([80,75,5,6],u16(0),u16(0),u16(central.length),u16(central.length),u32(cdLen),u32(off),u16(0)));
+ const all=parts.concat(cd,[end]);let total=0;all.forEach(a=>total+=a.length);
+ const out=new Uint8Array(total);let p=0;all.forEach(a=>{out.set(a,p);p+=a.length;});return out;
+}
+function docx(title,body){
+ const X=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+ const para=(txt,head)=>`<w:p><w:pPr><w:bidi/><w:jc w:val="right"/></w:pPr><w:r><w:rPr><w:rtl/>${head?'<w:b/><w:sz w:val="32"/>':""}</w:rPr><w:t xml:space="preserve">${X(txt)}</w:t></w:r></w:p>`;
+ const paras=[para(title,true)].concat(String(body||"").split("\n").map(l=>para(l||" ",false))).join("");
+ const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${paras}<w:sectPr><w:bidi/></w:sectPr></w:body></w:document>`;
+ const ct=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`;
+ const rels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+ return zip([{name:"[Content_Types].xml",data:ct},{name:"_rels/.rels",data:rels},{name:"word/document.xml",data:doc}]);
+}
+async function saveWord(filename,title,body,btn){
+ const bytes=docx(title,body);
+ try{
+  const dl=(typeof claude!=="undefined"&&claude.use)?await claude.use("downloads"):null;
+  if(dl){await dl.save({filename,data:bytes});return;}
+ }catch(e){}
+ try{
+  const blob=new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
+ }catch(e){copy(body,btn);}
+}
+
+/* PWA */
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;const b=document.getElementById("installBtn");if(b)b.style.display="inline-block";});
+function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;}
+function standalone(){return window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;}
+async function doInstall(){
+ if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("installBtn").style.display="none";return;}
+ alert("للتثبيت على الآيفون: افتح الصفحة في Safari ← زر المشاركة ⬆︎ ← «إضافة إلى الشاشة الرئيسية».\nعلى أندرويد: قائمة المتصفح ⋮ ← «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».");
+}
+if(isIOS()&&!standalone()){const b=document.getElementById("installBtn");if(b)b.style.display="inline-block";}
+if("serviceWorker" in navigator&&location.protocol==="https:"){
+ window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});
+}
+document.getElementById("importFile").addEventListener("change",e=>{
+ const f=e.target.files&&e.target.files[0];
+ if(f)importBackupFile(f);
+ e.target.value="";
+});
+load();
+tab=(cur1==="define")?3:1;
+render();
+setTimeout(()=>{
+ const sp=document.getElementById("splashScreen");
+ if(sp){sp.classList.add("hide");setTimeout(()=>sp.remove(),600);}
+},700);
+</script>
+</body>
+</html>
