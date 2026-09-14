@@ -1631,10 +1631,14 @@ function render(keep){
  document.getElementById("mtab2").className=section===2?"on":"";
  document.getElementById("mtab3").className=section===3?"on":"";
  document.getElementById("subTabs").style.display=section===1?"flex":"none";
+ const errBox=(where)=>`<div class="empty" style="padding:20px;text-align:center;line-height:1.9">⚠️ حصل خطأ في عرض ${where}.<br>بياناتك آمنة — جرّب قسم تاني أو تواصل مع أشرف.</div>`;
  if(section===2||section===3){
    document.getElementById("progBar").style.width="100%";
-   document.getElementById("screen").innerHTML=`<div class="card ${keep?"":"anim"}">${section===2?renderPlan():renderLedger()}</div>`;
-   renderRail();
+   let inner="";
+   try{inner=section===2?renderPlan():renderLedger();}
+   catch(err){try{console.error("render section error:",err);}catch(e2){}inner=errBox("هذا القسم");}
+   document.getElementById("screen").innerHTML=`<div class="card ${keep?"":"anim"}">${inner}</div>`;
+   try{renderRail();}catch(e3){}
    updateUndoBtnVisibility();
    renderUndoToastUI();
    if(keep)window.scrollTo(0,y);else window.scrollTo({top:0,behavior:"smooth"});
@@ -1643,16 +1647,23 @@ function render(keep){
  document.getElementById("tab1").className=tab===1?"on":"";
  document.getElementById("tab2").className=tab===2?"on":"";
  const L=list(),i=curIdx(),s=L[i];
- if(s.enter)s.enter();
+ let bodyHtml="",ok=true;
+ try{
+   if(s.enter)s.enter();
+   ok=(s.ok||(()=>true))();
+   bodyHtml=s.render();
+ }catch(err){
+   try{console.error("render step error:",err);}catch(e2){}
+   bodyHtml=errBox("هذه الخطوة");
+ }
  document.getElementById("progBar").style.width=(i/Math.max(1,L.length-1)*100)+"%";
- const ok=(s.ok||(()=>true))();
  document.getElementById("screen").innerHTML=`<div class="card ${keep?"":"anim"}">
    ${s.eyebrow?`<p class="eyebrow">${s.eyebrow}</p>`:""}<h2>${s.title}</h2>${s.lede?`<p class="lede">${s.lede}</p>`:""}
-   ${s.render()}
+   ${bodyHtml}
    <div class="nav"><button class="btn ghost" id="prev" ${i===0?"disabled":""}>السابق</button>
    ${s.last?"":`<button class="btn" id="next" ${ok?"":"disabled"}>التالي</button>`}
    <div class="spacer"></div><span class="savetag" id="savetag"></span></div></div>`;
- renderRail();
+ try{renderRail();}catch(e3){}
  updateUndoBtnVisibility();
  renderUndoToastUI();
  if(keep)window.scrollTo(0,y);else window.scrollTo({top:0,behavior:"smooth"});
