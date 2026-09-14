@@ -2158,9 +2158,19 @@ document.getElementById("importFile").addEventListener("change",e=>{
  if(f)importBackupFile(f);
  e.target.value="";
 });
-load();
-section=S.day1Done?2:1;
-render();
+try{
+ load();
+ section=S.day1Done?2:1;
+ render();
+}catch(err){
+ try{console.error("Load/render error:",err);}catch(e2){}
+ const scr=document.getElementById("screen");
+ if(scr)scr.innerHTML=`<div class="empty" style="padding:26px 18px;text-align:center;line-height:1.9">
+   ⚠️ حصل خطأ غير متوقع أثناء تحميل بياناتك.<br><br>
+   <b>بياناتك محفوظة وآمنة</b> — المشكلة في عرضها بس مش في البيانات نفسها.<br><br>
+   جرّب تقفل التطبيق وتفتحه تاني. لو المشكلة استمرت، تواصل مع أشرف عشان يحل المشكلة من غير ما تفقد أي حاجة.
+ </div>`;
+}
 setTimeout(()=>{
  const sp=document.getElementById("splashScreen");
  if(sp){sp.classList.add("hide");setTimeout(()=>sp.remove(),600);}
