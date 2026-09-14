@@ -2102,11 +2102,12 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){
      reg.update().catch(()=>{});
      setInterval(()=>{reg.update().catch(()=>{});},60000);
    }).catch(()=>{});
-   let refreshingNow=false;
    navigator.serviceWorker.addEventListener("controllerchange",()=>{
-     if(refreshingNow)return;refreshingNow=true;
-     sessionStorage.setItem("sm_just_updated","1");
-     window.location.reload();
+     let already=false;
+     try{already=sessionStorage.getItem("sm_reload_guard")==="1";}catch(e){}
+     if(already)return;
+     try{sessionStorage.setItem("sm_reload_guard","1");sessionStorage.setItem("sm_just_updated","1");}catch(e){}
+     setTimeout(()=>{window.location.reload();},1500);
    });
  });
 }
