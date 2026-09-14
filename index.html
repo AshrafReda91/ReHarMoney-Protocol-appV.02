@@ -386,6 +386,16 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   box-shadow:0 10px 24px -10px rgba(0,0,0,.4);opacity:0;transition:opacity .35s ease,transform .35s ease;z-index:996;
   pointer-events:none;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
 .update-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.update-banner{position:fixed;left:14px;right:14px;bottom:14px;z-index:998;
+  background:var(--surface);border:1px solid var(--gold);border-radius:14px;padding:12px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  box-shadow:0 14px 30px -14px rgba(0,0,0,.35);opacity:0;transform:translateY(16px);
+  transition:opacity .35s ease,transform .35s ease;max-width:420px;margin:0 auto}
+.update-banner.show{opacity:1;transform:translateY(0)}
+.update-banner span{font-size:13.5px;font-weight:700;color:var(--gold-deep)}
+.update-banner button{border:0;border-radius:9px;padding:8px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.update-banner #updateNowBtn{background:linear-gradient(180deg,var(--gold),var(--gold-deep));color:var(--on-gold)}
+.update-banner #updateLaterBtn{background:transparent;color:var(--ink-faint);padding:8px 10px}
 .confirm-modal{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-modal.open{display:flex}
 .confirm-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
@@ -2101,14 +2111,15 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){
    navigator.serviceWorker.register("sw.js").then(reg=>{
      reg.update().catch(()=>{});
      setInterval(()=>{reg.update().catch(()=>{});},60000);
+     if(reg.waiting&&navigator.serviceWorker.controller)showUpdateBanner(reg);
+     reg.addEventListener("updatefound",()=>{
+       const nw=reg.installing;
+       if(!nw)return;
+       nw.addEventListener("statechange",()=>{
+         if(nw.state==="installed"&&navigator.serviceWorker.controller)showUpdateBanner(reg);
+       });
+     });
    }).catch(()=>{});
-   navigator.serviceWorker.addEventListener("controllerchange",()=>{
-     let already=false;
-     try{already=sessionStorage.getItem("sm_reload_guard")==="1";}catch(e){}
-     if(already)return;
-     try{sessionStorage.setItem("sm_reload_guard","1");sessionStorage.setItem("sm_just_updated","1");}catch(e){}
-     setTimeout(()=>{window.location.reload();},1500);
-   });
  });
 }
 try{
@@ -2117,6 +2128,31 @@ try{
    setTimeout(()=>showUpdateToast("تم تحديث التطبيق لآخر إصدار ✓"),900);
  }
 }catch(e){}
+function showUpdateBanner(reg){
+ if(document.getElementById("updateBanner"))return;
+ const el=document.createElement("div");
+ el.id="updateBanner";
+ el.className="update-banner";
+ el.innerHTML=`<span>🔄 نسخة جديدة من التطبيق متاحة</span><div style="display:flex;gap:8px"><button id="updateNowBtn">تحديث الآن</button><button id="updateLaterBtn" title="تجاهل">✕</button></div>`;
+ document.body.appendChild(el);
+ setTimeout(()=>el.classList.add("show"),30);
+ document.getElementById("updateNowBtn").addEventListener("click",()=>{
+   try{
+     if(reg&&reg.waiting){
+       navigator.serviceWorker.addEventListener("controllerchange",()=>{
+         try{sessionStorage.setItem("sm_just_updated","1");}catch(e){}
+         window.location.reload();
+       },{once:true});
+       reg.waiting.postMessage({type:"SKIP_WAITING"});
+     }else{
+       window.location.reload();
+     }
+   }catch(e){window.location.reload();}
+ });
+ document.getElementById("updateLaterBtn").addEventListener("click",()=>{
+   el.classList.remove("show");setTimeout(()=>el.remove(),400);
+ });
+}
 document.getElementById("importFile").addEventListener("change",e=>{
  const f=e.target.files&&e.target.files[0];
  if(f)importBackupFile(f);
