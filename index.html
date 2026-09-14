@@ -381,6 +381,11 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   0%{transform:translateY(-10px) rotate(0deg);opacity:1}
   100%{transform:translateY(110vh) rotate(var(--rot,360deg));opacity:.25}
 }
+.update-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--gold-deep);color:#fff8e6;padding:11px 20px;border-radius:99px;font-size:13.5px;font-weight:700;
+  box-shadow:0 10px 24px -10px rgba(0,0,0,.4);opacity:0;transition:opacity .35s ease,transform .35s ease;z-index:996;
+  pointer-events:none;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
+.update-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .confirm-modal{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;padding:20px}
 .confirm-modal.open{display:flex}
 .confirm-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
@@ -608,6 +613,16 @@ function doUndo(){
  save();updateUndoBtnVisibility();renderUndoToastUI();render();
 }
 function tg(t){const e=document.getElementById("savetag");if(e)e.textContent=t;}
+function showUpdateToast(msg){
+ try{
+   const el=document.createElement("div");
+   el.className="update-toast";
+   el.textContent=msg;
+   document.body.appendChild(el);
+   setTimeout(()=>{el.classList.add("show");},30);
+   setTimeout(()=>{el.classList.remove("show");setTimeout(()=>el.remove(),400);},3500);
+ }catch(e){}
+}
 function undoBtnHTML(){return `<button class="iconbtn icononly" id="undoBtn" title="تراجع عن آخر إجراء">↶</button>`;}
 const esc=s=>{
  if(s==null)s="";
@@ -1767,7 +1782,7 @@ document.addEventListener("click",e=>{
  else if(id==="exportBtn")openExportModal();
  else if(id==="importBtn")openImportModal();
  else if(id==="aboutBtn"){
-   openInfoModal("About","<div style=\"direction:ltr;text-align:center;line-height:1.9;font-size:14.5px;color:var(--ink-soft)\">This app designed and developed with ❤️<br>for the <b style=\"color:var(--gold-deep)\">Soul Meeting Community</b><br><br>By<br><a href=\"https://wa.me/message/7BSPNRZIO57NG1\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--gold-deep);font-weight:700;text-decoration:underline\">Ashraf Reda</a></div>","");
+   openInfoModal("About","<div style=\"direction:ltr;text-align:center;line-height:1.9;font-size:14.5px;color:var(--ink-soft)\">This app designed and developed with ❤️<br>for the <b style=\"color:var(--gold-deep)\">Soul Meeting Community</b><br><br>By<br><a href=\"https://www.ashraf-reda.com\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--gold-deep);font-weight:700;text-decoration:underline\">Ashraf Reda</a></div>","");
  }
  else if(id==="ideaBankBtn"){navigateTo(2,"d7-1-ideas");}
  else if(id==="copyBackupBtn")copy(document.getElementById("backupText").value,document.getElementById("copyBackupBtn"));
@@ -2074,12 +2089,33 @@ function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MS
 function standalone(){return window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;}
 async function doInstall(){
  if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("installBtn").style.display="none";return;}
- alert("للتثبيت على الآيفون: افتح الصفحة في Safari ← زر المشاركة ⬆︎ ← «إضافة إلى الشاشة الرئيسية».\nعلى أندرويد: قائمة المتصفح ⋮ ← «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».");
+ if(isIOS()){
+   openInfoModal("تثبيت التطبيق","<div class=\"note\" style=\"line-height:2\">للتثبيت على الآيفون:<br>1) افتح الصفحة في متصفح <b>Safari</b> (لازم Safari تحديدًا)<br>2) اضغط على زر المشاركة ⬆︎ تحت الشاشة<br>3) اختر «إضافة إلى الشاشة الرئيسية»</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");
+ }else{
+   openInfoModal("تثبيت التطبيق","<div class=\"note\" style=\"line-height:2\">لتثبيت التطبيق على شاشتك الرئيسية:<br>افتح قائمة المتصفح (عادة ⋮ فوق يمين الشاشة)<br>واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».<br><br>لو الخيار ده مش ظاهر، جرّب فتح الصفحة من متصفح Chrome على أندرويد.</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");
+ }
 }
-if(isIOS()&&!standalone()){const b=document.getElementById("installBtn");if(b)b.style.display="inline-block";}
+if(!standalone()){const b=document.getElementById("installBtn");if(b)b.style.display="inline-block";}
 if("serviceWorker" in navigator&&location.protocol==="https:"){
- window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});
+ window.addEventListener("load",()=>{
+   navigator.serviceWorker.register("sw.js").then(reg=>{
+     reg.update().catch(()=>{});
+     setInterval(()=>{reg.update().catch(()=>{});},60000);
+   }).catch(()=>{});
+   let refreshingNow=false;
+   navigator.serviceWorker.addEventListener("controllerchange",()=>{
+     if(refreshingNow)return;refreshingNow=true;
+     sessionStorage.setItem("sm_just_updated","1");
+     window.location.reload();
+   });
+ });
 }
+try{
+ if(sessionStorage.getItem("sm_just_updated")==="1"){
+   sessionStorage.removeItem("sm_just_updated");
+   setTimeout(()=>showUpdateToast("تم تحديث التطبيق لآخر إصدار ✓"),900);
+ }
+}catch(e){}
 document.getElementById("importFile").addEventListener("change",e=>{
  const f=e.target.files&&e.target.files[0];
  if(f)importBackupFile(f);
