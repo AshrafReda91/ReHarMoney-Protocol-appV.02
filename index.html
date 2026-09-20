@@ -278,8 +278,9 @@ details .in{padding:12px 14px}
 .intent-sentence b{color:#000;font-weight:800}
 .intent-mission{position:relative;font-size:12.8px;color:#4a3410;margin-top:12px;padding-top:12px;
   border-top:1px solid rgba(40,26,4,.18)}
-.intent-stats{position:relative;display:flex;flex-wrap:nowrap;gap:6px;margin-top:16px;overflow-x:auto;padding-bottom:2px}
+.intent-stats{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:16px}
 .stat-pill{background:rgba(255,255,255,.5);border:1px solid rgba(60,40,8,.22);border-radius:99px;
+  min-width:0;justify-content:center;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   padding:5px 10px;font-size:11px;color:#241a08;display:flex;align-items:center;gap:5px;white-space:nowrap;flex:0 0 auto}
 .stat-pill b{color:#000;font-weight:800;font-size:12px}
 
@@ -320,7 +321,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 .ledger-hero-value{position:relative;font-family:Georgia,"Times New Roman","Amiri",serif;font-weight:700;
   font-size:clamp(28px,8vw,44px);line-height:1.25;margin:0 0 8px;color:#1c1305;text-shadow:0 1px 0 rgba(255,255,255,.5)}
 .ledger-hero-sub{position:relative;font-size:12.5px;color:#4a3410}
-.ledger-hero-stats{position:relative;display:flex;flex-wrap:nowrap;gap:6px;margin-top:14px;overflow-x:auto}
+.ledger-hero-stats{position:relative;display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .ledger-hero-insights{position:relative;margin-top:14px;border-top:1px solid rgba(40,26,4,.18);padding-top:10px}
 .ledger-hero-insights summary{color:#5a3e12;font-weight:700;font-size:12.5px;cursor:pointer}
 .ledger-hero-insights .in .kv{color:#3a2708;font-size:12.5px}
@@ -505,6 +506,18 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   </main>
 </div>
 <script>
+var deferredPrompt=null,appInstalled=false;
+function refreshInstallBtn(){
+ const b=document.getElementById("installBtn");if(!b)return;
+ const inApp=(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||window.navigator.standalone===true;
+ b.style.display=(inApp||appInstalled)?"none":"inline-block";
+}
+window.addEventListener("beforeinstallprompt",function(e){
+ e.preventDefault();deferredPrompt=e;refreshInstallBtn();
+});
+window.addEventListener("appinstalled",function(){
+ appInstalled=true;deferredPrompt=null;refreshInstallBtn();
+});
 /* ===================== مراجع ===================== */
 const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
 const YEARS=(()=>{const a=[];for(let y=2026;y<=2050;y++)a.push(String(y));return a;})();
@@ -1987,7 +2000,6 @@ document.addEventListener("click",e=>{
  else if(id==="archiveBtn")openArchive();
  else if(id==="exportBtn")openExportModal();
  else if(id==="importBtn")openImportModal();
- else if(id==="importPasteBtn"){doPasteImport();return;}
  else if(id==="aboutBtn"){
    openInfoModal("About","<div style=\"direction:ltr;text-align:center;line-height:1.9;font-size:14.5px;color:var(--ink-soft)\">This app designed and developed with ❤️<br>for the <b style=\"color:var(--gold-deep)\">Soul Meeting Community</b><br><br>By<br><a href=\"https://www.ashraf-reda.com\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--gold-deep);font-weight:700;text-decoration:underline\">Ashraf Reda</a></div>","");
  }
@@ -2161,54 +2173,13 @@ function openExportModal(){
    <button class="btn ghost" id="downloadBackupBtn">تجربة تنزيل كملف كمان</button>`;
  document.getElementById("infoModal").classList.add("open");
 }
-async function doPasteImport(){
- const ta=document.getElementById("importText");
- if(!ta)return;
- const apply=txt=>{
-   if(!txt||!txt.trim())return false;
-   ta.value=txt;
-   try{ta.dispatchEvent(new Event("input",{bubbles:true}));}catch(e){}
-   showUpdateToast("تم اللصق ✓ — اضغط «استرجاع من النص»");
-   return true;
- };
- // 1) Clipboard API
- try{
-   if(navigator.clipboard&&navigator.clipboard.readText){
-     const txt=await navigator.clipboard.readText();
-     if(apply(txt))return;
-   }
- }catch(e){}
- // 2) execCommand paste into the focused textarea
- try{
-   ta.focus();
-   const before=ta.value;
-   const okCmd=document.execCommand&&document.execCommand("paste");
-   if(okCmd&&ta.value&&ta.value!==before){
-     showUpdateToast("تم اللصق ✓ — اضغط «استرجاع من النص»");
-     return;
-   }
- }catch(e){}
- // 3) last resort: put the caret in place and paste on the next clipboard event
- try{
-   ta.focus();
-   const onPaste=ev=>{
-     const txt=(ev.clipboardData||window.clipboardData||{}).getData?((ev.clipboardData||window.clipboardData).getData("text")):"";
-     if(txt){ev.preventDefault();apply(txt);}
-     ta.removeEventListener("paste",onPaste);
-   };
-   ta.addEventListener("paste",onPaste);
- }catch(e){}
- showUpdateToast("المتصفح رفض القراءة — المربع جاهز، الصق فيه مباشرة");
-}
 function openImportModal(){
  document.getElementById("infoTitle").textContent="استيراد نسخة احتياطية";
  document.getElementById("infoBody").innerHTML=`
    <div class="note" style="margin:0 0 10px">الصق هنا النص اللي نسخته قبل كده:</div>
    <textarea id="importText" placeholder="الصق النص هنا..." style="width:100%;min-height:110px;font-size:10.5px;direction:ltr;text-align:left;font-family:monospace"></textarea>
-   <div style="display:flex;gap:8px;margin-top:10px">
-     <button class="minibtn" id="importPasteBtn" style="flex:1">📋 لصق</button>
-     <button class="minibtn" id="importFilePick" style="flex:1">اختيار ملف</button>
-   </div>`;
+   <div class="note" style="margin:10px 0 6px">اضغط مطوّلًا داخل المربع واختر «لصق» — أو استورد من ملف:</div>
+   <button class="minibtn" id="importFilePick">اختيار ملف من الجهاز</button>`;
  setTimeout(()=>{const ta=document.getElementById("importText");if(ta)ta.focus();},120);
  document.getElementById("infoActions").innerHTML=`<button class="btn" id="importTextBtn">استرجاع من النص</button>`;
  document.getElementById("infoModal").classList.add("open");
@@ -2345,19 +2316,27 @@ async function saveWord(filename,title,body,btn){
 }
 
 /* PWA */
-let deferredPrompt=null;
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;const b=document.getElementById("installBtn");if(b)b.style.display="inline-block";});
+
 function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;}
 function standalone(){return window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;}
 async function doInstall(){
- if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("installBtn").style.display="none";return;}
+ if(deferredPrompt){
+   try{
+     deferredPrompt.prompt();
+     const res=await deferredPrompt.userChoice;
+     deferredPrompt=null;
+     if(res&&res.outcome==="accepted"){appInstalled=true;}
+     refreshInstallBtn();
+     return;
+   }catch(e){deferredPrompt=null;}
+ }
  if(isIOS()){
    openInfoModal("تثبيت التطبيق","<div class=\"note\" style=\"line-height:2\">للتثبيت على الآيفون:<br>1) افتح الصفحة في متصفح <b>Safari</b> (لازم Safari تحديدًا)<br>2) اضغط على زر المشاركة ⬆︎ تحت الشاشة<br>3) اختر «إضافة إلى الشاشة الرئيسية»</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");
  }else{
    openInfoModal("تثبيت التطبيق","<div class=\"note\" style=\"line-height:2\">لتثبيت التطبيق على شاشتك الرئيسية:<br>افتح قائمة المتصفح (عادة ⋮ فوق يمين الشاشة)<br>واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».<br><br>لو الخيار ده مش ظاهر، جرّب فتح الصفحة من متصفح Chrome على أندرويد.</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");
  }
 }
-if(!standalone()){const b=document.getElementById("installBtn");if(b)b.style.display="inline-block";}
+refreshInstallBtn();
 if("serviceWorker" in navigator&&location.protocol==="https:"){
  window.addEventListener("load",()=>{
    navigator.serviceWorker.register("sw.js").then(reg=>{
