@@ -223,7 +223,9 @@ details .in{padding:12px 14px}
 .intent-progress-coin{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;
   filter:drop-shadow(0 1px 2px rgba(120,80,10,.35));z-index:1}
 .intent-progress .ring-fg.complete{filter:drop-shadow(0 0 4px rgba(120,210,110,.9))}
-.intent-progress .ring-fg-goal.complete{filter:drop-shadow(0 0 4px rgba(63,141,220,.9))}
+.intent-progress.tone-orange .ring-fg.complete{filter:drop-shadow(0 0 5px rgba(240,150,55,.95))}
+.intent-progress.tone-green .ring-fg.complete{filter:drop-shadow(0 0 5px rgba(63,160,100,.95))}
+.intent-progress .ring-fg-goal.complete{filter:drop-shadow(0 0 4px rgba(63,160,100,.95))}
 .intent-progress.complete{animation:ring-pulse 1.8s ease-in-out infinite}
 @keyframes ring-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 
@@ -588,10 +590,10 @@ function blank(){return{
  spendKind:{},spendDecisions:{},
  selAspects:[],aspectMeta:{},
  ideas:Array.from({length:7},()=>[{t:"",s:""},{t:"",s:""}]),
- actStatus:[],actBanked:[],ideaBank:[],pool:[],planView:"today",planFilterEnergy:"",planFilterAxis:"",todayReorderMode:false,
+ actStatus:[],actBanked:[],planSort:"date",ideaBank:[],pool:[],planView:"today",planFilterEnergy:"",planFilterAxis:"",todayReorderMode:false,
  ledger:[],ledgerDraftAmount:"",ledgerDraftNote:"",ledgerDraftType:"income",
  ledgerEditingId:"",ledgerEditAmount:"",ledgerEditNote:"",ledgerEditType:"income",day1Done:false,goalCelebrated:false};}
-function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.state){S=Object.assign(blank(),o.state);tab=o.tab||1;section=o.section||1;cur1=o.cur1||"start";cur2=o.cur2||"d7-1-ideas";return;}}}catch(e){}S=blank();}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.state){S=Object.assign(blank(),o.state);if(o.state.planSort===undefined)S.planSort="date";tab=o.tab||1;section=o.section||1;cur1=o.cur1||"start";cur2=o.cur2||"d7-1-ideas";return;}}}catch(e){}S=blank();}
 let st=null;
 function save(){clearTimeout(st);st=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify({state:S,tab,section,cur1,cur2}));tg("حُفظ تلقائيًا");}catch(e){tg("التخزين غير متاح");}},300);}
 /* تراجع (Undo) — زرار ثابت + toast عائم بعداد دائري 5 ثوانٍ */
@@ -833,6 +835,19 @@ function isRoutineDueToday(it){const df=it.def||{};if(df.repeatType!=="routine")
 function routineDoneToday(it){return !!(it.routineLog&&it.routineLog[todayKey()]);}
 function toggleRoutineToday(it){it.routineLog=it.routineLog||{};const k=todayKey();it.routineLog[k]=!it.routineLog[k];}
 function routineStreak(it){if(!it.routineLog)return 0;return Object.values(it.routineLog).filter(Boolean).length;}
+function rampColor(stops,pct){
+ let a=stops[0],b=stops[stops.length-1];
+ for(let i=0;i<stops.length-1;i++){if(pct>=stops[i][0]&&pct<=stops[i+1][0]){a=stops[i];b=stops[i+1];break;}}
+ const span=(b[0]-a[0])||1,t=(pct-a[0])/span;
+ const c=a[1].map((v,k)=>Math.round(v+(b[1][k]-v)*t));
+ return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function ringColorWarm(pct){
+ return rampColor([[0,[186,106,38]],[40,[214,133,46]],[75,[235,158,62]],[100,[247,178,86]]],pct);
+}
+function ringColorGreen(pct){
+ return rampColor([[0,[122,160,136]],[50,[79,145,104]],[100,[47,122,75]]],pct);
+}
 function ringColor(pct){
  const stops=[[0,[201,138,58]],[40,[232,181,69]],[75,[255,199,64]],[100,[126,224,153]]];
  let a=stops[0],b=stops[stops.length-1];
@@ -908,12 +923,13 @@ function goalProgressStats(){
  const target=parseIntentTarget();
  return {done:ledgerStats().income,total:target||0};
 }
-function renderProgressRing(taskStats,includeGoal,labelOverride){
+function renderProgressRing(taskStats,includeGoal,labelOverride,tone){
  if(includeGoal===undefined)includeGoal=true;
  const tTotal=taskStats?taskStats.total:allCommitted().length;
  const tDone=taskStats?taskStats.done:allCommitted().filter(it=>it.done).length;
  const tPct=tTotal?Math.min(100,Math.round(tDone/tTotal*100)):0;
- const tColor=ringColor(tPct),tComplete=tTotal>0&&tPct>=100;
+ const tColor=tone==="orange"?ringColorWarm(tPct):(tone==="green"?ringColorGreen(tPct):ringColor(tPct));
+ const tComplete=tTotal>0&&tPct>=100;
  const tLabel=labelOverride||(taskStats?"نسبة إنجاز مهام اليوم":"نسبة إنجاز مهام هذا الشهر");
  const cx=23,cy=23;
  let goalSvg="",gComplete=false,titleParts=[`${tLabel}: ${tPct}%`];
@@ -921,7 +937,7 @@ function renderProgressRing(taskStats,includeGoal,labelOverride){
    const gStats=goalProgressStats();
    const gPct=gStats.total?Math.min(100,Math.round(gStats.done/gStats.total*100)):0;
    gComplete=gStats.total>0&&gPct>=100;
-   const gColor=gPct>=100?"#3f7d55":"#3b7d94";
+   const gColor=gPct>=100?"#2f7a4b":(gPct>=50?"#4f9168":"#6ba883");
    const rOut=17,Cout=2*Math.PI*rOut,offOut=Cout*(1-gPct/100);
    const gLabel=gStats.total?`نسبة تحقيق النية المالية: ${gPct}% (${fmtMoney(gStats.done)} من ${fmtMoney(gStats.total)})`:"لم تُحدَّد قيمة رقمية للنية المالية بعد";
    titleParts.push(gLabel);
@@ -932,7 +948,7 @@ function renderProgressRing(taskStats,includeGoal,labelOverride){
  }
  const rIn=includeGoal?12.5:15,strokeIn=includeGoal?3:3.5;
  const Cin=2*Math.PI*rIn,offIn=Cin*(1-tPct/100);
- return `<div class="intent-progress ${(tComplete||gComplete)?"complete":""}" title="${titleParts.join("&#10;")}">
+ return `<div class="intent-progress ${tone?("tone-"+tone):""} ${(tComplete||gComplete)?"complete":""}" title="${titleParts.join("&#10;")}">
    <svg viewBox="0 0 46 46">
      ${goalSvg}
      <circle cx="${cx}" cy="${cy}" r="${rIn}" fill="none" stroke="#e8d7ae" stroke-width="${strokeIn}"/>
@@ -1434,6 +1450,29 @@ function filterScreens(t,d,sec){
 }
 
 /* ===================== الخطة والتصدير ===================== */
+const SORT_LABEL={impact:"الأكثر حلًّا للأنماط",date:"تاريخ التنفيذ"};
+const byImpact=list=>list.slice().sort((a,b)=>{
+ const na=(a.solves||[]).length,nb=(b.solves||[]).length;
+ if(na!==nb)return nb-na;
+ const da=itemDate(a),db=itemDate(b);
+ if(da&&db&&da-db)return da-db;
+ if(da&&!db)return -1;
+ if(!da&&db)return 1;
+ return (a.rank||0)-(b.rank||0);
+});
+const byExecDate=list=>list.slice().sort((a,b)=>{
+ const da=itemDate(a),db=itemDate(b);
+ if(da&&db&&da-db)return da-db;
+ if(da&&!db)return -1;
+ if(!da&&db)return 1;
+ const na=(a.solves||[]).length,nb=(b.solves||[]).length;
+ if(na!==nb)return nb-na;
+ return (a.rank||0)-(b.rank||0);
+});
+function cardDone(it){
+ const routine=(it.def||{}).repeatType==="routine";
+ return routine?routineDoneToday(it):!!it.done;
+}
 const byTodoOrder=list=>list.slice().sort((a,b)=>{
  const ad=a.done?1:0,bd=b.done?1:0;
  if(ad!==bd)return ad-bd;
@@ -1448,7 +1487,7 @@ function planCardFn(){
  return (it,n,badge)=>{const df=it.def||{};const i=S.pool.indexOf(it);const open=!!it.expanded;
    const recurring=df.repeatType==="recurring";const routine=df.repeatType==="routine";
    const reps=recurring?repsArray(it):null;
-   const isDone=routine?routineDoneToday(it):it.done;
+   const isDone=cardDone(it);
    const checkAttr=routine?`data-routinetoggle="${i}"`:`data-donetoggle="${i}"`;
    return `<div class="pcard ${n===0&&!isDone?"hero":""} ${isDone?"done":""}" data-carditem="${i}">
      <div class="plan-header" data-accordion="${i}">
@@ -1512,7 +1551,7 @@ function renderLedgerHero(){
  const st=ledgerStats(),target=parseIntentTarget();
  const gPct=target?Math.min(100,Math.round(st.income/target*100)):0;
  return `<div class="ledger-hero">
-   ${renderProgressRing({done:st.income,total:target},false,"نسبة تحقيق الدخل من النية المالية")}
+   ${renderProgressRing({done:st.income,total:target},false,"نسبة تحقيق الدخل من النية المالية","green")}
    <div class="ledger-hero-label">✦ الدخل حتى الآن</div>
    <div class="ledger-hero-value">${fmtMoney(st.income)}</div>
    <div class="ledger-hero-sub">${target?`من هدف ${fmtMoney(target)} — ${gPct}%`:"حدّد رقمًا في النية المالية لمتابعة النسبة"}</div>
@@ -1588,7 +1627,7 @@ function renderTodayWidget(){
  let h=`<div class="today-hero">
    <div class="today-icon" aria-hidden="true">${missionIcon()}</div>
    <div class="today-value">${esc(S.intentValue||"—")}</div>
-   ${renderProgressRing(todayProgressStats(),false)}
+   ${renderProgressRing(todayProgressStats(),false,null,"orange")}
  </div>
  <div class="task-toolbar between">
    <div class="today-heading" style="margin:0">مهام النهاردة</div>
@@ -1648,12 +1687,41 @@ function renderFullPlanList(){
      <button class="minibtn" data-clearfilter="1">مسح</button>
    </div>`;
  }
+ if(S.planSort&&S.planSort!=="date"){
+   h+=`<div class="active-filter">
+     <span>↕ ترتيب: <b>${SORT_LABEL[S.planSort]||""}</b></span>
+     <button class="minibtn" data-setsort="date">إلغاء</button>
+   </div>`;
+ }
  if(filterActive&&totalShown===0){
    h+=`<div class="empty">لا توجد أفعال تطابق هذا الفلتر.</div>`;
  }else{
-   h+=main.length?`<div class="plan">${main.map((it,n)=>cardFn(it,n)).join("")}</div>`:(filterActive?"":`<div class="empty">لم تكتمل فلترة اليوم الأول بعد.</div>`);
-   days.forEach(g=>{h+=`<div class="rule"></div><h3 style="font-size:16px;margin:0 0 10px">إضافات يوم ${g.d+1}</h3>
+   const sortMode=S.planSort||"";
+   const allItems=main.concat(days.reduce((acc,g)=>acc.concat(g.items),[]));
+   const doneAll=allItems.filter(cardDone);
+   let mainOpen,daysOpen;
+   if(sortMode==="impact"||sortMode==="date"){
+     const flatOpen=allItems.filter(it=>!cardDone(it));
+     mainOpen=(sortMode==="impact"?byImpact:byExecDate)(flatOpen);
+     daysOpen=[];
+   }else{
+     mainOpen=main.filter(it=>!cardDone(it));
+     daysOpen=days.map(g=>({d:g.d,items:g.items.filter(it=>!cardDone(it))})).filter(g=>g.items.length);
+   }
+   const anyOpen=mainOpen.length||daysOpen.length;
+   h+=mainOpen.length?`<div class="plan">${mainOpen.map((it,n)=>cardFn(it,n)).join("")}</div>`:"";
+   daysOpen.forEach(g=>{h+=`<div class="rule"></div><h3 style="font-size:16px;margin:0 0 10px">إضافات يوم ${g.d+1}</h3>
      <div class="plan">${g.items.map((it,n)=>cardFn(it,n+1)).join("")}</div>`;});
+   if(!anyOpen){
+     h+=doneAll.length?`<div class="okbox">خلصت كل مهام الشهر 🎉</div>`
+       :(filterActive?"":`<div class="empty">لم تكتمل فلترة اليوم الأول بعد.</div>`);
+   }
+   if(doneAll.length){
+     h+=`<div class="rule"></div>
+       <details><summary>✓ المهام المنجزة (${doneAll.length})</summary><div class="in">
+       <div class="plan">${doneAll.map((it,n)=>cardFn(it,n+1)).join("")}</div>
+       </div></details>`;
+   }
  }
  h+=`<div class="rule"></div>`;
  const resv=allReserve();
@@ -1784,7 +1852,7 @@ document.addEventListener("input",e=>{
 });
 document.addEventListener("change",e=>{if(e.target.tagName==="SELECT"&&e.target.dataset.bind){set(e.target.dataset.bind,e.target.value);render(true);}});
 document.addEventListener("click",e=>{
- const t=e.target.closest("[data-radio],[data-check],[data-seg],[data-move],[data-add],[data-del],[data-go],[data-pl],[data-prm],[data-addpool],[data-addidea],[data-copy],[data-rank],[data-psolve],[data-ibank],[data-idel],[data-brest],[data-bdel],[data-eftcopytopic],[data-archopen],[data-archtoggle],[data-archword],[data-archresume],[data-scoreinfo],[data-navto],[data-donetoggle],[data-accordion],[data-addtoplan],[data-reptoggle],[data-routinetoggle],[data-viewmode],[data-setfilter],[data-clearfilter],[data-filtertab],[data-todaymove],[data-titleedit],[data-ledgerdel],[data-ledgeredit],[data-addact],[data-actbank],[data-actdel],[data-skilldl],[data-addcustom],[data-bulkbank],[data-bulkdel]");
+ const t=e.target.closest("[data-radio],[data-check],[data-seg],[data-move],[data-add],[data-del],[data-go],[data-pl],[data-prm],[data-addpool],[data-addidea],[data-copy],[data-rank],[data-psolve],[data-ibank],[data-idel],[data-brest],[data-bdel],[data-eftcopytopic],[data-archopen],[data-archtoggle],[data-archword],[data-archresume],[data-scoreinfo],[data-navto],[data-donetoggle],[data-accordion],[data-addtoplan],[data-reptoggle],[data-routinetoggle],[data-viewmode],[data-setfilter],[data-clearfilter],[data-filtertab],[data-setsort],[data-todaymove],[data-titleedit],[data-ledgerdel],[data-ledgeredit],[data-addact],[data-actbank],[data-actdel],[data-skilldl],[data-addcustom],[data-bulkbank],[data-bulkdel]");
  if(t){
   if(isMutatingTarget(t))pushUndo();
   if(t.dataset.radio!=null)set(t.dataset.radio,get(t.dataset.radio)===t.dataset.val?"":t.dataset.val);
@@ -1862,6 +1930,7 @@ document.addEventListener("click",e=>{
     if(document.getElementById("infoModal").classList.contains("open"))renderFilterPanelBody();}
   else if(t.dataset.clearfilter){S.planFilterEnergy="";S.planFilterAxis="";save();}
   else if(t.dataset.filtertab){filterPanelTab=t.dataset.filtertab;renderFilterPanelBody();}
+  else if(t.dataset.setsort!=null){S.planSort=t.dataset.setsort;save();renderFilterPanelBody();}
   else if(t.dataset.titleedit!=null){const it=S.pool[+t.dataset.titleedit];it.titleEditMode=!it.titleEditMode;save();
     if(it.titleEditMode){setTimeout(()=>{const el=document.getElementById("titleInput-"+t.dataset.titleedit);if(el){el.focus();el.select();}},60);}}
   else if(t.dataset.ledgerdel){S.ledger=(S.ledger||[]).filter(e=>e.id!==t.dataset.ledgerdel);save();}
@@ -1918,6 +1987,7 @@ document.addEventListener("click",e=>{
  else if(id==="archiveBtn")openArchive();
  else if(id==="exportBtn")openExportModal();
  else if(id==="importBtn")openImportModal();
+ else if(id==="importPasteBtn"){doPasteImport();return;}
  else if(id==="aboutBtn"){
    openInfoModal("About","<div style=\"direction:ltr;text-align:center;line-height:1.9;font-size:14.5px;color:var(--ink-soft)\">This app designed and developed with ❤️<br>for the <b style=\"color:var(--gold-deep)\">Soul Meeting Community</b><br><br>By<br><a href=\"https://www.ashraf-reda.com\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--gold-deep);font-weight:700;text-decoration:underline\">Ashraf Reda</a></div>","");
  }
@@ -1988,9 +2058,20 @@ function renderFilterPanelBody(){
  const tabs=`<div class="view-toggle" style="margin-bottom:14px;flex:0 0 auto">
    <button class="${filterPanelTab==="energy"?"on":""}" data-filtertab="energy">الطاقات/الأنماط</button>
    <button class="${filterPanelTab==="axis"?"on":""}" data-filtertab="axis">محاور الحياة</button>
+   <button class="${filterPanelTab==="sort"?"on":""}" data-filtertab="sort">الترتيب</button>
  </div>`;
  let inner;
- if(filterPanelTab==="axis"){
+ if(filterPanelTab==="sort"){
+   const cur=S.planSort||"";
+   inner=`<div class="field" style="margin-bottom:0"><label class="fl">ترتيب مهام الشهر</label>
+     <div class="chips" style="flex-direction:column;align-items:stretch">
+       <button class="chip ${cur==="date"?"sel":""}" data-setsort="date">حسب تاريخ التنفيذ — الأقرب أولًا (الافتراضي)</button>
+       <button class="chip ${cur==="impact"?"sel":""}" data-setsort="impact">الأكثر حلًّا للأنماط أولًا</button>
+       <button class="chip ${cur===""?"sel":""}" data-setsort="">حسب مسار البروتوكول</button>
+     </div>
+     <div class="note" style="margin-top:10px">أول ترتيبين يدمجان أفعال اليوم الأول والأيام السبعة في قائمة واحدة.</div>
+   </div>`;
+ }else if(filterPanelTab==="axis"){
    inner=`<div class="field" style="margin-bottom:0"><label class="fl">محاور الحياة</label>
      <div class="chips">
        <button class="chip ${!S.planFilterAxis?"sel":""}" data-setfilter="axis~-1">الكل</button>
@@ -2080,13 +2161,55 @@ function openExportModal(){
    <button class="btn ghost" id="downloadBackupBtn">تجربة تنزيل كملف كمان</button>`;
  document.getElementById("infoModal").classList.add("open");
 }
+async function doPasteImport(){
+ const ta=document.getElementById("importText");
+ if(!ta)return;
+ const apply=txt=>{
+   if(!txt||!txt.trim())return false;
+   ta.value=txt;
+   try{ta.dispatchEvent(new Event("input",{bubbles:true}));}catch(e){}
+   showUpdateToast("تم اللصق ✓ — اضغط «استرجاع من النص»");
+   return true;
+ };
+ // 1) Clipboard API
+ try{
+   if(navigator.clipboard&&navigator.clipboard.readText){
+     const txt=await navigator.clipboard.readText();
+     if(apply(txt))return;
+   }
+ }catch(e){}
+ // 2) execCommand paste into the focused textarea
+ try{
+   ta.focus();
+   const before=ta.value;
+   const okCmd=document.execCommand&&document.execCommand("paste");
+   if(okCmd&&ta.value&&ta.value!==before){
+     showUpdateToast("تم اللصق ✓ — اضغط «استرجاع من النص»");
+     return;
+   }
+ }catch(e){}
+ // 3) last resort: put the caret in place and paste on the next clipboard event
+ try{
+   ta.focus();
+   const onPaste=ev=>{
+     const txt=(ev.clipboardData||window.clipboardData||{}).getData?((ev.clipboardData||window.clipboardData).getData("text")):"";
+     if(txt){ev.preventDefault();apply(txt);}
+     ta.removeEventListener("paste",onPaste);
+   };
+   ta.addEventListener("paste",onPaste);
+ }catch(e){}
+ showUpdateToast("المتصفح رفض القراءة — المربع جاهز، الصق فيه مباشرة");
+}
 function openImportModal(){
  document.getElementById("infoTitle").textContent="استيراد نسخة احتياطية";
  document.getElementById("infoBody").innerHTML=`
    <div class="note" style="margin:0 0 10px">الصق هنا النص اللي نسخته قبل كده:</div>
    <textarea id="importText" placeholder="الصق النص هنا..." style="width:100%;min-height:110px;font-size:10.5px;direction:ltr;text-align:left;font-family:monospace"></textarea>
-   <div class="note" style="margin:10px 0 6px">أو لو عندك ملف محفوظ:</div>
-   <button class="minibtn" id="importFilePick">اختيار ملف من الجهاز</button>`;
+   <div style="display:flex;gap:8px;margin-top:10px">
+     <button class="minibtn" id="importPasteBtn" style="flex:1">📋 لصق</button>
+     <button class="minibtn" id="importFilePick" style="flex:1">اختيار ملف</button>
+   </div>`;
+ setTimeout(()=>{const ta=document.getElementById("importText");if(ta)ta.focus();},120);
  document.getElementById("infoActions").innerHTML=`<button class="btn" id="importTextBtn">استرجاع من النص</button>`;
  document.getElementById("infoModal").classList.add("open");
 }
