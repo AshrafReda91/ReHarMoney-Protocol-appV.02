@@ -315,6 +315,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 .copy-icon-btn:hover{background:var(--gold);color:var(--on-gold)}
 .copy-icon-btn svg{pointer-events:none}
 .eft-head-t{flex:1;font-weight:700;font-size:14.5px;color:var(--gold-deep)}
+.rep-box.today{box-shadow:0 0 0 2px var(--gold);}
 .timeline{display:flex;flex-direction:column}
 .plan-actions{display:flex;gap:6px;flex-wrap:nowrap;margin-top:14px}
 .plan-actions .btn{flex:1;padding:10px 4px;font-size:11.5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -601,6 +602,7 @@ const AXES=[["العقل","أفعال ذهنية / تخطيطية"],["العاط
 
 /* ===================== الحالة ===================== */
 const KEY="sm_protocol_v3";
+let justCompleted=false;
 let S=null,tab=1,section=1,cur1="start",cur2="d7-1-ideas",timelineReturnId=null;
 function blank(){return{
  month:MONTHS[new Date().getMonth()],year:"2026",mission:"",
@@ -614,7 +616,8 @@ function blank(){return{
  ideas:Array.from({length:7},()=>[{t:"",s:""},{t:"",s:""}]),
  actStatus:[],actBanked:[],eftSkipped:false,planSort:"date",ideaBank:[],pool:[],planView:"today",planFilterEnergy:"",planFilterAxis:"",todayReorderMode:false,
  ledger:[],ledgerDraftAmount:"",ledgerDraftNote:"",ledgerDraftType:"income",
- ledgerEditingId:"",ledgerEditAmount:"",ledgerEditNote:"",ledgerEditType:"income",day1Done:false,goalCelebrated:false};}
+ ledgerEditingId:"",ledgerEditAmount:"",ledgerEditNote:"",ledgerEditType:"income",day1Done:false,goalCelebrated:false,goalCelebratedKey:"",dayCelebratedKey:"",
+ intentCurrency:"",fxRates:{},fxUpdatedAt:0,ledgerDraftCur:"",ledgerEditCur:""};}
 function load(){try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.state){S=Object.assign(blank(),o.state);if(o.state.planSort===undefined)S.planSort="date";tab=o.tab||1;section=o.section||1;cur1=o.cur1||"start";cur2=o.cur2||"d7-1-ideas";return;}}}catch(e){}S=blank();}
 let st=null;
 function save(){clearTimeout(st);st=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify({state:S,tab,section,cur1,cur2}));tg("حُفظ تلقائيًا");}catch(e){tg("التخزين غير متاح");}},300);}
@@ -896,7 +899,10 @@ function todayProgressStats(){
    }
    if(df.repeatType==="recurring"){
      const dt=itemDate(it);
-     if(!dt||dt.getTime()<=today.getTime()){total++;if(it.done)done++;}
+     if(dt&&dt.getTime()>today.getTime())return;
+     const doneToday=recurDoneToday(it);
+     if(it.done&&!doneToday)return;
+     total++;if(doneToday)done++;
      return;
    }
    const dt=itemDate(it);
@@ -905,12 +911,63 @@ function todayProgressStats(){
  return {done,total};
 }
 function fmtMoney(n){n=+n||0;return n.toLocaleString("en-US",{maximumFractionDigits:2});}
-function triggerConfetti(){
+const CURRENCIES=[["USD","دولار أمريكي","$"],["EGP","جنيه مصري","ج.م"],["SAR","ريال سعودي","ر.س"],["AED","درهم إماراتي","د.إ"],
+ ["KWD","دينار كويتي","د.ك"],["QAR","ريال قطري","ر.ق"],["BHD","دينار بحريني","د.ب"],["OMR","ريال عماني","ر.ع"],
+ ["JOD","دينار أردني","د.أ"],["LYD","دينار ليبي","د.ل"],["MAD","درهم مغربي","د.م"],["TND","دينار تونسي","د.ت"],
+ ["DZD","دينار جزائري","د.ج"],["IQD","دينار عراقي","د.ع"],["EUR","يورو","€"],["GBP","جنيه إسترليني","£"]];
+const FX_PEGGED={USD:1,SAR:3.75,AED:3.6725,QAR:3.64,BHD:0.376,OMR:0.3845,JOD:0.709};
+function curLabel(c){const x=CURRENCIES.find(z=>z[0]===c);return x?x[2]:(c||"");}
+function guessIntentCurrency(){
+ const v=(S.intentValue||"");
+ if(/\$|دولار|usd/i.test(v))return "USD";
+ if(/جنيه|ج\.م|egp/i.test(v))return "EGP";
+ if(/ريال سعودي|sar/i.test(v))return "SAR";
+ if(/درهم|aed/i.test(v))return "AED";
+ if(/يورو|€|eur/i.test(v))return "EUR";
+ return "";
+}
+function baseCurrency(){return S.intentCurrency||guessIntentCurrency();}
+function fxRate(c){
+ if(!c)return null;
+ const r=parseFloat((S.fxRates||{})[c]);
+ if(r>0)return r;
+ return FX_PEGGED[c]||null;
+}
+function toBase(amount,cur){
+ const base=baseCurrency();amount=+amount||0;
+ if(!base||!cur||cur===base)return amount;
+ const rc=fxRate(cur),rb=fxRate(base);
+ if(!rc||!rb)return null;
+ return amount/rc*rb;
+}
+async function fetchFxRates(btn){
+ const done=(ok,msg)=>{if(btn)btn.disabled=false;showUpdateToast(msg);if(ok){save();render(true);checkGoalCelebration();}};
+ if(btn)btn.disabled=true;
+ const apply=rates=>{
+   const out=Object.assign({},S.fxRates||{});let n=0;
+   CURRENCIES.forEach(c=>{const k=c[0];const v=rates[k]||rates[k.toLowerCase()];if(v>0){out[k]=String(+(+v).toFixed(4));n++;}});
+   if(!n)return false;
+   S.fxRates=out;S.fxUpdatedAt=Date.now();return true;
+ };
  try{
-   const colors=["#e2699a","#4caf6b","#d9a936","#3b7d94","#8a6417","#f3d98c","#c9536f"];
+   const r=await fetch("https://open.er-api.com/v6/latest/USD");
+   const j=await r.json();
+   if(j&&j.rates&&apply(j.rates))return done(true,"تم تحديث أسعار الصرف ✓");
+ }catch(e){}
+ try{
+   const r=await fetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json");
+   const j=await r.json();
+   if(j&&j.usd&&apply(j.usd))return done(true,"تم تحديث أسعار الصرف ✓");
+ }catch(e){}
+ done(false,"مفيش إنترنت أو الخدمة مش متاحة — الأسعار المحفوظة شغالة زي ما هي");
+}
+function triggerConfetti(count){
+ try{
+   const n=count||70;
+   const colors=["#e2699a","#4caf6b","#d9a936","#3b7d94","#8a6417","#f3d98c","#c9536f","#e8913a"];
    const wrap=document.createElement("div");
    wrap.className="confetti-wrap";
-   for(let i=0;i<70;i++){
+   for(let i=0;i<n;i++){
      const p=document.createElement("div");
      p.className="confetti-piece";
      p.style.left=(Math.random()*100)+"%";
@@ -923,13 +980,33 @@ function triggerConfetti(){
    document.body.appendChild(wrap);
    setTimeout(()=>wrap.remove(),4200);
  }catch(e){}
- openInfoModal("مبروك عليك 🎉","<div class=\"note\" style=\"text-align:center;font-size:15.5px;line-height:2\">لا تنسى الاحتفال بتحقيق نيتك المالية 🎉</div>","<button class=\"btn\" id=\"infoClose2\">أكيد</button>");
 }
 function checkGoalCelebration(){
  const target=parseIntentTarget();
- if(target>0&&ledgerStats().income>=target&&!S.goalCelebrated){
-   S.goalCelebrated=true;save();triggerConfetti();
- }
+ if(!(target>0))return;
+ const inc=ledgerStats().income;
+ const key=`${S.month}-${S.year}-${target}-${baseCurrency()}`;
+ if(inc<target){if(S.goalCelebratedKey){S.goalCelebratedKey="";save();}return;}
+ if(S.goalCelebratedKey===key)return;
+ S.goalCelebratedKey=key;save();
+ triggerConfetti(80);
+ openInfoModal("مبروك عليك 🎉","<div class=\"note\" style=\"text-align:center;font-size:15.5px;line-height:2\">حققت نيتك المالية لهذا الشهر.<br>لا تنسى الاحتفال بتحقيق نيتك المالية 🎉</div>","<button class=\"btn\" id=\"infoClose2\">أكيد</button>");
+}
+const DAY_MSGS=[
+ "خلصت كل مهام النهاردة. التزامك ده هو اللي بيبني النتيجة — كمّل!",
+ "يوم كامل من الالتزام ✓ خطوة صغيرة كل يوم بتعمل فرق كبير.",
+ "برافو! إنت بتثبت لنفسك كل يوم إنك قد كلمتك. استمر.",
+ "مهام اليوم خلصت. الاستمرارية أقوى من الحماس — وإنت ماشي صح."
+];
+function checkDayCelebration(){
+ const st=todayProgressStats();
+ if(!(st.total>0)||st.done<st.total)return;
+ const k=todayKey();
+ if(S.dayCelebratedKey===k)return;
+ S.dayCelebratedKey=k;save();
+ triggerConfetti(35);
+ const msg=DAY_MSGS[new Date().getDate()%DAY_MSGS.length];
+ openInfoModal("برافو عليك 👏","<div class=\"note\" style=\"text-align:center;font-size:15px;line-height:2\">"+msg+"</div>","<button class=\"btn\" id=\"infoClose2\">كمّل 💪</button>");
 }
 function parseIntentTarget(){
  const s=(S.intentValue||"").replace(/,/g,"");
@@ -937,9 +1014,13 @@ function parseIntentTarget(){
  return m?parseFloat(m[0]):0;
 }
 function ledgerStats(){
- const entries=S.ledger||[];let income=0,expense=0;
- entries.forEach(e=>{const amt=+e.amount||0;if(e.type==="expense")expense+=amt;else income+=amt;});
- return {income,expense,net:income-expense,count:entries.length};
+ const entries=S.ledger||[];let income=0,expense=0,missing=[];
+ entries.forEach(e=>{
+   const v=toBase(e.amount,e.currency);
+   if(v===null){if(missing.indexOf(e.currency)<0)missing.push(e.currency);return;}
+   if(e.type==="expense")expense+=v;else income+=v;
+ });
+ return {income,expense,net:income-expense,count:entries.length,missing};
 }
 function goalProgressStats(){
  const target=parseIntentTarget();
@@ -1491,9 +1572,15 @@ const byExecDate=list=>list.slice().sort((a,b)=>{
  if(na!==nb)return nb-na;
  return (a.rank||0)-(b.rank||0);
 });
-function cardDone(it){
- const routine=(it.def||{}).repeatType==="routine";
- return routine?routineDoneToday(it):!!it.done;
+function recurDoneToday(it){
+ const reps=repsArray(it),d=it.repeatDates||[],k=todayKey();
+ return reps.some((v,i)=>v&&d[i]===k);
+}
+function cardDone(it,ctx){
+ const df=it.def||{};
+ if(df.repeatType==="routine")return routineDoneToday(it);
+ if(ctx==="today"&&df.repeatType==="recurring")return recurDoneToday(it);
+ return !!it.done;
 }
 const byTodoOrder=list=>list.slice().sort((a,b)=>{
  const ad=a.done?1:0,bd=b.done?1:0;
@@ -1505,11 +1592,11 @@ const byTodoOrder=list=>list.slice().sort((a,b)=>{
  return (a.rank||0)-(b.rank||0);
 });
 const allReserve=()=>[reserve(1)].concat([0,1,2,3,4,5,6].map(d=>reserve(2,d))).flat();
-function planCardFn(){
+function planCardFn(ctx){
  return (it,n,badge)=>{const df=it.def||{};const i=S.pool.indexOf(it);const open=!!it.expanded;
    const recurring=df.repeatType==="recurring";const routine=df.repeatType==="routine";
    const reps=recurring?repsArray(it):null;
-   const isDone=cardDone(it);
+   const isDone=cardDone(it,ctx);
    const checkAttr=routine?`data-routinetoggle="${i}"`:`data-donetoggle="${i}"`;
    return `<div class="pcard ${n===0&&!isDone?"hero":""} ${isDone?"done":""}" data-carditem="${i}">
      <div class="plan-header" data-accordion="${i}">
@@ -1519,7 +1606,7 @@ function planCardFn(){
        ${scoreDot(it)}
      </div>
      ${recurring?`<div class="rep-row">
-       ${reps.map((d,ri)=>`<button class="rep-box ${d?"checked":""}" data-reptoggle="${i}.${ri}" title="المرة ${ri+1}">${d?"✓":ri+1}</button>`).join("")}
+       ${reps.map((d,ri)=>{const td=d&&(it.repeatDates||[])[ri]===todayKey();return `<button class="rep-box ${d?"checked":""} ${td?"today":""}" data-reptoggle="${i}.${ri}" title="${td?"خطوة النهاردة":"الخطوة "+(ri+1)}">${d?"✓":ri+1}</button>`;}).join("")}
        <span class="rep-count">${reps.filter(Boolean).length}/${reps.length}</span>
      </div>`:""}
      ${open?`<div class="plan-detail">
@@ -1552,7 +1639,7 @@ function todayWidgetItems(){
    const df=it.def||{};
    if(df.repeatType==="routine"){if(isRoutineDueToday(it))out.push({it,cat:df.routineTime==="مسائي"?"routine-evening":"routine-morning"});return;}
    if(df.repeatType==="recurring"){
-     if(it.done)return;
+     if(it.done&&!recurDoneToday(it))return;
      const dt=itemDate(it);
      if(!dt||dt.getTime()<=today.getTime())out.push({it,cat:"recurring"});
      return;
@@ -1569,17 +1656,37 @@ function todayWidgetItems(){
  return out;
 }
 const CAT_LABEL={overdue:"فات موعده",today:"اليوم","routine-morning":"روتين صباحي","routine-evening":"روتين مسائي",recurring:"قيد التقدم"};
+function renderFxPanel(){
+ const base=baseCurrency();
+ const used=[];(S.ledger||[]).forEach(e=>{if(e.currency&&used.indexOf(e.currency)<0)used.push(e.currency);});
+ if(S.ledgerDraftCur&&used.indexOf(S.ledgerDraftCur)<0)used.push(S.ledgerDraftCur);
+ const show=CURRENCIES.filter(c=>c[0]!=="USD"&&(used.indexOf(c[0])>=0||c[0]===base||!FX_PEGGED[c[0]]));
+ const upd=S.fxUpdatedAt?new Date(S.fxUpdatedAt):null;
+ return `<div class="rule"></div><details ${(ledgerStats().missing.length)?"open":""}><summary>💱 العملات وأسعار الصرف</summary><div class="in">
+   <div class="field"><label class="fl">عملة النية المالية</label>
+     <select data-bind="intentCurrency"><option value="" ${S.intentCurrency?"":"selected"}>تلقائي${guessIntentCurrency()?` (${guessIntentCurrency()})`:" — بدون تحويل"}</option>
+     ${CURRENCIES.map(c=>`<option value="${c[0]}" ${S.intentCurrency===c[0]?"selected":""}>${c[1]} (${c[0]})</option>`).join("")}</select>
+     <div class="note">كل الحركات بتتحوّل للعملة دي عشان تتقارن بالهدف.</div></div>
+   <label class="fl">كام وحدة من العملة = 1 دولار</label>
+   ${show.map(c=>{const peg=FX_PEGGED[c[0]];const v=(S.fxRates||{})[c[0]]||"";
+     return `<div class="row" style="align-items:center;margin-bottom:6px"><div style="flex:1;font-size:13.5px">${c[1]} <span class="note">(${c[0]})</span></div>
+       <input type="number" inputmode="decimal" data-bind="fxRates~${c[0]}" data-rerender="1" value="${esc(v)}" placeholder="${peg?peg:"السعر"}" style="max-width:110px"></div>`;}).join("")}
+   <button class="btn ghost" id="fxFetchBtn" style="width:100%;margin-top:8px">🌐 تحديث الأسعار من الإنترنت</button>
+   <div class="note" style="margin-top:6px">${upd?`آخر تحديث: ${upd.getDate()}/${upd.getMonth()+1}/${upd.getFullYear()}`:"لسه ماتحدّثتش من الإنترنت"} — الأسعار بتتحفظ على جهازك وتشتغل من غير إنترنت. العملات المربوطة بالدولار (السعودي، الإماراتي، القطري...) أسعارها ثابتة ومش محتاجة تحديث.</div>
+ </div></details>`;
+}
 function renderLedgerHero(){
  const st=ledgerStats(),target=parseIntentTarget();
  const gPct=target?Math.min(100,Math.round(st.income/target*100)):0;
  return `<div class="ledger-hero">
    ${renderProgressRing({done:st.income,total:target},false,"نسبة تحقيق الدخل من النية المالية","green")}
    <div class="ledger-hero-label">✦ الدخل حتى الآن</div>
-   <div class="ledger-hero-value">${fmtMoney(st.income)}</div>
+   <div class="ledger-hero-value">${fmtMoney(st.income)} <span style="font-size:.5em">${esc(curLabel(baseCurrency()))}</span></div>
    <div class="ledger-hero-sub">${target?`من هدف ${fmtMoney(target)} — ${gPct}%`:"حدّد رقمًا في النية المالية لمتابعة النسبة"}</div>
    <div class="ledger-hero-stats">
      <div class="stat-pill"><b>${fmtMoney(st.expense)}</b>مصروفات</div>
    </div>
+   ${st.missing.length?`<div class="ledger-hero-sub" style="margin-top:10px;color:#8a3a1a">⚠️ في حركات بعملة (${st.missing.map(curLabel).map(esc).join("، ")}) مش محسوبة لأن سعر صرفها مش متحدد — حدّده من «أسعار الصرف» تحت.</div>`:""}
  </div>`;
 }
 function renderLedger(){
@@ -1593,9 +1700,10 @@ function renderLedger(){
      <button class="chip ${type==="expense"?"sel":""}" data-radio="ledgerDraftType" data-val="expense">مصروف</button>
    </div>
    <div style="display:flex;gap:10px;margin-top:10px">
-     <input type="number" inputmode="decimal" id="ledgerAmount" data-bind="ledgerDraftAmount" value="${esc(S.ledgerDraftAmount||"")}" placeholder="القيمة" style="flex:1">
-     <input type="text" id="ledgerNote" data-bind="ledgerDraftNote" value="${esc(S.ledgerDraftNote||"")}" placeholder="ملاحظة (اختياري)" style="flex:2">
+     <input type="number" inputmode="decimal" id="ledgerAmount" data-bind="ledgerDraftAmount" value="${esc(S.ledgerDraftAmount||"")}" placeholder="القيمة" style="flex:1.2;min-width:0">
+     ${(()=>{const sel=S.ledgerDraftCur||baseCurrency()||"";return `<select data-bind="ledgerDraftCur" style="flex:1;min-width:0;padding:11px 6px">${sel?"":`<option value="" selected>العملة</option>`}${CURRENCIES.map(c=>`<option value="${c[0]}" ${sel===c[0]?"selected":""}>${c[2]} ${c[0]}</option>`).join("")}</select>`;})()}
    </div>
+   <input type="text" id="ledgerNote" data-bind="ledgerDraftNote" value="${esc(S.ledgerDraftNote||"")}" placeholder="ملاحظة (اختياري)" style="margin-top:10px">
    <button class="btn" id="ledgerAddBtn" style="width:100%;margin-top:10px">+ إضافة ${type==="income"?"دخل":"مصروف"}</button>
  </div>`;
  h+=`<details><summary>Insights</summary><div class="in">
@@ -1613,9 +1721,10 @@ function renderLedger(){
            <button class="chip ${et==="expense"?"sel":""}" data-radio="ledgerEditType" data-val="expense">مصروف</button>
          </div>
          <div style="display:flex;gap:8px;margin-top:8px">
-           <input type="number" inputmode="decimal" data-bind="ledgerEditAmount" value="${esc(S.ledgerEditAmount||"")}" placeholder="القيمة" style="flex:1">
-           <input type="text" data-bind="ledgerEditNote" value="${esc(S.ledgerEditNote||"")}" placeholder="ملاحظة" style="flex:2">
+           <input type="number" inputmode="decimal" data-bind="ledgerEditAmount" value="${esc(S.ledgerEditAmount||"")}" placeholder="القيمة" style="flex:1.2;min-width:0">
+           ${(()=>{const sel=S.ledgerEditCur||"";return `<select data-bind="ledgerEditCur" style="flex:1;min-width:0;padding:11px 6px">${sel?"":`<option value="" selected>العملة</option>`}${CURRENCIES.map(c=>`<option value="${c[0]}" ${sel===c[0]?"selected":""}>${c[2]} ${c[0]}</option>`).join("")}</select>`;})()}
          </div>
+         <input type="text" data-bind="ledgerEditNote" value="${esc(S.ledgerEditNote||"")}" placeholder="ملاحظة" style="margin-top:8px">
          <div style="display:flex;gap:8px;margin-top:8px">
            <button class="btn" id="ledgerSaveBtn" style="flex:1">✓ حفظ</button>
            <button class="btn ghost" id="ledgerCancelEditBtn" style="flex:1">إلغاء</button>
@@ -1627,12 +1736,15 @@ function renderLedger(){
      <button class="ledger-edit" data-ledgeredit="${e.id}" title="تعديل">✎</button>
      <button class="ledger-del" data-ledgerdel="${e.id}" title="حذف">✕</button>
      <div class="ledger-row-main">
-       <div class="ledger-row-top"><div class="ledger-row-amt">${e.type==="income"?"+":"−"}${fmtMoney(e.amount)}</div>
+       <div class="ledger-row-top"><div class="ledger-row-amt">${e.type==="income"?"+":"−"}${fmtMoney(e.amount)} <span style="font-size:.72em">${esc(curLabel(e.currency||baseCurrency()))}</span></div>
          ${e.day?`<div class="ledger-row-date">${e.day} ${esc(S.month)}</div>`:""}</div>
+       ${(()=>{const base=baseCurrency();if(!e.currency||!base||e.currency===base)return "";const v=toBase(e.amount,e.currency);
+         return `<div class="ledger-row-note">${v===null?"⚠️ سعر الصرف غير محدد — مش محسوبة":`≈ ${fmtMoney(v)} ${esc(curLabel(base))}`}</div>`;})()}
        ${e.note?`<div class="ledger-row-note">${esc(e.note)}</div>`:""}
      </div>
    </div>`;
  }).join(""):`<div class="empty">لسه مفيش أي حركات مسجّلة هذا الشهر.</div>`;
+ h+=renderFxPanel();
  return h;
 }
 function renderPlan(){
@@ -1643,7 +1755,7 @@ function renderPlan(){
  return toggle+(S.planView==="list"?renderFullPlanList():renderTodayWidget());
 }
 function renderTodayWidget(){
- const cardFn=planCardFn();
+ const cardFn=planCardFn("today");
  const list=todayWidgetItems();
  const reorderOn=!!S.todayReorderMode;
  let h=`<div class="today-hero">
@@ -1878,7 +1990,12 @@ document.addEventListener("input",e=>{
  if(el.dataset.bind){set(el.dataset.bind,el.value);const b=document.getElementById("next");if(b){const s=list()[curIdx()];b.disabled=!((s.ok||(()=>true))());}renderRail();}
  else if(el.dataset.pool!=null){const i=+el.dataset.pool;S.pool[i].text=el.value;S.pool[i].edited=true;save();}
 });
-document.addEventListener("change",e=>{if(e.target.tagName==="SELECT"&&e.target.dataset.bind){set(e.target.dataset.bind,e.target.value);render(true);}});
+document.addEventListener("change",e=>{
+ const el=e.target;
+ if(el.tagName==="SELECT"&&el.dataset.bind){set(el.dataset.bind,el.value);render(true);
+   if(el.dataset.bind==="intentCurrency")checkGoalCelebration();}
+ else if(el.dataset.rerender&&el.dataset.bind){set(el.dataset.bind,el.value);render(true);checkGoalCelebration();}
+});
 document.addEventListener("click",e=>{
  const t=e.target.closest("[data-radio],[data-check],[data-seg],[data-move],[data-add],[data-del],[data-go],[data-pl],[data-prm],[data-addpool],[data-addidea],[data-copy],[data-rank],[data-psolve],[data-ibank],[data-idel],[data-brest],[data-bdel],[data-eftcopytopic],[data-archopen],[data-archtoggle],[data-archword],[data-archresume],[data-scoreinfo],[data-navto],[data-donetoggle],[data-accordion],[data-addtoplan],[data-reptoggle],[data-routinetoggle],[data-viewmode],[data-setfilter],[data-clearfilter],[data-filtertab],[data-setsort],[data-todaymove],[data-titleedit],[data-ledgerdel],[data-ledgeredit],[data-addact],[data-actbank],[data-actdel],[data-skilldl],[data-addcustom],[data-bulkbank],[data-bulkdel]");
  if(t){
@@ -1933,12 +2050,17 @@ document.addEventListener("click",e=>{
   else if(t.dataset.scoreinfo!=null){showScorePopup(S.pool[+t.dataset.scoreinfo]);return;}
   else if(t.dataset.navto){const p=t.dataset.navto.split("~~");navigateTo(p[0],p[1]);return;}
   else if(t.dataset.donetoggle!=null){const it=S.pool[+t.dataset.donetoggle];const df=it.def||{};
-    if(df.repeatType==="recurring"){const reps=repsArray(it);const allDone=reps.every(Boolean);reps.fill(!allDone);it.done=!allDone;}
-    else it.done=!it.done;
+    if(df.repeatType==="recurring"){
+      const reps=repsArray(it);it.repeatDates=it.repeatDates||[];const k=todayKey();
+      if(recurDoneToday(it)){reps.forEach((v,ri)=>{if(v&&it.repeatDates[ri]===k){reps[ri]=false;it.repeatDates[ri]=null;}});}
+      else{const nx=reps.findIndex(v=>!v);if(nx>=0){reps[nx]=true;it.repeatDates[nx]=k;justCompleted=true;}}
+      it.done=reps.every(Boolean);
+    }
+    else{it.done=!it.done;if(it.done)justCompleted=true;}
     save();}
   else if(t.dataset.reptoggle){const p=t.dataset.reptoggle.split(".");const it=S.pool[+p[0]];const reps=repsArray(it);
-    reps[+p[1]]=!reps[+p[1]];it.done=reps.every(Boolean);save();}
-  else if(t.dataset.routinetoggle!=null){toggleRoutineToday(S.pool[+t.dataset.routinetoggle]);save();}
+    const ri=+p[1];reps[ri]=!reps[ri];it.repeatDates=it.repeatDates||[];it.repeatDates[ri]=reps[ri]?todayKey():null;it.done=reps.every(Boolean);if(reps[ri])justCompleted=true;save();}
+  else if(t.dataset.routinetoggle!=null){const rt=S.pool[+t.dataset.routinetoggle];toggleRoutineToday(rt);if(routineDoneToday(rt))justCompleted=true;save();}
   else if(t.dataset.viewmode){S.planView=t.dataset.viewmode;save();}
   else if(t.dataset.accordion!=null){const it=S.pool[+t.dataset.accordion];it.expanded=!it.expanded;save();}
   else if(t.dataset.addtoplan!=null){const it=S.pool[+t.dataset.addtoplan];it.promoted=true;it.commit="نعم";save();}
@@ -1964,12 +2086,15 @@ document.addEventListener("click",e=>{
   else if(t.dataset.ledgerdel){S.ledger=(S.ledger||[]).filter(e=>e.id!==t.dataset.ledgerdel);save();}
   else if(t.dataset.ledgeredit){
     const en=(S.ledger||[]).find(e=>e.id===t.dataset.ledgeredit);
-    if(en){S.ledgerEditingId=en.id;S.ledgerEditAmount=String(en.amount);S.ledgerEditNote=en.note||"";S.ledgerEditType=en.type;save();}
+    if(en){S.ledgerEditingId=en.id;S.ledgerEditAmount=String(en.amount);S.ledgerEditNote=en.note||"";S.ledgerEditType=en.type;S.ledgerEditCur=en.currency||baseCurrency()||"";save();}
   }
   else if(t.dataset.todaymove){const[dir,ii]=t.dataset.todaymove.split("~"),idx=+ii;
     const L=todayWidgetItems(),pos=L.findIndex(x=>S.pool.indexOf(x.it)===idx),swapPos=dir==="up"?pos-1:pos+1;
     if(pos>=0&&swapPos>=0&&swapPos<L.length){const a=L[pos].it,b=L[swapPos].it,tmp=a.todayRank;a.todayRank=b.todayRank;b.todayRank=tmp;save();}}
-  render(true);return;
+  render(true);
+  if(justCompleted){justCompleted=false;checkDayCelebration();}
+  if(t.dataset.ledgerdel)checkGoalCelebration();
+  return;
  }
  const idEl=e.target.closest("[id]");
  const id=idEl?idEl.id:"";
@@ -2007,7 +2132,7 @@ document.addEventListener("click",e=>{
    const amt=parseFloat(S.ledgerDraftAmount);
    if(amt&&amt>0){
      S.ledger=S.ledger||[];
-     S.ledger.push({id:Date.now()+"-"+Math.random().toString(36).slice(2,7),type:S.ledgerDraftType==="expense"?"expense":"income",amount:amt,note:(S.ledgerDraftNote||"").trim(),day:new Date().getDate(),createdAt:Date.now()});
+     S.ledger.push({id:Date.now()+"-"+Math.random().toString(36).slice(2,7),type:S.ledgerDraftType==="expense"?"expense":"income",amount:amt,currency:(S.ledgerDraftCur||baseCurrency()||""),note:(S.ledgerDraftNote||"").trim(),day:new Date().getDate(),createdAt:Date.now()});
      S.ledgerDraftAmount="";S.ledgerDraftNote="";
      save();render();
      checkGoalCelebration();
@@ -2017,11 +2142,12 @@ document.addEventListener("click",e=>{
    const en=(S.ledger||[]).find(e=>e.id===S.ledgerEditingId);
    const amt=parseFloat(S.ledgerEditAmount);
    if(en&&amt&&amt>0){
-     en.amount=amt;en.note=(S.ledgerEditNote||"").trim();en.type=S.ledgerEditType==="expense"?"expense":"income";
+     en.amount=amt;en.note=(S.ledgerEditNote||"").trim();en.type=S.ledgerEditType==="expense"?"expense":"income";en.currency=S.ledgerEditCur||en.currency||"";
      S.ledgerEditingId="";save();render();
      checkGoalCelebration();
    }
  }
+ else if(id==="fxFetchBtn"){fetchFxRates(document.getElementById("fxFetchBtn"));}
  else if(id==="ledgerCancelEditBtn"){S.ledgerEditingId="";save();render();}
  else if(id==="printBtn")window.print();
  else if(id==="wordBtn")saveWord(`خطة-${S.month}-${S.year}.docx`,`البروتوكول الشهري — ${when()}`,exportText(),e.target);
@@ -2056,7 +2182,7 @@ document.addEventListener("click",e=>{
  else if(id==="confirmScrim"||id==="confirmClose"||id==="cancelNewMonth")closeConfirmModal();
  else if(id==="confirmNewMonth"){
    pushUndo();
-   archiveCurrentMonth();const bank=S.ideaBank||[];S=blank();S.ideaBank=bank;cur1="start";cur2="d7-1-ideas";tab=1;section=1;save();
+   archiveCurrentMonth();const bank=S.ideaBank||[],fx=S.fxRates||{},fxAt=S.fxUpdatedAt||0,ic=S.intentCurrency||"";S=blank();S.ideaBank=bank;S.fxRates=fx;S.fxUpdatedAt=fxAt;S.intentCurrency=ic;cur1="start";cur2="d7-1-ideas";tab=1;section=1;save();
    closeConfirmModal();render();}
  else if(id==="infoScrim"||id==="infoClose"||id==="infoClose2")closeInfoModal();
  else if(id==="filterBtn")openFilterPanel();
@@ -2452,6 +2578,7 @@ try{
 setTimeout(()=>{
  const sp=document.getElementById("splashScreen");
  if(sp){sp.classList.add("hide");setTimeout(()=>sp.remove(),600);}
+ setTimeout(()=>{try{checkGoalCelebration();}catch(e){}},900);
 },700);
 </script>
 </body>
