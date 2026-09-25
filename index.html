@@ -12,7 +12,7 @@
 <title>البروتوكول الشهري لإعادة التناغم مع المال</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f7f2e8; --bg-2:#efe8da;
@@ -440,8 +440,53 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   border:1px solid var(--line);background:var(--surface-2);color:var(--ink-soft);font-size:15px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:all .2s}
 .modal-close:hover{border-color:var(--gold);color:var(--gold-deep)}
+/* ===== النتيجة (تقويم قبطي/ميلادي/هجري) — نفس هوية ودجت النتيجة ===== */
+.natiga-panel{position:fixed;inset:0;z-index:82;background:#EADBB8;display:none;overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 14px 60px;font-family:"Tajawal","Noto Sans Arabic",sans-serif}
+.natiga-panel.open{display:block;animation:rise .35s var(--spring) both}
+.natiga-wrap{max-width:560px;margin:0 auto}
+.natiga-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.natiga-head h2{margin:0;flex:1;text-align:center;font-family:inherit;font-size:19px;color:#1E5A57;font-weight:800}
+.natiga-head .spacer{width:74px;flex:0 0 auto}
+.natiga-back{flex:0 0 auto;width:74px;border:1px solid #C9A24A;background:#F4E8CE;color:#1E5A57;border-radius:99px;padding:6px 10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.nt-card{background:#F4E8CE;border:1.5px solid #C9A24A;border-radius:18px;overflow:hidden;box-shadow:0 10px 26px -14px rgba(70,52,20,.35);color:#3A2A1A}
+.nt-strip{background:#1E5A57;color:#F6ECD4;display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-size:14px}
+.nt-strip b{font-weight:800}
+.nt-strip span{font-size:12.5px;opacity:.95}
+.nt-dates{display:flex;align-items:center;padding:12px 10px 10px;gap:8px}
+.nt-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+.nt-vr{width:1px;align-self:stretch;min-height:64px;background:#D6BC80}
+.nt-num{font-size:52px;font-weight:800;line-height:1;letter-spacing:-.5px}
+.nt-num.fri{color:#A4301F}
+.nt-cop{font-size:15.5px;font-weight:800;margin-top:6px}
+.nt-gh{border-radius:12px;padding:6px 6px}
+.nt-gh.moon{background:#F0D995}
+.nt-greg{font-size:15.5px;font-weight:800}
+.nt-hij{font-size:14.5px;color:#6E5A3E;margin-top:4px}
+.nt-white{font-size:12.5px;font-weight:800;color:#6E4A0C;margin-top:4px;line-height:1.5}
+.nt-hr{height:1px;background:#D6BC80;margin:0 16px}
+.nt-ins{display:flex;gap:10px;padding:10px 14px 14px;align-items:center}
+.nt-ins .nt-col{align-items:flex-start;text-align:start}
+.nt-prov{color:#A4301F;font-weight:800;font-size:13.5px;line-height:1.6}
+.nt-theme{font-weight:800;font-size:14.5px;margin-top:3px}
+.nt-adv{color:#6E5A3E;font-size:13px;line-height:1.75}
+.nt-set{margin-top:16px;background:#F4E8CE;border:1px solid #D6BC80;border-radius:14px;padding:14px}
+.nt-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.nt-row+.nt-row{margin-top:12px;padding-top:12px;border-top:1px dashed #D6BC80}
+.nt-lbl{font-size:13.5px;font-weight:700;color:#3A2A1A}
+.nt-lbl small{display:block;font-weight:400;font-size:11.5px;color:#6E5A3E}
+.nt-ctl{display:flex;align-items:center;gap:8px}
+.nt-btn{border:1px solid #C9A24A;background:#fffaf0;color:#1E5A57;border-radius:10px;min-width:38px;padding:7px 12px;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.nt-btn:active{transform:scale(.96)}
+.nt-val{min-width:84px;text-align:center;font-size:13px;font-weight:700;color:#1E5A57}
+.nt-art{margin-top:16px;background:#F4E8CE;border:1px solid #D6BC80;border-radius:14px;overflow:hidden}
+.nt-art-h{width:100%;display:flex;justify-content:space-between;align-items:center;background:transparent;border:0;padding:13px 14px;font:inherit;font-size:14px;font-weight:800;color:#1E5A57;cursor:pointer;text-align:start}
+.nt-art-h i{font-style:normal;transition:transform .25s}
+.nt-art.open .nt-art-h i{transform:rotate(180deg)}
+.nt-art img{display:none;width:100%;height:auto;border-top:1px solid #D6BC80}
+.nt-art.open img{display:block}
+.nt-foot{margin-top:14px;text-align:center;font-size:11.5px;color:#6E5A3E}
 [data-carditem]{-webkit-user-select:none;user-select:none}
-@media print{.rail,.nav,.topbar,.prog,.tabs,.scrim,.archive-panel,.confirm-modal{display:none!important}.shell{grid-template-columns:1fr}.card{box-shadow:none;border:none;padding:0}}
+@media print{.rail,.nav,.topbar,.prog,.tabs,.scrim,.archive-panel,.natiga-panel,.confirm-modal{display:none!important}.shell{grid-template-columns:1fr}.card{box-shadow:none;border:none;padding:0}}
 </style>
 </head>
 <body>
@@ -465,6 +510,17 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   </div>
 </div>
 <div class="archive-panel" id="archivePanel"><div id="archiveInner" style="max-width:820px;margin:0 auto"></div></div>
+<div class="natiga-panel" id="natigaPanel" dir="rtl"><div class="natiga-wrap">
+  <div class="natiga-head"><button class="natiga-back" id="natigaBack">→ رجوع</button><h2>النتيجة</h2><div class="spacer"></div></div>
+  <div id="natigaCard"></div>
+  <div class="nt-set">
+    <div class="nt-row"><div class="nt-lbl">تعديل التاريخ الهجري<small>لو الهجري مختلف عن رؤية الهلال عندك</small></div>
+      <div class="nt-ctl"><button class="nt-btn" id="ntMinus">−</button><span class="nt-val" id="ntOffset"></span><button class="nt-btn" id="ntPlus">+</button></div></div>
+    <div class="nt-row"><div class="nt-lbl">شكل الأرقام</div><button class="nt-btn" id="ntDigits"></button></div>
+  </div>
+  <div class="nt-art" id="ntArt"><button class="nt-art-h" id="ntArtToggle">لوحة السنة القبطية: دورة الحياة في انسجام مع الطبيعة <i>▾</i></button><img src="coptic-year.jpg" alt="لوحة السنة القبطية" loading="lazy"></div>
+  <div class="nt-foot">تأملات الشهور من لوحة «السنة القبطية» — لقاء الروح</div>
+</div></div>
 <div class="scrim" id="infoScrim"></div>
 <div class="confirm-modal" id="infoModal">
   <div class="confirm-card">
@@ -483,6 +539,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 </div>
 <div class="shell">
   <aside class="rail" id="rail">
+    <button class="railnav" id="natigaBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> النتيجة — قبطي · ميلادي · هجري</button>
     <button class="railnav" id="archiveBtn">🕘 سجل الشهور السابقة</button>
     <div class="railnav-pair">
       <button class="railnav-mini" id="exportBtn">⬇ تصدير</button>
@@ -2607,6 +2664,89 @@ setTimeout(()=>{
  if(sp){sp.classList.add("hide");setTimeout(()=>sp.remove(),600);}
  setTimeout(()=>{try{checkGoalCelebration();}catch(e){}},900);
 },700);
+/* ===================== النتيجة: قبطي · ميلادي · هجري (منقولة من ودجت النتيجة) ===================== */
+const Natiga=(function(){
+ const PKEY="natiga_prefs";
+ const DAYS=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+ const GREG=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+ const HIJRI=["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
+ const COPTIC=["توت","بابه","هاتور","كيهك","طوبة","أمشير","برمهات","برمودة","بشنس","بؤونة","أبيب","مسرى","النسيء"];
+ const INS=[
+  ["«توت يقول للحر موت»","التجدد والبداية","اترك القديم ينتهي. نظّف مساحتك، وجدّد نيتك للدورة الجديدة."],
+  ["«بابه خُش واقفل البوابة»","الدخول إلى الداخل","أغلق الأبواب التي تشتت طاقتك. ضع حدوداً، وأعد انتباهك إلى عالمك الداخلي."],
+  ["«هاتور أبو الذهب المنثور»","الاستقبال والوفرة","انظر إلى ما هو موجود بالفعل. اسمح لنفسك بالاستقبال، والامتنان، والاستمتاع."],
+  ["«كيهك صباحك مساك، تقوم من فطورك تحضر عشاك»","السكون والنور الداخلي","وقت للتأمل، والإنصات، والأحلام، قبل الاندفاع نحو الفعل."],
+  ["«طوبه يخلي الصبية كركوبة»","حفظ الطاقة","الانكماش ليس فشلاً. احمِ مواردك، استرح، وغذِّ جسدك وروحك."],
+  ["«أمشير أبو الزعابيب الكتير»","التطهير والتحريك","اسمح للحياة أن تحرّك ما جمد. تخلَّ عمّا انتهى، ولا تقاوم كل عاصفة."],
+  ["«برمهات روح الغيط وهات»","الزرع والفعل","ما تأملته يحتاج الآن إلى التجسيد. ازرع، ابنِ، تحرّك."],
+  ["«برمودة دق العامودة»","التجذر والتثبيت","أعطِ رؤيتك شكلاً ملموساً. الالتزام، والنظام، والحدود."],
+  ["«بشنس يكنس الغيط كنس»","الحصاد والإتمام","اجمع ثمار التجربة، ثم نظّف الحقل. اترك البقايا."],
+  ["«بؤونة نقل وتخزين المونة»","الدمج والحفظ","خزّن الحكمة. حوّل التجارب إلى معرفة وموارد للمستقبل."],
+  ["«أبيب فيه العنب يطيب»","النضج","اسمح لما زرعته أن ينضج. لا تستعجل."],
+  ["«مسرى تجري فيه كل ترعة عسيرة»","التدفق والتسليم","دع المياه تتحرك، حرّر السيطرة. سامح، أفرغ، وأعد فتح القنوات التي انسدت داخلك."],
+  ["الأيام المكمّلة للسنة","العتبة المقدسة","راجع، اشكر، سامح، احتفل. أفرغ نفسك، ولا تتعجل. تجدّد من سكونك."]
+ ];
+ function season(m){return m<=3?"أخيت · الفيضان":m<=7?"بيرت · الزراعة والنمو":"شمو · الحصاد";}
+ function prefs(){let p={};try{p=JSON.parse(localStorage.getItem(PKEY)||"{}")||{};}catch(e){}
+   return {offset:Math.max(-2,Math.min(2,p.offset|0)),arabic:p.arabic!==false};}
+ function setPrefs(p){try{localStorage.setItem(PKEY,JSON.stringify(p));}catch(e){}}
+ function num(n,ar){const s=String(n);return ar?s.replace(/[0-9]/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]):s;}
+ function parts(cal,date){
+   const o={};new Intl.DateTimeFormat("en-u-ca-"+cal+"-nu-latn",{day:"numeric",month:"numeric",year:"numeric"})
+     .formatToParts(date).forEach(p=>{if(p.type==="day"||p.type==="month"||p.type==="year")o[p.type]=parseInt(p.value,10);});
+   return o;}
+ function today(){
+   const p=prefs(),ar=p.arabic,now=new Date();
+   const c=parts("coptic",now);const cm=Math.max(0,Math.min(12,(c.month||1)-1));
+   const hd=new Date(now.getTime());hd.setDate(hd.getDate()+p.offset);
+   const h=parts("islamic-umalqura",hd);
+   const ins=INS[cm];
+   return {
+     dayName:DAYS[now.getDay()],isFriday:now.getDay()===5,
+     copticDay:num(c.day,ar),copticMonthYear:COPTIC[cm]+" "+num(c.year,ar)+" ش",
+     gregorian:num(now.getDate(),ar)+" "+GREG[now.getMonth()]+" "+num(now.getFullYear(),ar),
+     hijri:num(h.day,ar)+" "+HIJRI[(h.month||1)-1]+" "+num(h.year,ar)+" هـ",
+     whiteDay:h.day===13?"🌔 أول الأيام البيض":h.day===14?"🌕 ليلة البدر — اكتمال القمر":h.day===15?"🌖 آخر الأيام البيض":"",
+     season:season(cm),proverb:ins[0],theme:ins[1],advice:ins[2],offset:p.offset,arabic:ar
+   };}
+ function render(){
+   const d=today(),E=s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+   document.getElementById("natigaCard").innerHTML=
+    `<div class="nt-card">
+      <div class="nt-strip"><b>${E(d.dayName)}</b><span>${E(d.season)}</span></div>
+      <div class="nt-dates">
+        <div class="nt-col"><div class="nt-num${d.isFriday?" fri":""}">${E(d.copticDay)}</div><div class="nt-cop">${E(d.copticMonthYear)}</div></div>
+        <div class="nt-vr"></div>
+        <div class="nt-col nt-gh${d.whiteDay?" moon":""}"><div class="nt-greg">${E(d.gregorian)}</div><div class="nt-hij">${E(d.hijri)}</div>${d.whiteDay?`<div class="nt-white">${E(d.whiteDay)}</div>`:""}</div>
+      </div>
+      <div class="nt-hr"></div>
+      <div class="nt-ins">
+        <div class="nt-col"><div class="nt-prov">${E(d.proverb)}</div><div class="nt-theme">${E(d.theme)}</div></div>
+        <div class="nt-vr"></div>
+        <div class="nt-col"><div class="nt-adv">${E(d.advice)}</div></div>
+      </div>
+    </div>`;
+   const o=d.offset;
+   document.getElementById("ntOffset").textContent=o===0?"بدون تعديل":(o>0?"+":"−")+num(Math.abs(o),d.arabic)+" يوم";
+   document.getElementById("ntDigits").textContent=d.arabic?"١٢٣ ← 123":"123 ← ١٢٣";
+ }
+ let isOpen=false;
+ function open(){isOpen=true;render();document.getElementById("natigaPanel").classList.add("open");
+   try{history.pushState({natiga:1},"");}catch(e){}}
+ function close(fromPop){if(!isOpen)return;isOpen=false;document.getElementById("natigaPanel").classList.remove("open");
+   if(!fromPop){try{if(history.state&&history.state.natiga)history.back();}catch(e){}}}
+ window.addEventListener("popstate",()=>close(true));
+ document.addEventListener("visibilitychange",()=>{if(isOpen&&!document.hidden)render();});
+ document.addEventListener("click",e=>{
+   const t=e.target.closest("button");if(!t)return;const id=t.id;
+   if(id==="natigaBtn"){closeRail();open();}
+   else if(id==="natigaBack")close();
+   else if(id==="ntMinus"||id==="ntPlus"){const p=prefs();p.offset=Math.max(-2,Math.min(2,p.offset+(id==="ntPlus"?1:-1)));setPrefs(p);render();}
+   else if(id==="ntDigits"){const p=prefs();p.arabic=!p.arabic;setPrefs(p);render();}
+   else if(id==="ntArtToggle")document.getElementById("ntArt").classList.toggle("open");
+ });
+ return {open,close,today};
+})();
 </script>
 </body>
 </html>
