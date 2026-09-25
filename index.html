@@ -12,7 +12,7 @@
 <title>البروتوكول الشهري لإعادة التناغم مع المال</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f7f2e8; --bg-2:#efe8da;
@@ -440,51 +440,53 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   border:1px solid var(--line);background:var(--surface-2);color:var(--ink-soft);font-size:15px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:all .2s}
 .modal-close:hover{border-color:var(--gold);color:var(--gold-deep)}
-/* ===== النتيجة (تقويم قبطي/ميلادي/هجري) — نفس هوية ودجت النتيجة ===== */
-.natiga-panel{position:fixed;inset:0;z-index:82;background:#EADBB8;display:none;overflow-y:auto;padding:max(16px,env(safe-area-inset-top)) 14px 60px;font-family:"Tajawal","Noto Sans Arabic",sans-serif}
+/* ===== النتيجة (تقويم قبطي/ميلادي/هجري) — بهوية التطبيق ===== */
+.natiga-panel{position:fixed;inset:0;z-index:82;background:var(--bg);display:none;overflow-y:auto;padding:max(18px,env(safe-area-inset-top)) 16px 60px}
 .natiga-panel.open{display:block;animation:rise .35s var(--spring) both}
 .natiga-wrap{max-width:560px;margin:0 auto}
 .natiga-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.natiga-head h2{margin:0;flex:1;text-align:center;font-family:inherit;font-size:19px;color:#1E5A57;font-weight:800}
+.natiga-head h2{margin:0;flex:1;text-align:center;font-size:clamp(16px,4.4vw,19px);color:var(--gold-deep);font-weight:700}
 .natiga-head .spacer{width:74px;flex:0 0 auto}
-.natiga-back{flex:0 0 auto;width:74px;border:1px solid #C9A24A;background:#F4E8CE;color:#1E5A57;border-radius:99px;padding:6px 10px;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
-.nt-card{background:#F4E8CE;border:1.5px solid #C9A24A;border-radius:18px;overflow:hidden;box-shadow:0 10px 26px -14px rgba(70,52,20,.35);color:#3A2A1A}
-.nt-strip{background:#1E5A57;color:#F6ECD4;display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-size:14px}
-.nt-strip b{font-weight:800}
-.nt-strip span{font-size:12.5px;opacity:.95}
-.nt-dates{display:flex;align-items:center;padding:12px 10px 10px;gap:8px}
+.natiga-back{flex:0 0 auto;width:74px;border:1px solid var(--gold);background:var(--gold-soft);color:var(--gold-deep);border-radius:99px;padding:6px 10px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .2s var(--spring)}
+.natiga-back:hover{background:var(--gold);color:var(--on-gold)}
+.nt-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);color:var(--ink)}
+.nt-strip{background:linear-gradient(90deg,var(--gold),var(--gold-deep));color:var(--on-gold);display:flex;justify-content:space-between;align-items:center;padding:9px 16px;font-size:14px}
+.nt-strip b{font-weight:700}
+.nt-strip span{font-size:12px;opacity:.95}
+.nt-dates{display:flex;align-items:center;padding:14px 10px 12px;gap:8px}
 .nt-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center}
-.nt-vr{width:1px;align-self:stretch;min-height:64px;background:#D6BC80}
-.nt-num{font-size:52px;font-weight:800;line-height:1;letter-spacing:-.5px}
-.nt-num.fri{color:#A4301F}
-.nt-cop{font-size:15.5px;font-weight:800;margin-top:6px}
-.nt-gh{border-radius:12px;padding:6px 6px}
-.nt-gh.moon{background:#F0D995}
-.nt-greg{font-size:15.5px;font-weight:800}
-.nt-hij{font-size:14.5px;color:#6E5A3E;margin-top:4px}
-.nt-white{font-size:12.5px;font-weight:800;color:#6E4A0C;margin-top:4px;line-height:1.5}
-.nt-hr{height:1px;background:#D6BC80;margin:0 16px}
-.nt-ins{display:flex;gap:10px;padding:10px 14px 14px;align-items:center}
+.nt-vr{width:1px;align-self:stretch;min-height:64px;background:var(--line)}
+.nt-num{font-size:50px;font-weight:800;line-height:1.1;color:var(--gold-deep)}
+.nt-num.fri{color:var(--warn)}
+.nt-cop{font-size:15px;font-weight:700;margin-top:4px}
+.nt-gh{border-radius:12px;padding:7px 6px;border:1px solid transparent}
+.nt-gh.moon{background:var(--gold-soft);border-color:var(--gold)}
+.nt-greg{font-size:15px;font-weight:700}
+.nt-hij{font-size:14px;color:var(--ink-soft);margin-top:3px}
+.nt-white{font-size:12px;font-weight:700;color:var(--gold-deep);margin-top:4px;line-height:1.5}
+.nt-hr{height:1px;background:linear-gradient(90deg,transparent,var(--line-strong),transparent);margin:0 16px}
+.nt-ins{display:flex;gap:10px;padding:12px 16px 16px;align-items:center}
 .nt-ins .nt-col{align-items:flex-start;text-align:start}
-.nt-prov{color:#A4301F;font-weight:800;font-size:13.5px;line-height:1.6}
-.nt-theme{font-weight:800;font-size:14.5px;margin-top:3px}
-.nt-adv{color:#6E5A3E;font-size:13px;line-height:1.75}
-.nt-set{margin-top:16px;background:#F4E8CE;border:1px solid #D6BC80;border-radius:14px;padding:14px}
+.nt-prov{color:var(--gold-deep);font-weight:700;font-size:13.5px;line-height:1.7}
+.nt-theme{font-weight:700;font-size:14.5px;margin-top:2px}
+.nt-adv{color:var(--ink-soft);font-size:13px;line-height:1.8}
+.nt-set{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 16px}
 .nt-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.nt-row+.nt-row{margin-top:12px;padding-top:12px;border-top:1px dashed #D6BC80}
-.nt-lbl{font-size:13.5px;font-weight:700;color:#3A2A1A}
-.nt-lbl small{display:block;font-weight:400;font-size:11.5px;color:#6E5A3E}
+.nt-row+.nt-row{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line-strong)}
+.nt-lbl{font-size:13.5px;font-weight:600;color:var(--ink)}
+.nt-lbl small{display:block;font-weight:400;font-size:12px;color:var(--ink-faint)}
 .nt-ctl{display:flex;align-items:center;gap:8px}
-.nt-btn{border:1px solid #C9A24A;background:#fffaf0;color:#1E5A57;border-radius:10px;min-width:38px;padding:7px 12px;font:inherit;font-size:14px;font-weight:800;cursor:pointer}
+.nt-btn{border:1px solid var(--line);background:var(--surface-2);color:var(--gold-deep);border-radius:10px;min-width:38px;padding:7px 12px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s var(--spring)}
+.nt-btn:hover{border-color:var(--gold);background:var(--gold-soft)}
 .nt-btn:active{transform:scale(.96)}
-.nt-val{min-width:84px;text-align:center;font-size:13px;font-weight:700;color:#1E5A57}
-.nt-art{margin-top:16px;background:#F4E8CE;border:1px solid #D6BC80;border-radius:14px;overflow:hidden}
-.nt-art-h{width:100%;display:flex;justify-content:space-between;align-items:center;background:transparent;border:0;padding:13px 14px;font:inherit;font-size:14px;font-weight:800;color:#1E5A57;cursor:pointer;text-align:start}
+.nt-val{min-width:84px;text-align:center;font-size:13px;font-weight:600;color:var(--ink-soft)}
+.nt-art{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.nt-art-h{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;background:transparent;border:0;padding:13px 16px;font:inherit;font-size:14px;font-weight:700;color:var(--gold-deep);cursor:pointer;text-align:start}
 .nt-art-h i{font-style:normal;transition:transform .25s}
 .nt-art.open .nt-art-h i{transform:rotate(180deg)}
-.nt-art img{display:none;width:100%;height:auto;border-top:1px solid #D6BC80}
+.nt-art img{display:none;width:100%;height:auto;border-top:1px solid var(--line)}
 .nt-art.open img{display:block}
-.nt-foot{margin-top:14px;text-align:center;font-size:11.5px;color:#6E5A3E}
+.nt-foot{margin-top:14px;text-align:center;font-size:11.5px;color:var(--ink-faint)}
 [data-carditem]{-webkit-user-select:none;user-select:none}
 @media print{.rail,.nav,.topbar,.prog,.tabs,.scrim,.archive-panel,.natiga-panel,.confirm-modal{display:none!important}.shell{grid-template-columns:1fr}.card{box-shadow:none;border:none;padding:0}}
 </style>
@@ -539,7 +541,6 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 </div>
 <div class="shell">
   <aside class="rail" id="rail">
-    <button class="railnav" id="natigaBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> النتيجة — قبطي · ميلادي · هجري</button>
     <button class="railnav" id="archiveBtn">🕘 سجل الشهور السابقة</button>
     <div class="railnav-pair">
       <button class="railnav-mini" id="exportBtn">⬇ تصدير</button>
@@ -549,6 +550,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
     <a class="railnav" id="resourcesBtn" href="https://t.me/+8gaYPLCcz1wzYjk0" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"/></svg> جروب المصادر</a>
     <button class="railnav" id="skillDlBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> تنزيل skill الـ EFT</button>
     <button class="railnav" id="ideaBankBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.5.5 1 1.3 1 2.5h6c0-1.2.5-2 1-2.5A6 6 0 0 0 12 3Z"/></svg> بنك الأفكار المؤجلة</button>
+    <button class="railnav" id="natigaBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> النتيجة — قبطي · ميلادي · هجري</button>
     <div class="rule" style="margin:16px 0"></div>
     <h3>مسار البروتوكول</h3>
     <ul class="steps" id="steps"></ul>
