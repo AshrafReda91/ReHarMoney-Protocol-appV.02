@@ -462,26 +462,26 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 .nt-btn:disabled{opacity:.35;cursor:default}
 .nt-val{flex:1;text-align:center;font-size:13.5px;font-weight:700;color:var(--ink)}
 .nt-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);color:var(--ink)}
-.nt-strip{background:linear-gradient(90deg,var(--gold),var(--gold-deep));color:var(--on-gold);display:flex;justify-content:space-between;align-items:center;padding:11px 20px;font-size:12.5px}
-.nt-strip b{font-size:14.5px;font-weight:700}
-.nt-strip span{opacity:.92;letter-spacing:.2px}
-.nt-hero{text-align:center;padding:30px 20px 26px}
-.nt-kicker{font-size:11px;letter-spacing:2.4px;color:var(--gold);font-weight:600}
-.nt-num{font-size:84px;font-weight:800;line-height:1;color:var(--gold-deep);margin:12px 0 8px;font-variant-numeric:lining-nums}
+.nt-strip{background:linear-gradient(90deg,var(--gold),var(--gold-deep));color:var(--on-gold);padding:10px 20px;font-size:13px;font-weight:600;letter-spacing:.2px}
+.nt-kicker{font-size:11px;letter-spacing:1.6px;color:var(--gold);font-weight:700}
+.nt-top{display:grid;grid-template-columns:1fr 1fr}
+.nt-cop-col{padding:22px 16px 20px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:start}
+.nt-num{font-size:68px;font-weight:800;line-height:1;color:var(--gold-deep);margin:10px 0 8px;font-variant-numeric:lining-nums}
 .nt-num.fri{color:var(--warn)}
-.nt-cop{font-size:19px;font-weight:700;color:var(--ink)}
+.nt-cop{font-size:16px;font-weight:700;color:var(--ink)}
+.nt-ins-col{padding:22px 16px 20px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.nt-prov{font-family:"Amiri",serif;color:var(--gold-deep);font-weight:700;font-size:16.5px;line-height:1.6}
+.nt-theme{align-self:flex-start;max-width:100%;font-size:11px;font-weight:700;color:var(--gold-deep);background:var(--gold-soft);border-radius:10px;padding:2px 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nt-adv{color:var(--ink-soft);font-size:12.5px;line-height:1.85;margin-top:2px}
 .nt-others{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)}
-.nt-cell{padding:18px 14px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.nt-cell{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px}
 .nt-cell+.nt-cell{border-inline-start:1px solid var(--line)}
-.nt-cell .nt-kicker{font-size:10.5px;letter-spacing:1.8px;color:var(--ink-faint)}
-.nt-d{font-size:16px;font-weight:700;color:var(--ink);line-height:1.4}
-.nt-y{font-size:13px;color:var(--ink-soft);font-weight:600}
+.nt-cell-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.nt-cell-h .nt-kicker{color:var(--ink-faint)}
+.nt-y{font-size:12.5px;color:var(--ink-soft);font-weight:700}
+.nt-d{font-size:16px;font-weight:700;color:var(--ink);line-height:1.4;white-space:nowrap}
 .nt-cell.moon{background:linear-gradient(180deg,var(--gold-soft),var(--surface))}
-.nt-white{display:inline-block;margin-top:2px;font-size:11.5px;font-weight:700;color:var(--gold-deep);background:var(--surface);border:1px solid var(--gold);border-radius:10px;padding:3px 10px;line-height:1.6;max-width:100%}
-.nt-ins{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px 22px;text-align:center}
-.nt-prov{font-family:"Amiri",serif;color:var(--gold-deep);font-weight:700;font-size:20px;line-height:1.7}
-.nt-theme{display:inline-block;margin-top:12px;font-size:12.5px;font-weight:700;color:var(--gold-deep);background:var(--gold-soft);border-radius:99px;padding:3px 14px}
-.nt-adv{margin-top:14px;color:var(--ink-soft);font-size:14px;line-height:1.95}
+.nt-white{align-self:flex-start;white-space:nowrap;font-size:11px;font-weight:700;color:var(--gold-deep);background:var(--surface);border:1px solid var(--gold);border-radius:99px;padding:1px 9px;line-height:1.7}
 .nt-art{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
 .nt-art-h{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;background:transparent;border:0;padding:16px 20px;font:inherit;font-size:14px;font-weight:700;color:var(--gold-deep);cursor:pointer;text-align:start;line-height:1.6}
 .nt-art-h i{font-style:normal;transition:transform .25s;flex:0 0 auto}
@@ -2694,7 +2694,7 @@ const Natiga=(function(){
   ["«مسرى تجري فيه كل ترعة عسيرة»","التدفق والتسليم","دع المياه تتحرك، حرّر السيطرة. سامح، أفرغ، وأعد فتح القنوات التي انسدت داخلك."],
   ["الأيام المكمّلة للسنة","العتبة المقدسة","راجع، اشكر، سامح، احتفل. أفرغ نفسك، ولا تتعجل. تجدّد من سكونك."]
  ];
- function season(m){return m<=3?"أخيت · الفيضان":m<=7?"بيرت · الزراعة والنمو":"شمو · الحصاد";}
+ function season(m){return m<=3?"الفيضان":m<=7?"الزراعة والنمو":"الحصاد";}
  function prefs(){let p={};try{p=JSON.parse(localStorage.getItem(PKEY)||"{}")||{};}catch(e){}
    return {offset:Math.max(-2,Math.min(2,p.offset|0))};}
  function setPrefs(p){try{localStorage.setItem(PKEY,JSON.stringify(p));}catch(e){}}
@@ -2714,31 +2714,32 @@ const Natiga=(function(){
      copticDay:num(c.day,ar),copticMonthYear:COPTIC[cm]+" "+num(c.year,ar)+" ش",
      gregorian:num(now.getDate(),ar)+" "+GREG[now.getMonth()]+" "+num(now.getFullYear(),ar),
      hijri:num(h.day,ar)+" "+HIJRI[(h.month||1)-1]+" "+num(h.year,ar)+" هـ",
-     gDM:now.getDate()+" "+GREG[now.getMonth()],gY:now.getFullYear()+" م",
+     gDM:now.getDate()+" "+GREG[now.getMonth()],gY:String(now.getFullYear()),
      hDM:h.day+" "+HIJRI[(h.month||1)-1],hY:h.year+" هـ",
-     whiteDay:h.day===13?"🌔 أول الأيام البيض":h.day===14?"🌕 ليلة البدر — اكتمال القمر":h.day===15?"🌖 آخر الأيام البيض":"",
+     whiteDay:h.day===13?"🌔 أول الأيام البيض":h.day===14?"🌕 ليلة اكتمال القمر":h.day===15?"🌖 آخر الأيام البيض":"",
      season:season(cm),proverb:ins[0],theme:ins[1],advice:ins[2],offset:p.offset
    };}
  function render(){
    const d=today(),E=s=>String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
    document.getElementById("natigaCard").innerHTML=
     `<div class="nt-card">
-      <div class="nt-strip"><span>${E(d.season)}</span><b>${E(d.dayName)}</b></div>
-      <div class="nt-hero">
-        <div class="nt-kicker">التقويم القبطي</div>
-        <div class="nt-num${d.isFriday?" fri":""}">${E(d.copticDay)}</div>
-        <div class="nt-cop">${E(d.copticMonthYear)}</div>
+      <div class="nt-strip">${E(d.season)}</div>
+      <div class="nt-top">
+        <div class="nt-cop-col">
+          <div class="nt-kicker">قبطي</div>
+          <div class="nt-num${d.isFriday?" fri":""}">${E(d.copticDay)}</div>
+          <div class="nt-cop">${E(d.copticMonthYear)}</div>
+        </div>
+        <div class="nt-ins-col">
+          <div class="nt-prov">${E(d.proverb)}</div>
+          <div class="nt-theme">${E(d.theme)}</div>
+          <div class="nt-adv">${E(d.advice)}</div>
+        </div>
       </div>
       <div class="nt-others">
-        <div class="nt-cell"><div class="nt-kicker">ميلادي</div><div class="nt-d">${E(d.gDM)}</div><div class="nt-y">${E(d.gY)}</div></div>
-        <div class="nt-cell${d.whiteDay?" moon":""}"><div class="nt-kicker">هجري</div><div class="nt-d">${E(d.hDM)}</div><div class="nt-y">${E(d.hY)}</div>${d.whiteDay?`<div class="nt-white">${E(d.whiteDay)}</div>`:""}</div>
+        <div class="nt-cell"><div class="nt-cell-h"><span class="nt-kicker">ميلادي</span><span class="nt-y">${E(d.gY)}</span></div><div class="nt-d">${E(d.gDM)}</div></div>
+        <div class="nt-cell${d.whiteDay?" moon":""}"><div class="nt-cell-h"><span class="nt-kicker">هجري</span><span class="nt-y">${E(d.hY)}</span></div><div class="nt-d">${E(d.hDM)}</div>${d.whiteDay?`<div class="nt-white">${E(d.whiteDay)}</div>`:""}</div>
       </div>
-    </div>
-    <div class="nt-ins">
-      <div class="nt-kicker">تأمل الشهر</div>
-      <div class="nt-prov" style="margin-top:10px">${E(d.proverb)}</div>
-      <div class="nt-theme">${E(d.theme)}</div>
-      <div class="nt-adv">${E(d.advice)}</div>
     </div>`;
    const o=d.offset;
    document.getElementById("ntOffset").textContent=o===0?"بدون تعديل":(o>0?"+":"−")+Math.abs(o)+" يوم";
