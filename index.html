@@ -317,6 +317,14 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 .copy-icon-btn:hover{background:var(--gold);color:var(--on-gold)}
 .copy-icon-btn svg{pointer-events:none}
 .eft-head-t{flex:1;font-weight:700;font-size:14.5px;color:var(--gold-deep)}
+.meta-edit-btn svg,.promote-btn svg{pointer-events:none;display:block}
+.toreserve-icon{color:var(--ink-soft);border-color:var(--line-strong);background:var(--surface-2)}
+.toreserve-icon:hover{color:var(--gold-deep);border-color:var(--gold);background:var(--gold-soft)}
+.opt.resv-row{cursor:default;align-items:center}
+.promote-btn{flex:0 0 auto;width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);
+  background:var(--gold-soft);color:var(--gold-deep);cursor:pointer;display:flex;align-items:center;
+  justify-content:center;padding:0;-webkit-appearance:none;appearance:none;transition:all .2s var(--spring)}
+.promote-btn:hover,.promote-btn:active{background:var(--gold);color:var(--on-gold)}
 .rep-box.today{box-shadow:0 0 0 2px var(--gold);}
 .timeline{display:flex;flex-direction:column}
 .plan-actions{display:flex;gap:6px;flex-wrap:nowrap;margin-top:14px}
@@ -507,7 +515,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   <div class="confirm-card">
     <button class="modal-close" id="confirmClose">✕</button>
     <h3>بدء شهر جديد</h3>
-    <p id="confirmMsg">سيتم حفظ خطة هذا الشهر في السجل، ثم فتح شهر جديد فارغ. هل تريد المتابعة؟</p>
+    <p id="confirmMsg">سيتم حفظ خطة هذا الشهر في السجل، ونقل الأفعال الاحتياطية اللي ماتعملتش لبنك الأفكار المؤجلة، ثم فتح شهر جديد فارغ. هل تريد المتابعة؟</p>
     <div class="confirm-actions">
       <button class="btn ghost" id="cancelNewMonth">إلغاء</button>
       <button class="btn" id="confirmNewMonth">نعم، ابدأ شهر جديد</button>
@@ -731,7 +739,7 @@ function doUndo(){
  const snap=undoStack.pop();if(!snap)return;
  try{const o=JSON.parse(snap);S=Object.assign(blank(),o.state);tab=o.tab||1;cur1=o.cur1||"start";cur2=o.cur2||"d7-1-ideas";}catch(e){}
  undoExpiry=0;if(undoTimer){clearTimeout(undoTimer);undoTimer=null;}
- save();updateUndoBtnVisibility();renderUndoToastUI();render();
+ save();updateUndoBtnVisibility();renderUndoToastUI();render(true);
 }
 function tg(t){const e=document.getElementById("savetag");if(e)e.textContent=t;}
 function showUpdateToast(msg){
@@ -1210,7 +1218,7 @@ function actOrder(){
 }
 function ideaBankBlock(target){
  const B=S.ideaBank||[];
- return `<details><summary>بنك الأفكار المؤجلة (${B.length})</summary><div class="in">
+ return `<details data-dkey="bank-${target}"><summary>بنك الأفكار المؤجلة (${B.length})</summary><div class="in">
    <div class="note" style="margin:0 0 8px">أفكار قلت عنها «متناغم فيما بعد» — محفوظة عبر الشهور. اختبرها من جديد مع الشهر الحالي.</div>
    ${B.length?B.map((b,bi)=>`<div class="row"><div style="flex:1;font-size:14px">${esc(b.text)}<div class="note">مؤجلة من ${esc(b.from||"—")}</div></div>
      <button class="minibtn" data-brest="${bi}.${target}">اختبرها الآن</button>
@@ -1335,7 +1343,7 @@ function screens1(){
        const topicInput=`الموضوع ${i+1}: ${n}\nالنوع: ${m.type||"غير محدد"} — الشاكرا: ${m.chakra||"غير محددة"}\n${m.interp?"تفسيري لهذه الطاقة: "+m.interp:""}`;
        h+=`<div class="eft-head"><div class="eft-head-t">${i+1}. ${esc(n)} ${has?"✓":""}</div>
          <button class="copy-icon-btn" data-eftcopytopic="${i}" title="نسخ نص الموضوع"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
-         <details ${has?"open":""}><summary>تفاصيل الموضوع والبرنامج</summary><div class="in">
+         <details data-dkey="eft-${i}" ${has?"open":""}><summary>تفاصيل الموضوع والبرنامج</summary><div class="in">
          <div class="note" style="margin-bottom:8px">هذا هو محتوى الموضوع لتلصقه في الـ skill:</div>
          <div class="out" style="font-size:13px;margin-bottom:10px">${esc(topicInput)}</div>
          <button class="minibtn" data-eftcopytopic="${i}">نسخ محتوى الموضوع</button>
@@ -1424,7 +1432,7 @@ function screens1(){
   lede:"لكل جانب اخترته: حدد النمط الطاقي المعيق، ثم الخطوة العملية — والتي تنتقل لخطتك.",
   render:()=>{
     if(!S.selAspects.length)return `<div class="empty">لم تختر جوانب بعد.</div>`;
-    return `<details><summary>الأنماط الطاقية المعيقة السبعة</summary><div class="in">${PATTERNS.map(p=>`<p style="margin:6px 0;font-size:13.3px"><b style="color:var(--gold-deep)">${p[0]}</b> — ${p[1]}</p>`).join("")}</div></details>`
+    return `<details data-dkey="patterns"><summary>الأنماط الطاقية المعيقة السبعة</summary><div class="in">${PATTERNS.map(p=>`<p style="margin:6px 0;font-size:13.3px"><b style="color:var(--gold-deep)">${p[0]}</b> — ${p[1]}</p>`).join("")}</div></details>`
      +S.selAspects.map((a,i)=>{const m=am(a);const pt=PATTERNS.find(p=>p[0]===m.pattern);
        return `<div class="block"><h4>الجانب ${i+1}</h4>
         <div style="font-family:'Noto Sans Arabic',sans-serif;font-size:17px;margin-bottom:10px">${esc(a)}</div>
@@ -1709,6 +1717,7 @@ function planCardFn(ctx){
          ${!routine?startDaySelect(i,it):""}
          ${repeatTypeSelect(i,it)}
          ${recurring?repeatCountSelect(i,it):""}
+         ${!it.done?`<button class="meta-edit-btn toreserve-icon" data-toreserve="${i}" title="إرجاع للاحتياطي" aria-label="إرجاع للاحتياطي"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>`:""}
        </div>
        ${df.what?`<div class="kv">${esc(it.text)}</div>`:""}
        ${routine?`<div class="kv"><b>الروتين:</b> ${df.routineFreq==="أسبوعي"?"أسبوعي — "+esc((WEEKDAYS.find(w=>w[0]===df.routineDay)||[])[1]||""):"يومي"} · ${df.routineTime==="مسائي"?"مسائي 🌙":"صباحي 🌅"} · أنجزته ${routineStreak(it)} مرة حتى الآن</div>`:""}
@@ -1751,7 +1760,7 @@ function renderFxPanel(){
  if(S.ledgerDraftCur&&used.indexOf(S.ledgerDraftCur)<0)used.push(S.ledgerDraftCur);
  const show=CURRENCIES.filter(c=>c[0]!=="USD"&&(used.indexOf(c[0])>=0||c[0]===base||!FX_PEGGED[c[0]]));
  const upd=S.fxUpdatedAt?new Date(S.fxUpdatedAt):null;
- return `<div class="rule"></div><details ${(ledgerStats().missing.length)?"open":""}><summary>💱 العملات وأسعار الصرف</summary><div class="in">
+ return `<div class="rule"></div><details data-dkey="fx" ${(ledgerStats().missing.length)?"open":""}><summary>💱 العملات وأسعار الصرف</summary><div class="in">
    <div class="field"><label class="fl">عملة النية المالية</label>
      <select data-bind="intentCurrency"><option value="" ${S.intentCurrency?"":"selected"}>تلقائي${guessIntentCurrency()?` (${guessIntentCurrency()})`:" — بدون تحويل"}</option>
      ${CURRENCIES.map(c=>`<option value="${c[0]}" ${S.intentCurrency===c[0]?"selected":""}>${c[1]} (${c[0]})</option>`).join("")}</select>
@@ -1796,7 +1805,7 @@ function renderLedger(){
    <input type="text" id="ledgerNote" data-bind="ledgerDraftNote" value="${esc(S.ledgerDraftNote||"")}" placeholder="ملاحظة (اختياري)" style="margin-top:10px">
    <button class="btn" id="ledgerAddBtn" style="width:100%;margin-top:10px">+ إضافة ${type==="income"?"دخل":"مصروف"}</button>
  </div>`;
- h+=`<details><summary>Insights</summary><div class="in">
+ h+=`<details data-dkey="insights"><summary>Insights</summary><div class="in">
    <div class="kv"><b>الصافي (الدخل − المصروفات):</b> ${fmtMoney(st.income-st.expense)}</div>
    <div class="kv"><b>نسبة المصروفات من الدخل:</b> ${st.income?Math.round(st.expense/st.income*100)+"%":"— (لسه مفيش دخل مسجّل)"}</div>
  </div></details>`;
@@ -1942,7 +1951,7 @@ function renderFullPlanList(){
    }
    if(doneAll.length){
      h+=`<div class="rule"></div>
-       <details><summary>✓ المهام المنجزة (${doneAll.length})</summary><div class="in">
+       <details data-dkey="done"><summary>✓ المهام المنجزة (${doneAll.length})</summary><div class="in">
        <div class="plan">${doneAll.map((it,n)=>cardFn(it,n+1)).join("")}</div>
        </div></details>`;
    }
@@ -1950,16 +1959,16 @@ function renderFullPlanList(){
  h+=`<div class="rule"></div>`;
  const resv=allReserve();
  if(resv.length){
-   h+=`<details><summary>احتياطي — أفعال عالية التناغم وصعبة التنفيذ (${resv.length})</summary><div class="in">
-     <div class="note" style="margin:0 0 10px">خلصت الأفعال السهلة ولقيت وقت إضافي؟ اضغط على أي فعل هنا ليدخل خطة الشهر فورًا.</div>
+   h+=`<details data-dkey="reserve"><summary>احتياطي — أفعال عالية التناغم وصعبة التنفيذ (${resv.length})</summary><div class="in">
+     <div class="note" style="margin:0 0 10px">خلصت الأفعال السهلة ولقيت وقت إضافي؟ اضغط على السهم جنب أي فعل ليدخل خطة الشهر فورًا.</div>
      ${resv.map(it=>{const i=S.pool.indexOf(it);
-       return `<div class="opt" data-addtoplan="${i}"><div class="box"></div><div style="flex:1">
+       return `<div class="opt resv-row"><button class="promote-btn" data-addtoplan="${i}" title="نقل لخطة الشهر" aria-label="نقل لخطة الشهر"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg></button><div style="flex:1">
          <div class="t" style="font-weight:500;display:flex;align-items:center">${scoreDot(it)}${esc(it.text)}</div>
          <div class="d">${esc(it.source)} — تناغم عالٍ، صعب التنفيذ</div></div></div>`;}).join("")}
    </div></details>`;
  }
- h+=`<details><summary>التسلسل الزمني للتنفيذ</summary><div class="in">${renderTimeline()}</div></details>
-  <details><summary>السجل الكامل للبروتوكول</summary><div class="in" style="font-size:13.3px;color:var(--ink-soft);white-space:pre-wrap">${esc(exportText())}</div></details>`;
+ h+=`<details data-dkey="timeline"><summary>التسلسل الزمني للتنفيذ</summary><div class="in">${renderTimeline()}</div></details>
+  <details data-dkey="fulllog"><summary>السجل الكامل للبروتوكول</summary><div class="in" style="font-size:13.3px;color:var(--ink-soft);white-space:pre-wrap">${esc(exportText())}</div></details>`;
  h+=`<div style="margin-top:14px"><button class="minibtn" data-addcustom="1">+ إضافة فعل جديد للخطة</button></div>`;
  h+=`<div class="plan-actions">
     <button class="btn" id="copyBtn">نسخ الخطة</button>
@@ -2010,6 +2019,15 @@ function list(){return tab===1?screens1():tab===2?screens2():[];}
 function curId(){return tab===1?cur1:cur2;}
 function setCur(id){if(tab===1)cur1=id;else if(tab===2)cur2=id;save();}
 function curIdx(){const L=list();const i=L.findIndex(s=>s.id===curId());return i<0?0:i;}
+function snapOpenDetails(){
+ const set=new Set();
+ try{document.querySelectorAll("#screen details[data-dkey]").forEach(d=>{if(d.open)set.add(d.dataset.dkey);});}catch(e){}
+ return set;
+}
+function restoreOpenDetails(set){
+ if(!set||!set.size)return;
+ try{document.querySelectorAll("#screen details[data-dkey]").forEach(d=>{if(set.has(d.dataset.dkey))d.open=true;});}catch(e){}
+}
 function goPrev(){
  if(tab===2&&cur2==="d7-timeline"&&timelineReturnId){setCur(timelineReturnId);timelineReturnId=null;render();return;}
  const L=list(),i=curIdx();if(i>0)setCur(L[i-1].id);render();
@@ -2026,7 +2044,9 @@ function render(keep){
    let inner="";
    try{inner=section===2?renderPlan():renderLedger();}
    catch(err){try{console.error("render section error:",err);}catch(e2){}inner=errBox("هذا القسم",err);}
+   const openSet=keep?snapOpenDetails():null;
    document.getElementById("screen").innerHTML=`<div class="card ${keep?"":"anim"}">${inner}</div>`;
+   restoreOpenDetails(openSet);
    try{renderRail();}catch(e3){}
    updateUndoBtnVisibility();
    renderUndoToastUI();
@@ -2046,6 +2066,7 @@ function render(keep){
    bodyHtml=errBox("هذه الخطوة",err);
  }
  document.getElementById("progBar").style.width=(i/Math.max(1,L.length-1)*100)+"%";
+ const openSet1=keep?snapOpenDetails():null;
  document.getElementById("screen").innerHTML=`<div class="card ${keep?"":"anim"}">
    <div class="eyebrow-row">${i>0?`<button class="back-top" id="prevTop" title="الرجوع للخطوة السابقة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>رجوع</button>`:""}${s.eyebrow?`<p class="eyebrow">${s.eyebrow}</p>`:""}</div>
    <h2>${s.title}</h2>${s.lede?`<p class="lede">${s.lede}</p>`:""}
@@ -2054,6 +2075,7 @@ function render(keep){
    ${s.last?"":`<button class="btn" id="next" ${ok?"":"disabled"}>التالي</button>`}
    ${s.skip&&!s.last?`<button class="btn ghost" id="skipStep">تخطي</button>`:""}
    <div class="spacer"></div><span class="savetag" id="savetag"></span></div></div>`;
+ restoreOpenDetails(openSet1);
  try{renderRail();}catch(e3){}
  updateUndoBtnVisibility();
  renderUndoToastUI();
@@ -2087,7 +2109,7 @@ document.addEventListener("change",e=>{
  else if(el.dataset.rerender&&el.dataset.bind){set(el.dataset.bind,el.value);render(true);checkGoalCelebration();}
 });
 document.addEventListener("click",e=>{
- const t=e.target.closest("[data-radio],[data-check],[data-seg],[data-move],[data-add],[data-del],[data-go],[data-pl],[data-prm],[data-addpool],[data-addidea],[data-copy],[data-rank],[data-psolve],[data-ibank],[data-idel],[data-brest],[data-bdel],[data-eftcopytopic],[data-archopen],[data-archtoggle],[data-archword],[data-archresume],[data-scoreinfo],[data-navto],[data-donetoggle],[data-accordion],[data-addtoplan],[data-reptoggle],[data-routinetoggle],[data-viewmode],[data-setfilter],[data-clearfilter],[data-filtertab],[data-setsort],[data-todaymove],[data-titleedit],[data-ledgerdel],[data-ledgeredit],[data-addact],[data-actbank],[data-actdel],[data-skilldl],[data-addcustom],[data-bulkbank],[data-bulkdel]");
+ const t=e.target.closest("[data-radio],[data-check],[data-seg],[data-move],[data-add],[data-del],[data-go],[data-pl],[data-prm],[data-addpool],[data-addidea],[data-copy],[data-rank],[data-psolve],[data-ibank],[data-idel],[data-brest],[data-bdel],[data-eftcopytopic],[data-archopen],[data-archtoggle],[data-archword],[data-archresume],[data-scoreinfo],[data-navto],[data-donetoggle],[data-accordion],[data-addtoplan],[data-reptoggle],[data-routinetoggle],[data-viewmode],[data-setfilter],[data-clearfilter],[data-filtertab],[data-setsort],[data-todaymove],[data-titleedit],[data-toreserve],[data-ledgerdel],[data-ledgeredit],[data-addact],[data-actbank],[data-actdel],[data-skilldl],[data-addcustom],[data-bulkbank],[data-bulkdel]");
  if(t){
   if(isMutatingTarget(t))pushUndo();
   if(t.dataset.radio!=null)set(t.dataset.radio,get(t.dataset.radio)===t.dataset.val?"":t.dataset.val);
@@ -2153,6 +2175,9 @@ document.addEventListener("click",e=>{
   else if(t.dataset.routinetoggle!=null){const rt=S.pool[+t.dataset.routinetoggle];toggleRoutineToday(rt);if(routineDoneToday(rt))justCompleted=true;save();}
   else if(t.dataset.viewmode){S.planView=t.dataset.viewmode;save();}
   else if(t.dataset.accordion!=null){const it=S.pool[+t.dataset.accordion];it.expanded=!it.expanded;save();}
+  else if(t.dataset.toreserve!=null){const it=S.pool[+t.dataset.toreserve];
+    if(it){it.promoted=false;it.ease="صعب";it.align="عالٍ";it.resolves="نعم";it.expanded=false;
+      save();showUpdateToast("اتنقلت للأفعال الاحتياطية ↩");}}
   else if(t.dataset.addtoplan!=null){const it=S.pool[+t.dataset.addtoplan];it.promoted=true;it.commit="نعم";save();}
   else if(t.dataset.go!=null){timelineReturnId=(t.dataset.go==="d7-timeline"&&tab===2)?cur2:null;setCur(t.dataset.go);closeRail();render();return;}
   else if(t.dataset.pl!=null){const p=t.dataset.pl.split("."),it=S.pool[+p[0]],f=p[1];
@@ -2272,6 +2297,11 @@ document.addEventListener("click",e=>{
  else if(id==="confirmScrim"||id==="confirmClose"||id==="cancelNewMonth")closeConfirmModal();
  else if(id==="confirmNewMonth"){
    pushUndo();
+   const fromLbl=S.month+" "+S.year+" · احتياطي";
+   const carry=allReserve().filter(x=>!x.done).map(x=>((x.def&&x.def.what)||x.text||"").trim()).filter(Boolean);
+   const bank0=S.ideaBank||[];
+   carry.forEach(txt=>{if(!bank0.some(b=>(b.text||"").trim()===txt))bank0.push({text:txt,from:fromLbl});});
+   S.ideaBank=bank0;
    archiveCurrentMonth();const bank=S.ideaBank||[],fx=S.fxRates||{},fxAt=S.fxUpdatedAt||0,ic=S.intentCurrency||"";S=blank();S.ideaBank=bank;S.fxRates=fx;S.fxUpdatedAt=fxAt;S.intentCurrency=ic;cur1="start";cur2="d7-1-ideas";tab=1;section=1;save();
    closeConfirmModal();render();}
  else if(id==="infoScrim"||id==="infoClose"||id==="infoClose2")closeInfoModal();
@@ -2283,7 +2313,7 @@ function closeRail(){document.getElementById("rail").classList.remove("open");do
 function openConfirmModal(){
  const hasWork=hasContent(S);
  document.getElementById("confirmMsg").textContent=hasWork
-   ?`سيتم حفظ خطة ${S.month} ${S.year} الحالية في السجل، ثم فتح شهر جديد فارغ. هل تريد المتابعة؟`
+   ?(()=>{const nr=allReserve().filter(x=>!x.done).length;return `سيتم حفظ خطة ${S.month} ${S.year} الحالية في السجل، ${nr?`ونقل ${nr===1?"الفعل الاحتياطي اللي ماتعملش":nr+" أفعال احتياطية ماتعملتش"} لبنك الأفكار المؤجلة، `:""}ثم فتح شهر جديد فارغ. هل تريد المتابعة؟`;})()
    :"سيتم فتح شهر جديد فارغ. هل تريد المتابعة؟";
  document.getElementById("confirmModal").classList.add("open");
 }
@@ -2653,6 +2683,7 @@ function diagText(err){
 try{
  load();
  section=S.day1Done?2:1;
+if(section===2)S.planView="today";
  render();
 }catch(err){
  try{console.error("Load/render error:",err);}catch(e2){}
