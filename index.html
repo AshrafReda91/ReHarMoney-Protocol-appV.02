@@ -454,6 +454,19 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   0%{transform:translateY(-10px) rotate(0deg);opacity:1}
   100%{transform:translateY(110vh) rotate(var(--rot,360deg));opacity:.25}
 }
+.np-card{position:fixed;left:50%;bottom:22px;z-index:95;width:calc(100% - 32px);max-width:420px;box-sizing:border-box;
+  transform:translateX(-50%) translateY(30px);opacity:0;pointer-events:none;transition:all .35s var(--spring);
+  background:var(--surface);border:1px solid var(--gold);border-radius:16px;padding:14px 14px 12px;box-shadow:0 10px 30px rgba(90,62,18,.22);
+  display:flex;gap:12px;align-items:flex-start;direction:rtl}
+.np-card.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.np-ic{flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:var(--gold-soft);color:var(--gold-deep);display:flex;align-items:center;justify-content:center}
+.np-tx{flex:1;min-width:0}
+.np-tx b{display:block;font-size:14.5px;color:var(--gold-deep);margin-bottom:2px}
+.np-tx span{display:block;font-size:12.8px;color:var(--ink-soft);line-height:1.7}
+.np-act{display:flex;gap:8px;margin-top:10px}
+.np-act button{font:inherit;font-size:13px;font-weight:700;border-radius:99px;padding:7px 16px;cursor:pointer;border:1px solid var(--gold)}
+.np-yes{background:var(--gold);color:#fff}
+.np-no{background:transparent;color:var(--ink-soft);border-color:var(--line)!important}
 .update-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
   background:var(--gold-deep);color:#fff8e6;padding:11px 20px;border-radius:99px;font-size:13.5px;font-weight:700;
   box-shadow:0 10px 24px -10px rgba(0,0,0,.4);opacity:0;transition:opacity .35s ease,transform .35s ease;z-index:996;
@@ -601,17 +614,17 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 </div>
 <div class="shell">
   <aside class="rail" id="rail">
+    <button class="railnav" id="notifBtn" style="display:none"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> <span class="notif-lbl">الإشعارات</span><span class="nt-switch" aria-hidden="true"><i></i></span></button>
     <a class="railnav" id="resourcesBtn" href="https://t.me/+8gaYPLCcz1wzYjk0" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"/></svg> جروب المصادر</a>
     <button class="railnav" id="skillDlBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg> تنزيل skill الـ EFT</button>
     <button class="railnav" id="ideaBankBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.5.5 1 1.3 1 2.5h6c0-1.2.5-2 1-2.5A6 6 0 0 0 12 3Z"/></svg> بنك الأفكار المؤجلة</button>
+    <button class="railnav" id="natigaBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> التقويم — قبطي · ميلادي · هجري</button>
     <button class="railnav" id="archiveBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg> سجل الشهور السابقة</button>
     <div class="railnav-pair">
       <button class="railnav-mini" id="exportBtn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg> تصدير</button>
       <button class="railnav-mini" id="importBtn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg> استيراد</button>
     </div>
     <input type="file" id="importFile" accept="application/json" style="display:none">
-    <button class="railnav" id="natigaBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> التقويم — قبطي · ميلادي · هجري</button>
-    <button class="railnav" id="notifBtn" style="display:none"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> <span class="notif-lbl">الإشعارات</span><span class="nt-switch" aria-hidden="true"><i></i></span></button>
     <div class="rule" style="margin:16px 0"></div>
     <h3>مسار البروتوكول</h3>
     <ul class="steps" id="steps"></ul>
@@ -2699,7 +2712,7 @@ const Notif=(()=>{
      try{const appUrl=location.origin+base;
      await O.init({appId:ONESIGNAL_APP_ID,safari_web_id:ONESIGNAL_SAFARI_ID,welcomeNotification:{title:"البروتوكول الشهري",message:"تم تفعيل الإشعارات ✓ ستصلك رسائل البرنامج هنا.",url:appUrl},notificationClickHandlerMatch:"origin",serviceWorkerPath:base.slice(1)+"sw.js",serviceWorkerParam:{scope:base},allowLocalhostAsSecureOrigin:true});
        try{O.Notifications.setDefaultUrl(appUrl);}catch(e){}
-       OS=O;O.User.PushSubscription.addEventListener("change",refresh);O.Notifications.addEventListener("permissionChange",refresh);refresh();}catch(e){}
+       OS=O;O.User.PushSubscription.addEventListener("change",refresh);O.Notifications.addEventListener("permissionChange",refresh);refresh();setTimeout(maybePrompt,2500);}catch(e){}
    });
    const sc=document.createElement("script");sc.src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";sc.defer=true;document.head.appendChild(sc);
  }
@@ -2715,10 +2728,26 @@ const Notif=(()=>{
    refresh();
    if(on())openInfoModal("تم تفعيل الإشعارات 🔔",note("ستصلك رسائل البرنامج والتذكيرات على هذا الجهاز."),ok,true);
  }
- return {init,click,refresh};
+ const NP_KEY="sm_notif_prompt_done";
+ function maybePrompt(){
+   try{
+     if(on()||!OS)return;
+     if(ios&&!standalone)return;
+     if(Notification.permission==="denied")return;
+     if(localStorage.getItem(NP_KEY))return;
+     if(document.querySelector(".np-card")||document.querySelector("#infoModal.open"))return;
+     const el=document.createElement("div");el.className="np-card";el.setAttribute("role","dialog");el.setAttribute("aria-label","تفعيل الإشعارات");
+     el.innerHTML='<div class="np-ic"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div><div class="np-tx"><b>فعّل الإشعارات</b><span>لتصلك التذكيرات والرسائل المهمة من البرنامج. يمكنك تفعيلها الآن، أو لاحقًا من القائمة ☰ ← «الإشعارات».</span><div class="np-act"><button class="np-yes" type="button">فعّلها الآن</button><button class="np-no" type="button">لاحقًا</button></div></div>';
+     document.body.appendChild(el);setTimeout(()=>el.classList.add("show"),30);
+     const close=()=>{try{localStorage.setItem(NP_KEY,"1");}catch(x){}el.classList.remove("show");setTimeout(()=>el.remove(),400);};
+     el.querySelector(".np-no").addEventListener("click",e=>{e.stopPropagation();close();});
+     el.querySelector(".np-yes").addEventListener("click",e=>{e.stopPropagation();close();click();});
+   }catch(e){}
+ }
+ return {init,click,refresh,maybePrompt};
 })();
 try{Notif.init();}catch(e){}
-const APP_VERSION="v37";
+const APP_VERSION="v38";
 if("serviceWorker" in navigator&&location.protocol==="https:"){
  const verOf=t=>{const m=/protocol-(v\d+)/.exec(t||"");return m?m[1]:"";};
  let reloading=false;
