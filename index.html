@@ -480,7 +480,11 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 .confirm-card p{margin:0 0 20px;font-size:14px;color:var(--ink-soft);line-height:1.8}
 .confirm-actions{display:flex;flex-direction:column;gap:10px;flex:0 0 auto}
 .confirm-actions .btn{width:100%}
-#infoBody{overflow-y:auto;flex:1 1 auto;min-height:0}
+#infoBody{overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0}
+.confirm-card.celebrate{text-align:center}
+.confirm-card.celebrate h3{padding:0 40px}
+.confirm-card.celebrate #infoBody{overflow:visible;flex:0 0 auto}
+.confirm-card.celebrate #infoBody .note{margin:0;font-size:15px;line-height:2;color:var(--ink-soft)}
 .modal-close{position:absolute;top:12px;inset-inline-end:12px;width:34px;height:34px;border-radius:50%;
   border:1px solid var(--line);background:var(--surface-2);color:var(--ink-soft);font-size:15px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:all .2s}
@@ -1126,7 +1130,7 @@ function checkGoalCelebration(){
      <div class="note" style="text-align:center;font-size:15px;line-height:2">حققت نيتك المالية لهذا الشهر — ${inc} ${cur}.<br>لا تنسى الاحتفال بتحقيق نيتك المالية 🎉</div>`
    :`<div style="font-family:Georgia,'Times New Roman',serif;font-size:40px;font-weight:700;color:var(--gold-deep);text-align:center;line-height:1.2">${pct}%</div>
      <div class="note" style="text-align:center;font-size:15px;line-height:2">تجاوزت نيتك المالية ووصلت لـ ${pct}% منها — ${inc} ${cur}.<br>الوفرة تكبر، احتفل بها 🎉</div>`;
- openInfoModal(first?"مبروك عليك 🎉":"تجاوزت هدفك 🚀",body,"<button class=\"btn\" id=\"infoClose2\">أكيد</button>");
+ openInfoModal(first?"مبروك عليك 🎉":"تجاوزت هدفك 🚀",body,"<button class=\"btn\" id=\"infoClose2\">أكيد</button>",true);
 }
 const DAY_MSGS=[
  "أنهيت كل مهام اليوم. التزامك هذا هو ما يصنع النتيجة، فاستمر!",
@@ -1142,7 +1146,7 @@ function checkDayCelebration(){
  S.dayCelebratedKey=k;save();
  triggerConfetti(35);
  const msg=DAY_MSGS[new Date().getDate()%DAY_MSGS.length];
- openInfoModal("برافو عليك 👏","<div class=\"note\" style=\"text-align:center;font-size:15px;line-height:2\">"+msg+"</div>","<button class=\"btn\" id=\"infoClose2\">يلا نحتفل 🎉</button>");
+ openInfoModal("برافو عليك 👏","<div class=\"note\" style=\"text-align:center;font-size:15px;line-height:2\">"+msg+"</div>","<button class=\"btn\" id=\"infoClose2\">يلا نحتفل 🎉</button>",true);
 }
 function parseIntentTarget(){
  const s=(S.intentValue||"").replace(/,/g,"");
@@ -2370,7 +2374,8 @@ function openConfirmModal(){
 function closeConfirmModal(){document.getElementById("confirmModal").classList.remove("open");}
 
 /* بوباب: الطاقات التي يحلها فعل / تفاصيل مصدره */
-function openInfoModal(title,bodyHtml,actionsHtml){
+function openInfoModal(title,bodyHtml,actionsHtml,celebrate){
+ document.querySelector("#infoModal .confirm-card").classList.toggle("celebrate",!!celebrate);
  document.getElementById("infoTitle").textContent=title;
  document.getElementById("infoBody").innerHTML=bodyHtml;
  document.getElementById("infoActions").innerHTML=actionsHtml||"";
@@ -2667,7 +2672,7 @@ async function doInstall(){
  }
 }
 refreshInstallBtn();
-const APP_VERSION="v32";
+const APP_VERSION="v33";
 if("serviceWorker" in navigator&&location.protocol==="https:"){
  const verOf=t=>{const m=/protocol-(v\d+)/.exec(t||"");return m?m[1]:"";};
  let reloading=false;
