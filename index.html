@@ -57,6 +57,11 @@ h1,h2,h3{font-family:"Noto Sans Arabic",system-ui,sans-serif;font-weight:700;lin
 #resourcesBtn.railnav{margin-bottom:10px}
 .railnav:hover{border-color:var(--gold);background:var(--gold-soft);transform:translateY(-1px)}
 .railnav-pair{display:flex;gap:8px;margin-bottom:10px}
+.nt-switch{margin-inline-start:auto;position:relative;width:36px;height:21px;border-radius:99px;background:#d9d2c3;flex:0 0 auto;transition:background .25s;pointer-events:none}
+.nt-switch i{position:absolute;top:2.5px;right:2.5px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:right .25s var(--spring)}
+#notifBtn.on .nt-switch{background:#2f8a5b}
+#notifBtn.on .nt-switch i{right:17.5px}
+#infoBody>.note:first-child{margin-top:0}
 .railnav-mini{flex:1;min-width:0;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--gold-deep);
   border-radius:10px;padding:8px 6px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s var(--spring)}
 .railnav-mini:hover{border-color:var(--gold);background:var(--gold-soft)}
@@ -606,7 +611,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
     </div>
     <input type="file" id="importFile" accept="application/json" style="display:none">
     <button class="railnav" id="natigaBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> التقويم — قبطي · ميلادي · هجري</button>
-    <button class="railnav" id="notifBtn" style="display:none"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> <span class="notif-lbl">تفعيل الإشعارات</span></button>
+    <button class="railnav" id="notifBtn" style="display:none"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> <span class="notif-lbl">الإشعارات</span><span class="nt-switch" aria-hidden="true"><i></i></span></button>
     <div class="rule" style="margin:16px 0"></div>
     <h3>مسار البروتوكول</h3>
     <ul class="steps" id="steps"></ul>
@@ -2684,14 +2689,16 @@ const Notif=(()=>{
  function on(){try{return !!(OS&&OS.User.PushSubscription.optedIn&&Notification.permission==="granted");}catch(e){return false;}}
  function refresh(){const b=document.getElementById("notifBtn"),l=document.querySelector("#notifBtn .notif-lbl");if(!b)return;
    const show=!!ONESIGNAL_APP_ID&&hostOk&&(supported||ios);b.style.display=show?"":"none";
-   if(l)l.textContent=on()?"الإشعارات مفعّلة ✓":"تفعيل الإشعارات";}
+   const o=on();b.classList.toggle("on",o);b.setAttribute("aria-pressed",o?"true":"false");b.title=o?"الإشعارات مفعّلة — اضغط للإيقاف":"الإشعارات متوقفة — اضغط للتفعيل";}
  function init(){
    refresh();
    if(!ONESIGNAL_APP_ID||!hostOk||!supported)return;
    const base=location.pathname.replace(/[^/]*$/,"");
    window.OneSignalDeferred=window.OneSignalDeferred||[];
    OneSignalDeferred.push(async function(O){
-     try{await O.init({appId:ONESIGNAL_APP_ID,safari_web_id:ONESIGNAL_SAFARI_ID,serviceWorkerPath:base.slice(1)+"sw.js",serviceWorkerParam:{scope:base},allowLocalhostAsSecureOrigin:true});
+     try{const appUrl=location.origin+base;
+     await O.init({appId:ONESIGNAL_APP_ID,safari_web_id:ONESIGNAL_SAFARI_ID,welcomeNotification:{title:"البروتوكول الشهري",message:"تم تفعيل الإشعارات ✓ ستصلك رسائل البرنامج هنا.",url:appUrl},notificationClickHandlerMatch:"origin",serviceWorkerPath:base.slice(1)+"sw.js",serviceWorkerParam:{scope:base},allowLocalhostAsSecureOrigin:true});
+       try{O.Notifications.setDefaultUrl(appUrl);}catch(e){}
        OS=O;O.User.PushSubscription.addEventListener("change",refresh);O.Notifications.addEventListener("permissionChange",refresh);refresh();}catch(e){}
    });
    const sc=document.createElement("script");sc.src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";sc.defer=true;document.head.appendChild(sc);
@@ -2699,19 +2706,19 @@ const Notif=(()=>{
  const note=t=>"<div class=\"note\" style=\"font-size:14px;line-height:1.9\">"+t+"</div>";
  const ok="<button class=\"btn\" id=\"infoClose2\">حسنًا</button>";
  async function click(){
-   if(ios&&!standalone){openInfoModal("تفعيل الإشعارات",note("على الآيفون تعمل الإشعارات بعد تثبيت التطبيق على الشاشة الرئيسية:<br>1) افتح التطبيق من Safari<br>2) اضغط زر المشاركة ⬆︎<br>3) اختر «إضافة إلى الشاشة الرئيسية»<br>ثم افتح التطبيق من أيقونته وفعّل الإشعارات من القائمة."),ok);return;}
-   if(!supported){openInfoModal("تفعيل الإشعارات",note("هذا المتصفح لا يدعم الإشعارات. جرّب Chrome على أندرويد أو التطبيق المثبّت على الآيفون."),ok);return;}
-   if(on()){openInfoModal("الإشعارات مفعّلة ✓",note("ستصلك رسائل البرنامج على هذا الجهاز. لإيقافها افتح إعدادات الإشعارات في جهازك."),ok);return;}
-   if(Notification.permission==="denied"){openInfoModal("الإشعارات متوقفة",note("سبق رفض الإشعارات لهذا التطبيق. لتفعيلها افتح إعدادات الموقع أو التطبيق في جهازك واسمح بالإشعارات، ثم ارجع واضغط «تفعيل الإشعارات»."),ok);return;}
-   if(!OS){openInfoModal("تفعيل الإشعارات",note("خدمة الإشعارات لم تُحمَّل بعد. تأكد من اتصالك بالإنترنت وحاول مرة أخرى بعد لحظات."),ok);return;}
+   if(ios&&!standalone){openInfoModal("تفعيل الإشعارات",note("على الآيفون تعمل الإشعارات بعد تثبيت التطبيق على الشاشة الرئيسية:<br>1) افتح التطبيق من Safari<br>2) اضغط زر المشاركة ⬆︎<br>3) اختر «إضافة إلى الشاشة الرئيسية»<br>ثم افتح التطبيق من أيقونته وفعّل الإشعارات من القائمة."),ok,true);return;}
+   if(!supported){openInfoModal("تفعيل الإشعارات",note("هذا المتصفح لا يدعم الإشعارات. جرّب Chrome على أندرويد أو التطبيق المثبّت على الآيفون."),ok,true);return;}
+   if(on()){try{await OS.User.PushSubscription.optOut();}catch(e){}refresh();showUpdateToast("تم إيقاف الإشعارات");return;}
+   if(Notification.permission==="denied"){openInfoModal("الإشعارات متوقفة",note("سبق رفض الإشعارات لهذا التطبيق. لتفعيلها افتح إعدادات الموقع أو التطبيق في جهازك واسمح بالإشعارات، ثم ارجع واضغط «تفعيل الإشعارات»."),ok,true);return;}
+   if(!OS){openInfoModal("تفعيل الإشعارات",note("خدمة الإشعارات لم تُحمَّل بعد. تأكد من اتصالك بالإنترنت وحاول مرة أخرى بعد لحظات."),ok,true);return;}
    try{await OS.Notifications.requestPermission();if(Notification.permission==="granted"&&!OS.User.PushSubscription.optedIn)await OS.User.PushSubscription.optIn();}catch(e){}
    refresh();
-   if(on())openInfoModal("تم تفعيل الإشعارات 🔔",note("ستصلك رسائل البرنامج والتذكيرات على هذا الجهاز."),ok);
+   if(on())openInfoModal("تم تفعيل الإشعارات 🔔",note("ستصلك رسائل البرنامج والتذكيرات على هذا الجهاز."),ok,true);
  }
  return {init,click,refresh};
 })();
 try{Notif.init();}catch(e){}
-const APP_VERSION="v34";
+const APP_VERSION="v35";
 if("serviceWorker" in navigator&&location.protocol==="https:"){
  const verOf=t=>{const m=/protocol-(v\d+)/.exec(t||"");return m?m[1]:"";};
  let reloading=false;
