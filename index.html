@@ -606,6 +606,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
     </div>
     <input type="file" id="importFile" accept="application/json" style="display:none">
     <button class="railnav" id="natigaBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg> التقويم — قبطي · ميلادي · هجري</button>
+    <button class="railnav" id="notifBtn" style="display:none"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> <span class="notif-lbl">تفعيل الإشعارات</span></button>
     <div class="rule" style="margin:16px 0"></div>
     <h3>مسار البروتوكول</h3>
     <ul class="steps" id="steps"></ul>
@@ -2329,6 +2330,7 @@ document.addEventListener("click",e=>{
  else if(id==="archiveBtn")openArchive();
  else if(id==="exportBtn")openExportModal();
  else if(id==="importBtn")openImportModal();
+ else if(id==="notifBtn"){closeRail();Notif.click();return;}
  else if(id==="aboutBtn"){
    openInfoModal("About","<div style=\"direction:ltr;text-align:center;line-height:1.9;font-size:14.5px;color:var(--ink-soft)\">This app designed and developed with ❤️<br>for the <b style=\"color:var(--gold-deep)\">Soul Meeting Community</b><br><br>By<br><a href=\"https://www.ashraf-reda.com\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--gold-deep);font-weight:700;text-decoration:underline\">Ashraf Reda</a></div>","");
  }
@@ -2672,7 +2674,44 @@ async function doInstall(){
  }
 }
 refreshInstallBtn();
-const APP_VERSION="v33";
+const ONESIGNAL_APP_ID="efad2ecb-0aca-48c6-8f86-5c858690de0b",ONESIGNAL_SAFARI_ID="web.onesignal.auto.01d22b73-bccb-4a84-9633-69c73285f3f4";
+const Notif=(()=>{
+ const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+ const standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+ const hostOk=/(^|\.)github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname);
+ const supported="serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+ let OS=null;
+ function on(){try{return !!(OS&&OS.User.PushSubscription.optedIn&&Notification.permission==="granted");}catch(e){return false;}}
+ function refresh(){const b=document.getElementById("notifBtn"),l=document.querySelector("#notifBtn .notif-lbl");if(!b)return;
+   const show=!!ONESIGNAL_APP_ID&&hostOk&&(supported||ios);b.style.display=show?"":"none";
+   if(l)l.textContent=on()?"الإشعارات مفعّلة ✓":"تفعيل الإشعارات";}
+ function init(){
+   refresh();
+   if(!ONESIGNAL_APP_ID||!hostOk||!supported)return;
+   const base=location.pathname.replace(/[^/]*$/,"");
+   window.OneSignalDeferred=window.OneSignalDeferred||[];
+   OneSignalDeferred.push(async function(O){
+     try{await O.init({appId:ONESIGNAL_APP_ID,safari_web_id:ONESIGNAL_SAFARI_ID,serviceWorkerPath:base.slice(1)+"sw.js",serviceWorkerParam:{scope:base},allowLocalhostAsSecureOrigin:true});
+       OS=O;O.User.PushSubscription.addEventListener("change",refresh);O.Notifications.addEventListener("permissionChange",refresh);refresh();}catch(e){}
+   });
+   const sc=document.createElement("script");sc.src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";sc.defer=true;document.head.appendChild(sc);
+ }
+ const note=t=>"<div class=\"note\" style=\"font-size:14px;line-height:1.9\">"+t+"</div>";
+ const ok="<button class=\"btn\" id=\"infoClose2\">حسنًا</button>";
+ async function click(){
+   if(ios&&!standalone){openInfoModal("تفعيل الإشعارات",note("على الآيفون تعمل الإشعارات بعد تثبيت التطبيق على الشاشة الرئيسية:<br>1) افتح التطبيق من Safari<br>2) اضغط زر المشاركة ⬆︎<br>3) اختر «إضافة إلى الشاشة الرئيسية»<br>ثم افتح التطبيق من أيقونته وفعّل الإشعارات من القائمة."),ok);return;}
+   if(!supported){openInfoModal("تفعيل الإشعارات",note("هذا المتصفح لا يدعم الإشعارات. جرّب Chrome على أندرويد أو التطبيق المثبّت على الآيفون."),ok);return;}
+   if(on()){openInfoModal("الإشعارات مفعّلة ✓",note("ستصلك رسائل البرنامج على هذا الجهاز. لإيقافها افتح إعدادات الإشعارات في جهازك."),ok);return;}
+   if(Notification.permission==="denied"){openInfoModal("الإشعارات متوقفة",note("سبق رفض الإشعارات لهذا التطبيق. لتفعيلها افتح إعدادات الموقع أو التطبيق في جهازك واسمح بالإشعارات، ثم ارجع واضغط «تفعيل الإشعارات»."),ok);return;}
+   if(!OS){openInfoModal("تفعيل الإشعارات",note("خدمة الإشعارات لم تُحمَّل بعد. تأكد من اتصالك بالإنترنت وحاول مرة أخرى بعد لحظات."),ok);return;}
+   try{await OS.Notifications.requestPermission();if(Notification.permission==="granted"&&!OS.User.PushSubscription.optedIn)await OS.User.PushSubscription.optIn();}catch(e){}
+   refresh();
+   if(on())openInfoModal("تم تفعيل الإشعارات 🔔",note("ستصلك رسائل البرنامج والتذكيرات على هذا الجهاز."),ok);
+ }
+ return {init,click,refresh};
+})();
+try{Notif.init();}catch(e){}
+const APP_VERSION="v34";
 if("serviceWorker" in navigator&&location.protocol==="https:"){
  const verOf=t=>{const m=/protocol-(v\d+)/.exec(t||"");return m?m[1]:"";};
  let reloading=false;
@@ -2684,7 +2723,11 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){
    w.postMessage({type:"SKIP_WAITING"});
  };
  window.addEventListener("load",()=>{
-   navigator.serviceWorker.register("sw.js").then(reg=>{
+   navigator.serviceWorker.getRegistration().then(r0=>{
+     const cur=r0&&(r0.active||r0.waiting||r0.installing);
+     const url=cur&&/[?&]appId=/.test(cur.scriptURL)?cur.scriptURL:"sw.js";
+     return navigator.serviceWorker.register(url);
+   }).then(reg=>{
      reg.update().catch(()=>{});
      setInterval(()=>{reg.update().catch(()=>{});},60000);
      if(reg.waiting&&navigator.serviceWorker.controller)applyUpdate(reg);
