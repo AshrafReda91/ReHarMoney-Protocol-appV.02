@@ -550,7 +550,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
   <div class="confirm-card">
     <button class="modal-close" id="confirmClose">✕</button>
     <h3>بدء شهر جديد</h3>
-    <p id="confirmMsg">سيتم حفظ خطة هذا الشهر في السجل، ونقل الأفعال الاحتياطية اللي ماتعملتش لبنك الأفكار المؤجلة، ثم فتح شهر جديد فارغ. هل تريد المتابعة؟</p>
+    <p id="confirmMsg">سيتم حفظ خطة هذا الشهر في السجل، ونقل الأفعال الاحتياطية التي لم تُنفَّذ إلى بنك الأفكار المؤجلة، ثم فتح شهر جديد فارغ. هل تريد المتابعة؟</p>
     <div class="confirm-actions">
       <button class="btn ghost" id="cancelNewMonth">إلغاء</button>
       <button class="btn" id="confirmNewMonth">نعم، ابدأ شهر جديد</button>
@@ -565,7 +565,7 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
     <button class="nt-gear" id="ntGear" title="الإعدادات" aria-label="الإعدادات"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></button>
     <div class="nt-pop" id="ntPop">
       <h4>تعديل التاريخ الهجري</h4>
-      <p>لو الهجري مختلف عن رؤية الهلال عندك، زوّد أو قلّل يوم.</p>
+      <p>إذا اختلف التاريخ الهجري عن رؤية الهلال عندك، زِد أو أنقص يومًا.</p>
       <div class="nt-ctl"><button class="nt-btn" id="ntPlus">+</button><span class="nt-val" id="ntOffset"></span><button class="nt-btn" id="ntMinus">−</button></div>
     </div>
   </div>
@@ -919,7 +919,7 @@ function repeatSubFields(i,it){const df=it.def||{};const rt=df.repeatType==="rec
        <button class="chip ${time==="صباحي"?"sel":""}" data-radio="pool~${i}~def~routineTime" data-val="صباحي">🌅 صباحي</button>
        <button class="chip ${time==="مسائي"?"sel":""}" data-radio="pool~${i}~def~routineTime" data-val="مسائي">🌙 مسائي</button>
      </div>
-     <div class="note" style="margin-top:8px">الروتين يتم تحديده يوميًا بشكل مستقل — كل يوم تعمل عليه check لوحده، وسجل إنجازك بيتحفظ عبر الشهور.</div>
+     <div class="note" style="margin-top:8px">الروتين يتم تحديده يوميًا بشكل مستقل — كل يوم تعمل عليه check وحده، وسجل إنجازك يُحفظ عبر الشهور.</div>
    </div>`;
  }
  return "";}
@@ -932,7 +932,7 @@ function repeatField(i,it){const df=it.def||{};const rt=df.repeatType==="recurri
    </div>`;
  if(rt==="recurring"){
    h+=`<div style="margin-top:10px;max-width:160px">${F.tx(`pool~${i}~def~repeatCount`,"عدد مرات التكرار","مثال: 7")}</div>
-     <div class="note" style="margin-top:-6px">هيظهرلك ${Math.max(1,Math.min(31,+df.repeatCount||1))} مربع صغير في خطة الشهر تعمل عليهم check كل ما تنجز مرة.</div>`;
+     <div class="note" style="margin-top:-6px">سيظهر لك ${Math.max(1,Math.min(31,+df.repeatCount||1))} مربع صغير في خطة الشهر، تعمل على كل منها check كلما أنجزت مرة.</div>`;
  }
  if(rt==="routine"){
    const freq=df.routineFreq==="أسبوعي"?"أسبوعي":"يومي";
@@ -949,7 +949,7 @@ function repeatField(i,it){const df=it.def||{};const rt=df.repeatType==="recurri
        <button class="chip ${time==="صباحي"?"sel":""}" data-radio="pool~${i}~def~routineTime" data-val="صباحي">🌅 صباحي</button>
        <button class="chip ${time==="مسائي"?"sel":""}" data-radio="pool~${i}~def~routineTime" data-val="مسائي">🌙 مسائي</button>
      </div>
-     <div class="note" style="margin-top:8px">الروتين يتم تحديده يوميًا بشكل مستقل — كل يوم تعمل عليه check لوحده، وسجل إنجازك بيتحفظ عبر الشهور.</div>
+     <div class="note" style="margin-top:8px">الروتين يتم تحديده يوميًا بشكل مستقل — كل يوم تعمل عليه check وحده، وسجل إنجازك يُحفظ عبر الشهور.</div>
    </div>`;
  }
  return h+`</div>`;}
@@ -1080,7 +1080,7 @@ async function fetchFxRates(btn){
    const j=await r.json();
    if(j&&j.usd&&apply(j.usd))return done(true,"تم تحديث أسعار الصرف ✓");
  }catch(e){}
- done(false,"مفيش إنترنت أو الخدمة مش متاحة — الأسعار المحفوظة شغالة زي ما هي");
+ done(false,"لا يوجد إنترنت أو الخدمة غير متاحة — الأسعار المحفوظة تعمل كما هي");
 }
 function triggerConfetti(count){
  try{
@@ -1125,14 +1125,14 @@ function checkGoalCelebration(){
    ?`<div style="font-family:Georgia,'Times New Roman',serif;font-size:40px;font-weight:700;color:var(--gold-deep);text-align:center;line-height:1.2">${pct}%</div>
      <div class="note" style="text-align:center;font-size:15px;line-height:2">حققت نيتك المالية لهذا الشهر — ${inc} ${cur}.<br>لا تنسى الاحتفال بتحقيق نيتك المالية 🎉</div>`
    :`<div style="font-family:Georgia,'Times New Roman',serif;font-size:40px;font-weight:700;color:var(--gold-deep);text-align:center;line-height:1.2">${pct}%</div>
-     <div class="note" style="text-align:center;font-size:15px;line-height:2">تجاوزت نيتك المالية ووصلت لـ ${pct}% منها — ${inc} ${cur}.<br>الوفرة بتكبر، احتفل بيها 🎉</div>`;
+     <div class="note" style="text-align:center;font-size:15px;line-height:2">تجاوزت نيتك المالية ووصلت لـ ${pct}% منها — ${inc} ${cur}.<br>الوفرة تكبر، احتفل بها 🎉</div>`;
  openInfoModal(first?"مبروك عليك 🎉":"تجاوزت هدفك 🚀",body,"<button class=\"btn\" id=\"infoClose2\">أكيد</button>");
 }
 const DAY_MSGS=[
- "خلصت كل مهام النهاردة. التزامك ده هو اللي بيبني النتيجة — كمّل!",
- "يوم كامل من الالتزام ✓ خطوة صغيرة كل يوم بتعمل فرق كبير.",
- "برافو! إنت بتثبت لنفسك كل يوم إنك قد كلمتك. استمر.",
- "مهام اليوم خلصت. الاستمرارية أقوى من الحماس — وإنت ماشي صح."
+ "أنهيت كل مهام اليوم. التزامك هذا هو ما يصنع النتيجة، فاستمر!",
+ "يوم كامل من الالتزام ✓ خطوة صغيرة كل يوم تصنع فرقًا كبيرًا.",
+ "برافو! كل يوم تثبت لنفسك أنك قدّ كلمتك. استمر.",
+ "اكتملت مهام اليوم. الاستمرارية أقوى من الحماس، وأنت على الطريق الصحيح."
 ];
 function checkDayCelebration(){
  const st=todayProgressStats();
@@ -1142,7 +1142,7 @@ function checkDayCelebration(){
  S.dayCelebratedKey=k;save();
  triggerConfetti(35);
  const msg=DAY_MSGS[new Date().getDate()%DAY_MSGS.length];
- openInfoModal("برافو عليك 👏","<div class=\"note\" style=\"text-align:center;font-size:15px;line-height:2\">"+msg+"</div>","<button class=\"btn\" id=\"infoClose2\">كمّل 💪</button>");
+ openInfoModal("برافو عليك 👏","<div class=\"note\" style=\"text-align:center;font-size:15px;line-height:2\">"+msg+"</div>","<button class=\"btn\" id=\"infoClose2\">يلا نحتفل 🎉</button>");
 }
 function parseIntentTarget(){
  const s=(S.intentValue||"").replace(/,/g,"");
@@ -1244,7 +1244,7 @@ function downloadSkillFile(){
  }catch(e){
    try{
      const txt=decodeURIComponent(escape(atob(EFT_SKILL_B64)));
-     openInfoModal("ملف الـ skill","<div class=\"note\" style=\"margin-bottom:8px\">التنزيل المباشر مش متاح على متصفحك — انسخ النص ده واحفظه في ملف باسم SKILL.md</div><textarea id=\"skillBox\" readonly style=\"width:100%;height:200px;font-size:11px;direction:ltr;text-align:left\">"+esc(txt)+"</textarea>","<button class=\"btn\" id=\"copySkillBtn\">نسخ النص</button>");
+     openInfoModal("ملف الـ skill","<div class=\"note\" style=\"margin-bottom:8px\">التنزيل المباشر غير متاح على متصفحك — انسخ هذا النص واحفظه في ملف باسم SKILL.md</div><textarea id=\"skillBox\" readonly style=\"width:100%;height:200px;font-size:11px;direction:ltr;text-align:left\">"+esc(txt)+"</textarea>","<button class=\"btn\" id=\"copySkillBtn\">نسخ النص</button>");
    }catch(e2){}
  }
 }
@@ -1298,7 +1298,7 @@ function screens1(){
         <button class="chip ${st==="بعد"?"sel":""}" data-seg="actStatus~${i}" data-val="بعد">متناغم فيما بعد</button>
         <button class="chip ${st==="لا"?"sel":""}" data-seg="actStatus~${i}" data-val="لا">غير متناغم</button>
       </div>
-      ${st==="بعد"?`<div class="note">هتروح بنك الأفكار عند الانتقال للترتيب.</div>`:st==="لا"?`<div class="note">هتتحذف عند الانتقال للترتيب.</div>`:""}</div>`;}).join("");
+      ${st==="بعد"?`<div class="note">ستنتقل إلى بنك الأفكار عند الانتقال للترتيب.</div>`:st==="لا"?`<div class="note">ستُحذف عند الانتقال للترتيب.</div>`:""}</div>`;}).join("");
     h+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
        <button class="minibtn" data-addact="1">+ إضافة فعل</button></div>`;
     h+=ideaBankBlock("act");
@@ -1375,7 +1375,7 @@ function screens1(){
       +F.ta("cleanseNotes","ملاحظاتي بعد التنظيف","ما الذي تغيّر؟");}});
 
   L.push({id:"eft",skip:true,sec:"القسم الثاني",eyebrow:"القسم الثاني · ثانيًا",title:"برنامج EFT",
-   lede:"مواضيعك هي الطاقات غير المتناغمة اللي حددتها بالترتيب. لكل موضوع: انسخ محتواه وألصقه في الـ skill الخاصة بك على Claude، ثم الصق ناتج البرنامج هنا داخل المربع الخاص به.",
+   lede:"مواضيعك هي الطاقات غير المتناغمة التي حددتها بالترتيب. لكل موضوع: انسخ محتواه وألصقه في الـ skill الخاصة بك على Claude، ثم الصق ناتج البرنامج هنا داخل المربع الخاص به.",
    render:()=>{const list=energyList();
      if(!list.length)return `<div class="empty">لا توجد طاقات لبناء البرنامج عليها.</div>`;
      let h="";
@@ -1593,7 +1593,7 @@ function filterScreens(t,d,sec){
     return p.map(it=>tuneBlock(S.pool.indexOf(it),it)).join("");}});
 
  L.push({id:"filter-result",sec:sec,eyebrow:"الفلترة · النتيجة",title:"الأفعال الباقية",
-  lede:"عالية التناغم وسهلة التنفيذ هي التي تكمل إجباريًا. لو طاقة غير متناغمة فضلت بلا فعل يحلها، هنقترح لك من الاحتياطي.",
+  lede:"عالية التناغم وسهلة التنفيذ هي التي تكمل إجباريًا. إذا بقيت طاقة غير متناغمة بلا فعل يحلها، سنقترح لك من الاحتياطي.",
   render:()=>{
     const s=byPlanPriority(survivors(1)),res=reserve(1),out=P(1).filter(x=>x.resolves==="لا"),low=resolved(1).filter(x=>x.align==="منخفض");
     let h=`<div class="plan">${s.length?s.map(i=>`<div class="pcard hero" style="position:relative;padding-left:34px" data-carditem="${S.pool.indexOf(i)}">${scoreBadge(i)}${i.promoted?`<button class="card-undo" data-pl="${S.pool.indexOf(i)}.promoted" data-val="1" title="إلغاء الإضافة من الاحتياطي">✕</button>`:""}<span class="tag">تكمل المسار</span><h4>${esc(i.text)}</h4><div class="kv">${esc(i.source)}</div></div>`).join(""):`<div class="empty">لا توجد أفعال عالية التناغم وسهلة التنفيذ بعد.</div>`}</div>`;
@@ -1734,7 +1734,7 @@ function planCardFn(ctx){
    const recurring=df.repeatType==="recurring";const routine=df.repeatType==="routine";
    const reps=recurring?repsArray(it):null;
    const isDone=cardDone(it,ctx);
-   const checkAttr=routine?`data-routinetoggle="${i}"`:`data-donetoggle="${i}"`;
+   const checkAttr=routine?`data-routinetoggle="${i}"`:`data-donetoggle="${i}"${ctx==="today"?` data-ctx="today"`:""}`;
    const edge=recurring;const dn=edge?reps.filter(Boolean).length:0;
    return `<div class="pcard ${n===0&&!isDone?"hero":""} ${isDone?"done":""} ${edge?"has-prog":""}" data-carditem="${i}">
      <div class="plan-header" data-accordion="${i}">
@@ -1746,7 +1746,7 @@ function planCardFn(ctx){
      ${edge?`<span class="rep-mini">${dn}/${reps.length}</span><div class="rep-edge" title="${dn} من ${reps.length}"><i style="width:${Math.round(dn/reps.length*100)}%"></i></div>`:""}
      ${open?`<div class="plan-detail">
        ${recurring?`<div class="rep-row rep-row-detail">
-       ${reps.map((d,ri)=>{const td=d&&(it.repeatDates||[])[ri]===todayKey();return `<button class="rep-box ${d?"checked":""} ${td?"today":""}" data-reptoggle="${i}.${ri}" title="${td?"خطوة النهاردة":"الخطوة "+(ri+1)}">${d?"✓":ri+1}</button>`;}).join("")}
+       ${reps.map((d,ri)=>{const td=d&&(it.repeatDates||[])[ri]===todayKey();return `<button class="rep-box ${d?"checked":""} ${td?"today":""}" data-reptoggle="${i}.${ri}" title="${td?"خطوة اليوم":"الخطوة "+(ri+1)}">${d?"✓":ri+1}</button>`;}).join("")}
        <span class="rep-count">${reps.filter(Boolean).length}/${reps.length}</span>
      </div>`:""}
        ${it.titleEditMode?`<div class="title-edit-row">
@@ -1806,13 +1806,13 @@ function renderFxPanel(){
    <div class="field"><label class="fl">عملة النية المالية</label>
      <select data-bind="intentCurrency"><option value="" ${S.intentCurrency?"":"selected"}>تلقائي${guessIntentCurrency()?` (${guessIntentCurrency()})`:" — بدون تحويل"}</option>
      ${CURRENCIES.map(c=>`<option value="${c[0]}" ${S.intentCurrency===c[0]?"selected":""}>${c[1]} (${c[0]})</option>`).join("")}</select>
-     <div class="note">كل الحركات بتتحوّل للعملة دي عشان تتقارن بالهدف.</div></div>
+     <div class="note">كل الحركات تُحوَّل إلى هذه العملة لتُقارن بالهدف.</div></div>
    <label class="fl">كام وحدة من العملة = 1 دولار</label>
    ${show.map(c=>{const peg=FX_PEGGED[c[0]];const v=(S.fxRates||{})[c[0]]||"";
      return `<div class="row" style="align-items:center;margin-bottom:6px"><div style="flex:1;font-size:13.5px">${c[1]} <span class="note">(${c[0]})</span></div>
        <input type="number" inputmode="decimal" data-bind="fxRates~${c[0]}" data-rerender="1" value="${esc(v)}" placeholder="${peg?peg:"السعر"}" style="max-width:110px"></div>`;}).join("")}
    <button class="btn ghost" id="fxFetchBtn" style="width:100%;margin-top:8px">🌐 تحديث الأسعار من الإنترنت</button>
-   <div class="note" style="margin-top:6px">${upd?`آخر تحديث: ${upd.getDate()}/${upd.getMonth()+1}/${upd.getFullYear()}`:"لسه ماتحدّثتش من الإنترنت"} — الأسعار بتتحفظ على جهازك وتشتغل من غير إنترنت. العملات المربوطة بالدولار (السعودي، الإماراتي، القطري...) أسعارها ثابتة ومش محتاجة تحديث.</div>
+   <div class="note" style="margin-top:6px">${upd?`آخر تحديث: ${upd.getDate()}/${upd.getMonth()+1}/${upd.getFullYear()}`:"لم تُحدَّث من الإنترنت بعد"} — الأسعار تُحفظ على جهازك وتعمل بدون إنترنت. العملات المربوطة بالدولار (السعودي، الإماراتي، القطري...) أسعارها ثابتة ولا تحتاج إلى تحديث.</div>
  </div></details>`;
 }
 function renderLedgerHero(){
@@ -1827,7 +1827,7 @@ function renderLedgerHero(){
    <div class="ledger-hero-stats">
      <div class="stat-pill"><b>${fmtMoney(st.expense)}</b>مصروفات</div>
    </div>
-   ${st.missing.length?`<div class="ledger-hero-sub" style="margin-top:10px;color:#8a3a1a">⚠️ في حركات بعملة (${st.missing.map(curLabel).map(esc).join("، ")}) مش محسوبة لأن سعر صرفها مش متحدد — حدّده من «أسعار الصرف» تحت.</div>`:""}
+   ${st.missing.length?`<div class="ledger-hero-sub" style="margin-top:10px;color:#8a3a1a">⚠️ في حركات بعملة (${st.missing.map(curLabel).map(esc).join("، ")}) غير محسوبة لأن سعر صرفها غير محدد — حدّده من «أسعار الصرف» بالأسفل.</div>`:""}
  </div>`;
 }
 function renderLedger(){
@@ -1849,7 +1849,7 @@ function renderLedger(){
  </div>`;
  h+=`<details data-dkey="insights"><summary>Insights</summary><div class="in">
    <div class="kv"><b>الصافي (الدخل − المصروفات):</b> ${fmtMoney(st.income-st.expense)}</div>
-   <div class="kv"><b>نسبة المصروفات من الدخل:</b> ${st.income?Math.round(st.expense/st.income*100)+"%":"— (لسه مفيش دخل مسجّل)"}</div>
+   <div class="kv"><b>نسبة المصروفات من الدخل:</b> ${st.income?Math.round(st.expense/st.income*100)+"%":"— (لا يوجد دخل مسجّل بعد)"}</div>
  </div></details>`;
  h+=`<div class="rule"></div>`;
  h+=entries.length?entries.map(e=>{
@@ -1880,11 +1880,11 @@ function renderLedger(){
        <div class="ledger-row-top"><div class="ledger-row-amt">${e.type==="income"?"+":"−"}${fmtMoney(e.amount)} <span style="font-size:.72em">${esc(curLabel(e.currency||baseCurrency()))}</span></div>
          ${e.day?`<div class="ledger-row-date">${e.day} ${esc(S.month)}</div>`:""}</div>
        ${(()=>{const base=baseCurrency();if(!e.currency||!base||e.currency===base)return "";const v=toBase(e.amount,e.currency);
-         return `<div class="ledger-row-note">${v===null?"⚠️ سعر الصرف غير محدد — مش محسوبة":`≈ ${fmtMoney(v)} ${esc(curLabel(base))}`}</div>`;})()}
+         return `<div class="ledger-row-note">${v===null?"⚠️ سعر الصرف غير محدد — غير محسوبة":`≈ ${fmtMoney(v)} ${esc(curLabel(base))}`}</div>`;})()}
        ${e.note?`<div class="ledger-row-note">${esc(e.note)}</div>`:""}
      </div>
    </div>`;
- }).join(""):`<div class="empty">لسه مفيش أي حركات مسجّلة هذا الشهر.</div>`;
+ }).join(""):`<div class="empty">لا توجد أي حركات مسجّلة هذا الشهر بعد.</div>`;
  h+=renderFxPanel();
  return h;
 }
@@ -1903,12 +1903,12 @@ function renderTodayWidget(){
    <div class="today-icon" aria-hidden="true">${missionIcon()}</div>
    <div class="today-mid">
      <div class="today-value">${esc(S.intentValue||"—")}</div>
-     ${(()=>{let pv="";try{pv=Natiga.today().proverb;}catch(e){}return pv?`<button class="today-wisdom" id="ntDayLine" title="تقويم النهاردة"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>${esc(pv)}</span></button>`:"";})()}
+     ${(()=>{let pv="";try{pv=Natiga.today().proverb;}catch(e){}return pv?`<button class="today-wisdom" id="ntDayLine" title="تقويم اليوم"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>${esc(pv)}</span></button>`:"";})()}
    </div>
    ${renderProgressRing(todayProgressStats(),false,null,"orange")}
  </div>
  <div class="task-toolbar between">
-   <div class="today-heading" style="margin:0">مهام النهاردة</div>
+   <div class="today-heading" style="margin:0">مهام اليوم</div>
    <div style="display:flex;gap:8px;align-items:center">
      ${undoBtnHTML()}
      <button class="iconbtn icononly reorder-toggle-btn ${reorderOn?"on":""}" id="reorderToggleBtn" title="ترتيب المهام يدويًا"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg></button>
@@ -1992,7 +1992,7 @@ function renderFullPlanList(){
    daysOpen.forEach(g=>{h+=`<div class="rule"></div><h3 style="font-size:16px;margin:0 0 10px">إضافات يوم ${g.d+1}</h3>
      <div class="plan">${g.items.map((it,n)=>cardFn(it,n+1)).join("")}</div>`;});
    if(!anyOpen){
-     h+=doneAll.length?`<div class="okbox">خلصت كل مهام الشهر 🎉</div>`
+     h+=doneAll.length?`<div class="okbox">أنهيت كل مهام الشهر 🎉</div>`
        :(filterActive?"":`<div class="empty">لم تكتمل فلترة اليوم الأول بعد.</div>`);
    }
    if(doneAll.length){
@@ -2005,7 +2005,7 @@ function renderFullPlanList(){
  const resv=allReserve();
  if(resv.length){
    h+=`<details data-dkey="reserve"><summary>احتياطي (عالي التناغم، صعب التنفيذ) · ${resv.length}</summary><div class="in">
-     <div class="note" style="margin:0 0 10px">خلصت الأفعال السهلة ولقيت وقت إضافي؟ اضغط على السهم جنب أي فعل ليدخل خطة الشهر فورًا.</div>
+     <div class="note" style="margin:0 0 10px">أنهيت الأفعال السهلة ووجدت وقتًا إضافيًا؟ اضغط على السهم بجانب أي فعل ليدخل خطة الشهر فورًا.</div>
      ${resv.map(it=>{const i=S.pool.indexOf(it);
        return `<div class="opt resv-row"><button class="promote-btn" data-addtoplan="${i}" title="نقل لخطة الشهر" aria-label="نقل لخطة الشهر"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg></button><div style="flex:1">
          <div class="t" style="font-weight:500;display:flex;align-items:center">${scoreDot(it)}${esc(it.text)}</div>
@@ -2079,11 +2079,12 @@ function goPrev(){
 }
 function render(keep){
  const y=window.scrollY;
+ try{if(S&&S.dayCelebratedKey&&S.dayCelebratedKey===todayKey()){const ds=todayProgressStats();if(ds.done<ds.total)S.dayCelebratedKey=null;}}catch(e){}
  document.getElementById("mtab1").className=section===1?"on":"";
  document.getElementById("mtab2").className=section===2?"on":"";
  document.getElementById("mtab3").className=section===3?"on":"";
  document.getElementById("subTabs").style.display=section===1?"flex":"none";
- const errBox=(where,err)=>`<div class="empty" style="padding:20px;text-align:center;line-height:1.9">⚠️ حصل خطأ في عرض ${where}.<br>بياناتك آمنة — جرّب قسم تاني أو تواصل مع أشرف.<br><br><span style="font-size:11.5px;direction:ltr;display:inline-block;color:var(--ink-faint)">${esc((err&&err.message)?err.message:"")}</span></div>`;
+ const errBox=(where,err)=>`<div class="empty" style="padding:20px;text-align:center;line-height:1.9">⚠️ حدث خطأ في عرض ${where}.<br>بياناتك آمنة — جرّب قسمًا آخر أو تواصل مع أشرف.<br><br><span style="font-size:11.5px;direction:ltr;display:inline-block;color:var(--ink-faint)">${esc((err&&err.message)?err.message:"")}</span></div>`;
  if(section===2||section===3){
    document.getElementById("progBar").style.width="100%";
    let inner="";
@@ -2210,8 +2211,10 @@ document.addEventListener("click",e=>{
   else if(t.dataset.donetoggle!=null){const it=S.pool[+t.dataset.donetoggle];const df=it.def||{};
     if(df.repeatType==="recurring"){
       const reps=repsArray(it);it.repeatDates=it.repeatDates||[];const k=todayKey();
+      const ti=t.dataset.ctx==="today"?reps.findIndex((v,j)=>v&&it.repeatDates[j]===k):-1;
       const nx=reps.findIndex(v=>!v);
-      if(nx>=0){reps[nx]=true;it.repeatDates[nx]=k;justCompleted=true;}
+      if(ti>=0){reps[ti]=false;it.repeatDates[ti]=null;}
+      else if(nx>=0){reps[nx]=true;it.repeatDates[nx]=k;justCompleted=true;}
       else{const last=reps.length-1;reps[last]=false;it.repeatDates[last]=null;}
       it.done=reps.every(Boolean);
     }
@@ -2335,7 +2338,7 @@ document.addEventListener("click",e=>{
    const txt=(document.getElementById("importText").value||"").trim();
    let backup=null;
    try{backup=JSON.parse(txt);}catch(err){}
-   if(!backup){openInfoModal("تعذّر الاستيراد","<div class=\"note\">النص المُلصق مش صالح. تأكد إنك نسخت النص كامل من غير ما ينقص منه حاجة.</div>","");}
+   if(!backup){openInfoModal("تعذّر الاستيراد","<div class=\"note\">النص المُلصق غير صالح. تأكد أنك نسخت النص كاملًا دون أن ينقص منه شيء.</div>","");}
    else applyBackupObject(backup);
  }
  else if(id==="archBack")closeArchive();
@@ -2360,7 +2363,7 @@ function closeRail(){document.getElementById("rail").classList.remove("open");do
 function openConfirmModal(){
  const hasWork=hasContent(S);
  document.getElementById("confirmMsg").textContent=hasWork
-   ?(()=>{const nr=allReserve().filter(x=>!x.done).length;return `سيتم حفظ خطة ${S.month} ${S.year} الحالية في السجل، ${nr?`ونقل ${nr===1?"الفعل الاحتياطي اللي ماتعملش":nr+" أفعال احتياطية ماتعملتش"} لبنك الأفكار المؤجلة، `:""}ثم فتح شهر جديد فارغ. هل تريد المتابعة؟`;})()
+   ?(()=>{const nr=allReserve().filter(x=>!x.done).length;return `سيتم حفظ خطة ${S.month} ${S.year} الحالية في السجل، ${nr?`ونقل ${nr===1?"الفعل الاحتياطي الذي لم يُنفَّذ":nr+" أفعال احتياطية لم تُنفَّذ"} إلى بنك الأفكار المؤجلة، `:""}ثم فتح شهر جديد فارغ. هل تريد المتابعة؟`;})()
    :"سيتم فتح شهر جديد فارغ. هل تريد المتابعة؟";
  document.getElementById("confirmModal").classList.add("open");
 }
@@ -2467,7 +2470,7 @@ function buildBackupText(){
 }
 function applyBackupObject(backup){
  if(!backup||typeof backup!=="object"||!backup.main){
-   openInfoModal("تعذّر الاستيراد","<div class=\"note\">النص أو الملف ده مش نسخة احتياطية صحيحة من هذا التطبيق.</div>","");
+   openInfoModal("تعذّر الاستيراد","<div class=\"note\">هذا النص أو الملف ليس نسخة احتياطية صحيحة من هذا التطبيق.</div>","");
    return false;
  }
  try{
@@ -2475,7 +2478,7 @@ function applyBackupObject(backup){
    if(backup.archive)localStorage.setItem(ARCHIVE_KEY,JSON.stringify(backup.archive));
  }catch(err){}
  load();closeInfoModal();render();
- setTimeout(()=>{openInfoModal("تم الاسترجاع ✓","<div class=\"note\">اتحمّلت النسخة الاحتياطية بنجاح، وبياناتك دلوقتي محدّثة.</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");},150);
+ setTimeout(()=>{openInfoModal("تم الاسترجاع ✓","<div class=\"note\">تم تحميل النسخة الاحتياطية بنجاح، وبياناتك الآن محدّثة.</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");},150);
  return true;
 }
 function exportBackupFileAttempt(){
@@ -2493,7 +2496,7 @@ function openExportModal(){
  const text=buildBackupText();
  document.getElementById("infoTitle").textContent="نسخة احتياطية";
  document.getElementById("infoBody").innerHTML=`
-   <div class="note" style="margin:0 0 10px">اضغط «نسخ النص» واحفظه في أي مكان تقدر ترجعله بعدين (Notes، واتساب لنفسك، إيميل...) — دي أضمن طريقة تشتغل على كل الأجهزة والمتصفحات.</div>
+   <div class="note" style="margin:0 0 10px">اضغط «نسخ النص» واحفظه في أي مكان يمكنك الرجوع إليه لاحقًا (Notes، واتساب لنفسك، إيميل...) — هذه أضمن طريقة تعمل على كل الأجهزة والمتصفحات.</div>
    <textarea id="backupText" readonly style="width:100%;min-height:110px;font-size:10.5px;direction:ltr;text-align:left;font-family:monospace">${esc(text)}</textarea>`;
  document.getElementById("infoActions").innerHTML=`
    <button class="btn" id="copyBackupBtn">نسخ النص</button>
@@ -2503,7 +2506,7 @@ function openExportModal(){
 function openImportModal(){
  document.getElementById("infoTitle").textContent="استيراد نسخة احتياطية";
  document.getElementById("infoBody").innerHTML=`
-   <div class="note" style="margin:0 0 10px">الصق هنا النص اللي نسخته قبل كده:</div>
+   <div class="note" style="margin:0 0 10px">الصق هنا النص الذي نسخته سابقًا:</div>
    <textarea id="importText" placeholder="الصق النص هنا..." style="width:100%;min-height:110px;font-size:10.5px;direction:ltr;text-align:left;font-family:monospace"></textarea>
    <div class="note" style="margin:10px 0 6px">اضغط مطوّلًا داخل المربع واختر «لصق» — أو استورد من ملف:</div>
    <button class="minibtn" id="importFilePick">اختيار ملف من الجهاز</button>`;
@@ -2658,13 +2661,13 @@ async function doInstall(){
    }catch(e){deferredPrompt=null;}
  }
  if(isIOS()){
-   openInfoModal("تثبيت التطبيق","<div class=\"note\" style=\"line-height:2\">للتثبيت على الآيفون:<br>1) افتح الصفحة في متصفح <b>Safari</b> (لازم Safari تحديدًا)<br>2) اضغط على زر المشاركة ⬆︎ تحت الشاشة<br>3) اختر «إضافة إلى الشاشة الرئيسية»</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");
+   openInfoModal("تثبيت التطبيق","<div class=\"note\" style=\"line-height:2\">للتثبيت على الآيفون:<br>1) افتح الصفحة في متصفح <b>Safari</b> (يجب أن يكون Safari تحديدًا)<br>2) اضغط على زر المشاركة ⬆︎ تحت الشاشة<br>3) اختر «إضافة إلى الشاشة الرئيسية»</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");
  }else{
-   openInfoModal("تثبيت التطبيق","<div class=\"note\" style=\"line-height:2\">لتثبيت التطبيق على شاشتك الرئيسية:<br>افتح قائمة المتصفح (عادة ⋮ فوق يمين الشاشة)<br>واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».<br><br>لو الخيار ده مش ظاهر، جرّب فتح الصفحة من متصفح Chrome على أندرويد.</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");
+   openInfoModal("تثبيت التطبيق","<div class=\"note\" style=\"line-height:2\">لتثبيت التطبيق على شاشتك الرئيسية:<br>افتح قائمة المتصفح (عادة ⋮ فوق يمين الشاشة)<br>واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».<br><br>إذا لم يظهر هذا الخيار، جرّب فتح الصفحة من متصفح Chrome على أندرويد.</div>","<button class=\"btn\" id=\"infoClose2\">تمام</button>");
  }
 }
 refreshInstallBtn();
-const APP_VERSION="v31";
+const APP_VERSION="v32";
 if("serviceWorker" in navigator&&location.protocol==="https:"){
  const verOf=t=>{const m=/protocol-(v\d+)/.exec(t||"");return m?m[1]:"";};
  let reloading=false;
@@ -2692,7 +2695,7 @@ if("serviceWorker" in navigator&&location.protocol==="https:"){
 }
 try{
  const prev=localStorage.getItem("sm_app_version");
- if((prev&&prev!==APP_VERSION)||(!prev&&localStorage.getItem(KEY)))setTimeout(()=>showUpdateToast("تم تحديث التطبيق لنسخة أحدث ✓"),900);
+ if((prev&&prev!==APP_VERSION)||(!prev&&localStorage.getItem(KEY)))setTimeout(()=>showUpdateToast("تم تحديث التطبيق إلى نسخة أحدث ✓"),900);
  localStorage.setItem("sm_app_version",APP_VERSION);
  sessionStorage.removeItem("sm_just_updated");
 }catch(e){}
@@ -2702,7 +2705,7 @@ function showUpdateBanner(reg){
  el.id="updateBanner";
  el.className="update-banner";
  el.innerHTML=`<div class="ub-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></div>
-   <div class="ub-text"><span class="ub-title">نسخة جديدة متاحة</span><span class="ub-sub">حدّث عشان تاخد آخر التحسينات</span></div>
+   <div class="ub-text"><span class="ub-title">نسخة جديدة متاحة</span><span class="ub-sub">حدّث لتحصل على آخر التحسينات</span></div>
    <button id="updateNowBtn">تحديث الآن</button>
    <button id="updateLaterBtn" title="لاحقًا">✕</button>`;
  document.body.appendChild(el);
@@ -2747,9 +2750,9 @@ if(section===2)S.planView="today";
  const info=diagText(err);
  const scr=document.getElementById("screen");
  if(scr)scr.innerHTML=`<div class="empty" style="padding:22px 16px;text-align:center;line-height:1.9">
-   ⚠️ حصل خطأ غير متوقع أثناء عرض بياناتك.<br><br>
-   <b>بياناتك محفوظة وآمنة</b> — المشكلة في العرض بس.<br><br>
-   ابعت التفاصيل دي لأشرف عشان يتصلح:
+   ⚠️ حدث خطأ غير متوقع أثناء عرض بياناتك.<br><br>
+   <b>بياناتك محفوظة وآمنة</b> — المشكلة في العرض فقط.<br><br>
+   أرسل هذه التفاصيل إلى أشرف لإصلاح المشكلة:
    <textarea id="diagBox" readonly style="width:100%;height:150px;margin-top:12px;font-size:11.5px;direction:ltr;text-align:left">${esc(info)}</textarea>
    <button class="btn" id="copyDiagBtn" style="margin-top:10px">نسخ تفاصيل الخطأ</button>
  </div>`;
