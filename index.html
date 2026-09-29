@@ -466,6 +466,13 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 @keyframes swipeInR{from{opacity:.4;transform:translateX(28px)}to{opacity:1;transform:none}}
 #screen.swipe-in-l{animation:swipeInL .3s ease-out}
 #screen.swipe-in-r{animation:swipeInR .3s ease-out}
+.fp-tabs{margin-bottom:12px;flex:0 0 auto}
+.fp-tabs button{font-size:12.8px;padding:8px 6px;white-space:nowrap}
+.fp-list{display:flex;flex-direction:column;gap:7px}
+.fp-list.fp-wrapx{flex-direction:row;flex-wrap:wrap}
+.fp-list .fp-opt,.fp-chips .chip{font-size:13px;padding:6px 14px;line-height:1.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:start}
+.fp-chips{gap:7px}
+.fp-note{font-size:12px;margin-top:10px;line-height:1.7}
 .np-card{position:fixed;left:50%;bottom:22px;z-index:95;width:calc(100% - 32px);max-width:420px;box-sizing:border-box;
   transform:translateX(-50%) translateY(30px);opacity:0;pointer-events:none;transition:all .35s var(--spring);
   background:var(--surface);border:1px solid var(--gold);border-radius:16px;padding:14px 14px 12px;box-shadow:0 10px 30px rgba(90,62,18,.22);
@@ -511,6 +518,14 @@ select.meta-pill{font-family:inherit;cursor:pointer;-webkit-appearance:auto;appe
 .confirm-actions{display:flex;flex-direction:column;gap:10px;flex:0 0 auto}
 .confirm-actions .btn{width:100%}
 #infoBody{overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0}
+#infoBody{scrollbar-width:none;-ms-overflow-style:none}
+#infoBody::-webkit-scrollbar{display:none;width:0;height:0}
+.about-box{direction:ltr;text-align:center;font-family:Georgia,"Times New Roman",serif;color:var(--ink-soft);padding:4px 0 6px}
+.about-box .ab-l1{font-size:15.5px;line-height:1.6;letter-spacing:.2px}
+.about-box .ab-l2{font-size:15.5px;line-height:1.6;margin-top:2px}
+.about-box .ab-name{font-size:18px;font-weight:700;color:var(--gold-deep);margin-top:6px;letter-spacing:.3px}
+.about-box .ab-by{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-faint);margin-top:18px}
+.about-box .ab-link{display:inline-block;margin-top:4px;font-size:17px;font-weight:700;color:var(--gold-deep);text-decoration:none;border-bottom:1.5px solid var(--gold);padding-bottom:1px}
 .confirm-card.celebrate{text-align:center}
 .confirm-card.celebrate h3{padding:0 40px}
 .confirm-card.celebrate #infoBody{overflow:visible;flex:0 0 auto}
@@ -2363,7 +2378,7 @@ document.addEventListener("click",e=>{
  else if(id==="importBtn")openImportModal();
  else if(id==="notifBtn"){closeRail();Notif.click();return;}
  else if(id==="aboutBtn"){
-   openInfoModal("About","<div style=\"direction:ltr;text-align:center;line-height:1.9;font-size:14.5px;color:var(--ink-soft)\">This app designed and developed with ❤️<br>for the <b style=\"color:var(--gold-deep)\">Soul Meeting Community</b><br><br>By<br><a href=\"https://www.ashraf-reda.com\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--gold-deep);font-weight:700;text-decoration:underline\">Ashraf Reda</a></div>","");
+   openInfoModal("About",'<div class="about-box"><div class="ab-l1">This app<br>designed and developed</div><div class="ab-l2">with ❤️ for</div><div class="ab-name">Soul Meeting Community.</div><div class="ab-by">By</div><a class="ab-link" href="https://www.ashraf-reda.com" target="_blank" rel="noopener">Ashraf Reda</a></div>',"",true);
  }
  else if(id==="ideaBankBtn"){navigateTo(2,"d7-1-ideas");}
  else if(id==="skillDlBtn"){closeRail();downloadSkillFile();}
@@ -2405,29 +2420,38 @@ try{document.documentElement.style.overscrollBehaviorX="none";document.body.styl
  const mobile=()=>{const r=rail();return r&&getComputedStyle(r).position==="fixed";};
  const isOpen=()=>rail().classList.contains("open");
  const blocked=()=>document.querySelector(".confirm-modal.open,#infoModal.open,.nt-day-modal.open,.archive-panel.open,.natiga-panel.open");
- /* تبديل التابات بالسحب: المحتوى الحالي بيتسحب مع الصباع والتاب التاني بيدخل مكانه، والمربع الأبيض بيتنقل بين التابين */
+ /* تبديل التابات بالسحب (خطة الشهر + تابات نافذة التصفية): المحتوى الحالي بيتسحب مع الصباع والتاب المجاور بيدخل من ناحيته، والمربع الأبيض بيتنقل */
  let T=null,bypass=false;
+ const GROUPS={
+   plan:{attr:"viewmode",order:["today","list"],root:()=>document.querySelector(".main"),cur:()=>(S&&S.planView==="list")?"list":"today",
+     render:to=>{const keep=S.planView;let h="";try{S.planView=to;h=to==="list"?renderFullPlanList():renderTodayWidget();}catch(e){}S.planView=keep;return h;},
+     commit:to=>{const b=document.querySelector('[data-viewmode="'+to+'"]');if(b){bypass=true;b.click();bypass=false;}}},
+   fp:{attr:"filtertab",get order(){return FP_TABS.map(x=>x[0]);},root:()=>document.querySelector("#infoModal .confirm-card"),cur:()=>filterPanelTab,
+     render:to=>{try{return renderFilterInner(to);}catch(e){return "";}},
+     commit:to=>{filterPanelTab=to;renderFilterPanelBody();}}
+ };
  /* الضغط على زرار التاب بيعمل نفس حركة السحب */
  document.addEventListener("click",e=>{
-   if(bypass)return;const b=e.target.closest&&e.target.closest("[data-viewmode]");if(!b||T)return;
-   const from=(S&&S.planView==="list")?"list":"today";if(b.dataset.viewmode===from)return;
-   if(!document.querySelector(".pv-wrap"))return;
+   if(bypass||T)return;const b=e.target.closest&&e.target.closest("[data-viewmode],[data-filtertab]");if(!b)return;
+   const g=b.dataset.filtertab!=null?"fp":"plan",G=GROUPS[g],from=G.cur(),to=b.dataset[G.attr];if(to===from)return;
+   const fi=G.order.indexOf(from),ti=G.order.indexOf(to);if(fi<0||ti<0)return;
    e.preventDefault();e.stopImmediatePropagation();
-   if(!tabSetup(0))return;const d=T.dir;tabEnd(d*T.W);
+   if(!tabSetup(g,ti>fi?1:-1,to))return;tabEnd(T.dir*T.W);
  },true);
- function tabSetup(dx){
-   const wrap=document.querySelector(".pv-wrap"),cur=wrap&&wrap.querySelector(".pv-cur"),vt=document.querySelector(".view-toggle");if(!cur||!vt)return false;
-   const from=(S.planView==="list")?"list":"today",to=from==="list"?"today":"list";
-   const dir=from==="today"?1:-1; /* ترتيب عربي: القائمة على الشمال، فالسحب من الشمال لليمين يجيبها */
-   const bFrom=vt.querySelector('[data-viewmode="'+from+'"]'),bTo=vt.querySelector('[data-viewmode="'+to+'"]'),ind=vt.querySelector(".vt-ind");
-   const vr=vt.getBoundingClientRect(),rf=bFrom.getBoundingClientRect(),rt=bTo.getBoundingClientRect();
-   let html="";const keep=S.planView;try{S.planView=to;html=to==="list"?renderFullPlanList():renderTodayWidget();}catch(e){}S.planView=keep;
-   const next=document.createElement("div");next.className="pv-next";next.innerHTML=html;
+ function tabSetup(g,dx,forceTo){
+   const G=GROUPS[g],root=G.root();if(!root)return false;
+   const wrap=root.querySelector(".pv-wrap"),cur=wrap&&wrap.querySelector(".pv-cur"),vt=root.querySelector(".view-toggle");if(!cur||!vt)return false;
+   const from=G.cur(),fi=G.order.indexOf(from),dir=dx>0?1:-1;
+   const to=forceTo||G.order[fi+dir]||null;
+   const ind=vt.querySelector(".vt-ind"),vr=vt.getBoundingClientRect(),bFrom=vt.querySelector('[data-'+G.attr+'="'+from+'"]'),bTo=to&&vt.querySelector('[data-'+G.attr+'="'+to+'"]');
+   if(!bFrom||!ind)return false;
+   const rf=bFrom.getBoundingClientRect(),rt=bTo?bTo.getBoundingClientRect():rf;
+   const next=document.createElement("div");next.className="pv-next";next.innerHTML=to?G.render(to):"";
    wrap.classList.add("pv-drag");wrap.appendChild(next);
    ind.style.width=rf.width+"px";ind.style.transform="translateX("+(rf.left-vr.left)+"px)";
    vt.classList.add("vt-drag");
-   T={wrap,cur,next,vt,ind,to,dir,W:wrap.getBoundingClientRect().width,gap:24,x0:rf.left-vr.left,x1:rt.left-vr.left};
-   tabMove(dx);return true;
+   T={G,wrap,cur,next,vt,ind,to,dir,W:wrap.getBoundingClientRect().width,gap:24,x0:rf.left-vr.left,x1:rt.left-vr.left};
+   if(!forceTo)tabMove(dx);return true;
  }
  function tabPos(off){
    const t=T,p=Math.min(1,Math.abs(off)/t.W);
@@ -2435,29 +2459,34 @@ try{document.documentElement.style.overscrollBehaviorX="none";document.body.styl
    t.next.style.transform="translateX("+(off-t.dir*(t.W+t.gap))+"px)";
    t.ind.style.transform="translateX("+(t.x0+(t.x1-t.x0)*p)+"px)";
  }
- function tabMove(dx){if(!T)return;let off=dx;if(Math.sign(dx)!==T.dir)off=dx*0.2;else off=Math.max(-T.W,Math.min(T.W,dx));tabPos(off);}
+ function tabMove(dx){if(!T)return;let off;if(!T.to||Math.sign(dx)!==T.dir)off=dx*0.2;else off=Math.max(-T.W,Math.min(T.W,dx));tabPos(off);}
  function tabClean(){const t=T;T=null;if(!t)return;t.wrap.classList.remove("pv-drag","pv-anim");t.next.remove();t.cur.style.transform="";t.vt.classList.remove("vt-drag","vt-anim");t.ind.style.transform="";t.ind.style.width="";}
  function tabEnd(dx){
-   if(!T)return;const t=T,go=Math.sign(dx)===t.dir&&Math.abs(dx)>=Math.min(MIN,t.W*.25);
+   if(!T)return;const t=T,go=!!t.to&&Math.sign(dx)===t.dir&&Math.abs(dx)>=Math.min(MIN,t.W*.25);
    t.wrap.classList.add("pv-anim");t.vt.classList.add("vt-anim");void t.wrap.offsetWidth;
    tabPos(go?t.dir*(t.W+t.gap):0);
-   setTimeout(()=>{if(go){T=null;const b=document.querySelector('[data-viewmode="'+t.to+'"]');if(b){bypass=true;b.click();bypass=false;}try{window.scrollTo(0,window.scrollY);}catch(e){}}else tabClean();},290);
+   setTimeout(()=>{if(go){T=null;t.G.commit(t.to);}else tabClean();},290);
  }
  document.addEventListener("touchstart",e=>{
-   st=null;if(e.touches.length!==1||!mobile()||blocked())return;
+   st=null;if(e.touches.length!==1)return;
    const t=e.touches[0],W=window.innerWidth;
+   const fpc=document.querySelector("#infoModal.open .fp-wrap");
+   if(fpc){const card=document.querySelector("#infoModal .confirm-card");if(!card||!card.contains(e.target))return;
+     for(let n=e.target;n&&n!==card;n=n.parentElement){const cs=getComputedStyle(n);if(/(auto|scroll)/.test(cs.overflowX)&&n.scrollWidth>n.clientWidth+2)return;}
+     st={x:t.clientX,y:t.clientY,tabs:"fp",lock:null};return;}
+   if(!mobile()||blocked())return;
    if(!isOpen()&&t.clientX<W-EDGE){
      /* سحب يمين/شمال جوه خطة الشهر = تبديل بين مهام اليوم والقائمة الكاملة */
      if(section!==2||!document.querySelector("[data-viewmode]"))return;
      const scr=document.querySelector(".main");if(!scr||!scr.contains(e.target))return;
      for(let n=e.target;n&&n!==scr;n=n.parentElement){const cs=getComputedStyle(n);if(/(auto|scroll)/.test(cs.overflowX)&&n.scrollWidth>n.clientWidth+2)return;if(/^(INPUT|TEXTAREA|SELECT)$/.test(n.tagName))return;}
-     st={x:t.clientX,y:t.clientY,tabs:true,lock:null};return;
+     st={x:t.clientX,y:t.clientY,tabs:"plan",lock:null};return;
    }
    st={x:t.clientX,y:t.clientY,open:isOpen(),lock:null,w:rail().getBoundingClientRect().width};
  },{passive:true});
  document.addEventListener("touchmove",e=>{
    if(!st)return;const t=e.touches[0],dx=t.clientX-st.x,dy=t.clientY-st.y;
-   if(st.lock===null){if(Math.abs(dx)<LOCK&&Math.abs(dy)<LOCK)return;st.lock=Math.abs(dx)>Math.abs(dy)*1.3?"h":"v";if(st.lock==="h"){if(st.tabs){if(!tabSetup(dx))st=null;}else rail().style.transition="none";}}
+   if(st.lock===null){if(Math.abs(dx)<LOCK&&Math.abs(dy)<LOCK)return;st.lock=Math.abs(dx)>Math.abs(dy)*1.3?"h":"v";if(st.lock==="h"){if(st.tabs){if(!tabSetup(st.tabs,dx))st=null;}else rail().style.transition="none";}}
    if(!st||st.lock!=="h")return;
    if(st.tabs){tabMove(dx);return;}
    const r=rail();let off;
@@ -2514,43 +2543,41 @@ function showSourcePopup(it){
 }
 function navigateTo(t,id){tab=+t;section=1;setCur(id);closeInfoModal();closeRail();render();}
 let filterPanelTab="energy";
-function renderFilterPanelBody(){
- const energies=energyList();
- const tabs=`<div class="view-toggle" style="margin-bottom:14px;flex:0 0 auto">
-   <button class="${filterPanelTab==="energy"?"on":""}" data-filtertab="energy">الطاقات/الأنماط</button>
-   <button class="${filterPanelTab==="axis"?"on":""}" data-filtertab="axis">محاور الحياة</button>
-   <button class="${filterPanelTab==="sort"?"on":""}" data-filtertab="sort">الترتيب</button>
- </div>`;
- let inner;
- if(filterPanelTab==="sort"){
+const FP_TABS=[["sort","الترتيب"],["energy","الأنماط"],["axis","محاور الحياة"]];
+function shortName(n){const w=String(n||"").trim().split(/\s+/);return w.length>4?w.slice(0,4).join(" ")+"…":n;}
+function renderFilterInner(tab){
+ if(tab==="sort"){
    const cur=S.planSort||"";
-   inner=`<div class="field" style="margin-bottom:0"><label class="fl">ترتيب مهام الشهر</label>
-     <div class="chips" style="flex-direction:column;align-items:stretch">
-       <button class="chip ${cur==="date"?"sel":""}" data-setsort="date">حسب تاريخ التنفيذ — الأقرب أولًا (الافتراضي)</button>
-       <button class="chip ${cur==="impact"?"sel":""}" data-setsort="impact">الأكثر حلًّا للأنماط أولًا</button>
-       <button class="chip ${cur===""?"sel":""}" data-setsort="">حسب مسار البروتوكول</button>
+   return `<div class="fp-list">
+       <button class="chip fp-opt ${cur==="date"?"sel":""}" data-setsort="date">تاريخ التنفيذ — الأقرب أولًا</button>
+       <button class="chip fp-opt ${cur==="impact"?"sel":""}" data-setsort="impact">الأكثر حلًّا للأنماط أولًا</button>
+       <button class="chip fp-opt ${cur===""?"sel":""}" data-setsort="">حسب مسار البروتوكول</button>
      </div>
-     <div class="note" style="margin-top:10px">أول ترتيبين يدمجان أفعال اليوم الأول والأيام السبعة في قائمة واحدة.</div>
-   </div>`;
- }else if(filterPanelTab==="axis"){
-   inner=`<div class="field" style="margin-bottom:0"><label class="fl">محاور الحياة</label>
-     <div class="chips">
+     <div class="note fp-note">أول ترتيبين يدمجان اليوم الأول والأيام السبعة.</div>`;
+ }
+ if(tab==="axis"){
+   return `<div class="chips fp-chips">
        <button class="chip ${!S.planFilterAxis?"sel":""}" data-setfilter="axis~-1">الكل</button>
        ${AXES.map((a,i)=>`<button class="chip ${S.planFilterAxis===a[0]?"sel":""}" data-setfilter="axis~${i}">${a[0]}</button>`).join("")}
-     </div></div>`;
- }else{
-   inner=energies.length?`<div class="field" style="margin-bottom:0"><label class="fl">المعتقدات / الطاقات غير المتناغمة</label>
-     <div class="chips">
-       <button class="chip ${!S.planFilterEnergy?"sel":""}" data-setfilter="energy~-1">الكل</button>
-       ${energies.map((n,i)=>`<button class="chip ${S.planFilterEnergy===n?"sel":""}" data-setfilter="energy~${i}">${esc(n)}</button>`).join("")}
-     </div></div>`:`<div class="note">لا توجد طاقات غير متناغمة مسجّلة هذا الشهر.</div>`;
+     </div>`;
  }
- const b=document.getElementById("infoBody");if(b)b.innerHTML=tabs+inner;
+ const energies=energyList();
+ return energies.length?`<div class="fp-list fp-wrapx">
+       <button class="chip fp-opt ${!S.planFilterEnergy?"sel":""}" data-setfilter="energy~-1">كل الأنماط</button>
+       ${energies.map((n,i)=>`<button class="chip fp-opt ${S.planFilterEnergy===n?"sel":""}" data-setfilter="energy~${i}" title="${esc(n)}">${esc(shortName(n))}</button>`).join("")}
+     </div>`:`<div class="note">لا توجد طاقات غير متناغمة مسجّلة هذا الشهر.</div>`;
+}
+function renderFilterPanelBody(){
+ const tabs=`<div class="view-toggle fp-tabs">
+   ${FP_TABS.map(([k,l])=>`<button class="${filterPanelTab===k?"on":""}" data-filtertab="${k}">${l}</button>`).join("")}
+   <span class="vt-ind" aria-hidden="true"></span>
+ </div>`;
+ const b=document.getElementById("infoBody");if(b)b.innerHTML=tabs+`<div class="pv-wrap fp-wrap"><div class="pv-cur">${renderFilterInner(filterPanelTab)}</div></div>`;
 }
 function openFilterPanel(){
  document.getElementById("infoTitle").textContent="تصفية القائمة";
  document.getElementById("infoActions").innerHTML=`<button class="btn" id="filterDone">تم</button>`;
- filterPanelTab=S.planFilterAxis&&!S.planFilterEnergy?"axis":"energy";
+ filterPanelTab=S.planFilterEnergy?"energy":(S.planFilterAxis?"axis":"sort");
  renderFilterPanelBody();
  document.getElementById("infoModal").classList.add("open");
 }
@@ -2841,7 +2868,7 @@ const Notif=(()=>{
  return {init,click,refresh,maybePrompt};
 })();
 try{Notif.init();}catch(e){}
-const APP_VERSION="v40";
+const APP_VERSION="v41";
 if("serviceWorker" in navigator&&location.protocol==="https:"){
  const verOf=t=>{const m=/protocol-(v\d+)/.exec(t||"");return m?m[1]:"";};
  let reloading=false;
