@@ -850,7 +850,8 @@ const esc=s=>{
 };
 function get(p){return p.split("~").reduce((o,k)=>(o==null?undefined:o[k]),S);}
 function set(p,v){const ks=p.split("~");let o=S;for(let i=0;i<ks.length-1;i++){const k=ks[i];if(o[k]==null)o[k]=/^\d+$/.test(ks[i+1])?[]:{};o=o[k];}o[ks[ks.length-1]]=v;save();}
-function toggleArr(p,v){const a=get(p)||[];const i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);set(p,a);}
+function toggleArr(p,v){let a=get(p);a=Array.isArray(a)?a:(a?[a]:[]);const i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);set(p,a);}
+const trigArr=b=>{const v=(S.blockerTrigger||{})[b];return Array.isArray(v)?v:(v?[v]:[]);};
 const when=()=>`${S.month} ${S.year}`;
 const intentSentence=()=>`أن أحصل على ${S.intentValue||"........."} هذا الشهر — ${when()} — وليكن الأمر كذلك`;
 const energyList=()=>S.selBeliefs.concat((S.customEnergies||[]).filter(x=>(x||"").trim()));
@@ -878,7 +879,7 @@ function derived(){
  energyList().forEach(n=>{(S.correctiveByEnergy[n]||"").split("\n").map(x=>x.trim()).filter(Boolean).forEach((t,i)=>
    out.push({key:`corr-${n}-${i}`,text:t,source:`الأفعال التصحيحية · ${n}`,tab:1,nav:{tab:1,id:"corrective"}}));});
  (S.lack||[]).forEach((b,bi)=>{const r=S.lackRemedy[b];if(r)out.push({key:"lack-"+b,text:`${r} — لعلاج اعتقاد «${b}»`,source:"علاج اعتقادات النقص",tab:1,nav:{tab:1,id:"lack-remedy-"+bi}});});
- (S.blockers||[]).forEach((b,bi)=>{const t=S.blockerTrigger[b];const a=(S.blockerAffirm[b]||"").trim();
+ (S.blockers||[]).forEach((b,bi)=>{const t=trigArr(b).join("، ");const a=(S.blockerAffirm[b]||"").trim();
    if(t)out.push({key:"blk-"+b,text:`استخدام التوكيد عند تنشّط «${b}» — ${t}${a?" — التوكيد: "+a:""}`,source:"المشاعر المعيقة · التوكيد",tab:1,nav:{tab:1,id:"blk-trigger-"+bi}});});
  Object.entries(S.spendDecisions||{}).forEach(([pt,d])=>{if(d&&d.method){const n=(d.note||"").trim();
    out.push({key:"spend-"+pt,text:`${pt} — ${d.method}${n?": "+n:""}`,source:"تحويل صرف إلى استثمار",tab:1,nav:{tab:1,id:"spend-decide"}});}});
@@ -1478,11 +1479,11 @@ function screens1(){
  (S.blockers||[]).forEach((b,i)=>L.push({id:"blk-trigger-"+i,sec:"القسم الثالث",eyebrow:`القسم الثالث · رابعًا (${i+1} من ${S.blockers.length})`,title:"متى يتحفز هذا المعيق؟",
   lede:"لكل معيق محفّزه الخاص.",
   render:()=>`<div class="block"><h4>المعيق</h4><div style="font-size:18px;font-family:'Noto Sans Arabic',sans-serif;color:var(--gold-deep)">${esc(b)}</div></div>`
-    +F.radios("blockerTrigger~"+b,TRIGGERS)
+    +`<div class="hint" style="margin-bottom:8px">اختر كل ما ينطبق — يمكنك اختيار أكثر من حالة.</div>`+F.checks("blockerTrigger~"+b,TRIGGERS)
     +`<div class="rule"></div><div class="mantra">«أنا — بمنتهى الامتنان والسعادة — أختار (أو لا أختار) أن أستبدل مالي مقابل (اذكر المقابل)»</div>
       <div class="note">قله كلما شعرت بأن الطاقة السلبية يتم تنشيطها.</div><div style="height:14px"></div>`
     +F.tx("blockerAffirm~"+b,"صياغة التوكيد الخاص بهذا المعيق","اكتب التوكيد كما ستقوله"),
-  ok:()=>!!S.blockerTrigger[b]}));
+  ok:()=>trigArr(b).length>0}));
 
  L.push({id:"spend",sec:"القسم الثالث",eyebrow:"القسم الثالث · خامسًا",title:"استثمار أم صرف؟",
   lede:"أمام كل بند، حدد طاقة التبادل. بنود «الصرف» هي التي سنشتغل عليها.",
@@ -2101,7 +2102,7 @@ function exportText(){
  L.push("");L.push("— اعتقادات النقص وعلاجها —");
  (S.lack||[]).forEach(b=>L.push(`• ${b} ← ${S.lackRemedy[b]||"—"}`));
  L.push("");L.push("— المشاعر المعيقة ومحفزاتها —");
- (S.blockers||[]).forEach(b=>L.push(`• ${b} ← ${S.blockerTrigger[b]||"—"}${S.blockerAffirm[b]?" — التوكيد: "+S.blockerAffirm[b]:""}`));
+ (S.blockers||[]).forEach(b=>L.push(`• ${b} ← ${trigArr(b).join("، ")||"—"}${S.blockerAffirm[b]?" — التوكيد: "+S.blockerAffirm[b]:""}`));
  L.push("");L.push("— استثمار أم صرف —");
  SPEND.forEach(i=>{if(S.spendKind[i]){const d=S.spendDecisions[i]||{};L.push(`• ${i}: ${S.spendKind[i]}${d.method?" ← "+d.method+(d.note?": "+d.note:""):""}`);}});
  if((S.ideaBank||[]).length){L.push("");L.push("— بنك الأفكار المؤجلة (للشهر القادم) —");S.ideaBank.forEach(b=>L.push(`• ${b.text} (مؤجلة من ${b.from||"—"})`));}
@@ -2868,7 +2869,7 @@ const Notif=(()=>{
  return {init,click,refresh,maybePrompt};
 })();
 try{Notif.init();}catch(e){}
-const APP_VERSION="v41";
+const APP_VERSION="v42";
 if("serviceWorker" in navigator&&location.protocol==="https:"){
  const verOf=t=>{const m=/protocol-(v\d+)/.exec(t||"");return m?m[1]:"";};
  let reloading=false;
